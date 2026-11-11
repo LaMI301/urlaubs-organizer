@@ -194,9 +194,9 @@ export const RightCalendarPanel: React.FC = () => {
   }, [trip.activities, trip.meals, selectedDay]);
 
   return (
-    <aside className="bg-[#EFECE6]/70 rounded-[28px] p-5 flex flex-col gap-5 border border-black/5 h-full">
+    <aside className="bg-white/50 backdrop-blur-xl rounded-[30px] p-5 flex flex-col gap-5 border border-white/70 shadow-sm h-full">
       {/* Calendar Header & Month Grid */}
-      <div className="bg-[#F9F6F0] rounded-[24px] p-4 shadow-xs border border-black/5">
+      <div className="bg-white/70 backdrop-blur-lg rounded-[26px] p-4 shadow-xs border border-white/80">
         <div className="flex items-center justify-between mb-3">
           <div>
             <span className="text-[11px] uppercase tracking-wider text-neutral-500 font-semibold block">
@@ -357,8 +357,8 @@ export const RightCalendarPanel: React.FC = () => {
                   }}
                   className={`rounded-[22px] p-3.5 transition-all border flex items-center justify-between gap-3 ${
                     isSelectedCard
-                      ? 'bg-[#E8C2E8] border-[#141416]/15 shadow-xs'
-                      : 'bg-[#F9F6F0] hover:bg-white border-black/5'
+                      ? 'bg-gradient-to-r from-[#E8C2E8]/95 to-[#E8C2E8]/80 border-white/80 shadow-md backdrop-blur-md'
+                      : 'bg-white/75 hover:bg-white border-white/70 shadow-2xs backdrop-blur-md'
                   } ${item.kind === 'activity' ? 'cursor-pointer' : ''}`}
                 >
                   <div className="flex items-center gap-3 min-w-0">

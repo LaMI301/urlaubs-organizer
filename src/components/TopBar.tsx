@@ -75,8 +75,8 @@ export const TopBar: React.FC = () => {
 
   return (
     <header className="mb-2 flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-3">
-      {/* Left: Clean Search Input (No embedded filter pills) */}
-      <div className="relative flex-1 max-w-md flex items-center gap-2.5 bg-[#EFECE6] rounded-full px-4 py-2.5 border border-black/5 focus-within:border-black/20 transition-colors">
+      {/* Left: Clean Search Input */}
+      <div className="relative flex-1 max-w-md flex items-center gap-2.5 bg-white/70 backdrop-blur-md rounded-full px-4 py-2.5 border border-white/80 shadow-xs focus-within:border-black/20 focus-within:bg-white transition-all">
         <Search className="w-4 h-4 text-[#141416]/45 shrink-0" />
         <input
           type="text"

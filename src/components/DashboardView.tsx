@@ -12,6 +12,8 @@ import {
   CheckCircle2,
   Plus,
   Euro,
+  Lightbulb,
+  ArrowRight,
 } from 'lucide-react';
 import { useVacation } from '../context/VacationContext';
 import { ActivityCategory, DayActivity } from '../types/vacation';
@@ -177,12 +179,12 @@ export const DashboardView: React.FC = () => {
         </button>
       </div>
 
-      {/* 4 Simplified Pastel Bento Cards with Generous Breathing Room */}
+      {/* 4 Simplified Pastel Bento Cards with Glassy Look */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* Card 1: Sunny Yellow (#F4DF7B) */}
         <div
           onClick={() => setActiveTab('schedule')}
-          className="bg-[#F4DF7B] rounded-[28px] p-6 flex items-center justify-between gap-4 min-h-[175px] shadow-xs cursor-pointer hover:brightness-[1.01] transition-all"
+          className="relative overflow-hidden bg-gradient-to-br from-[#F4DF7B]/95 via-[#F4DF7B]/80 to-[#F4DF7B]/70 backdrop-blur-xl rounded-[30px] p-6 flex items-center justify-between gap-4 min-h-[175px] shadow-[0_8px_30px_rgba(244,223,123,0.22)] border border-white/70 cursor-pointer hover:shadow-[0_12px_35px_rgba(244,223,123,0.35)] hover:-translate-y-0.5 transition-all duration-300"
         >
           <div className="space-y-2">
             <h2 className="text-base font-extrabold text-[#141416]">
@@ -238,7 +240,7 @@ export const DashboardView: React.FC = () => {
         {/* Card 2: Soft Lilac (#E8C2E8) */}
         <div
           onClick={() => setActiveTab('budget')}
-          className="bg-[#E8C2E8] rounded-[28px] p-6 flex items-center justify-between gap-4 min-h-[175px] shadow-xs cursor-pointer hover:brightness-[1.01] transition-all"
+          className="relative overflow-hidden bg-gradient-to-br from-[#E8C2E8]/95 via-[#E8C2E8]/80 to-[#E8C2E8]/70 backdrop-blur-xl rounded-[30px] p-6 flex items-center justify-between gap-4 min-h-[175px] shadow-[0_8px_30px_rgba(232,194,232,0.22)] border border-white/70 cursor-pointer hover:shadow-[0_12px_35px_rgba(232,194,232,0.35)] hover:-translate-y-0.5 transition-all duration-300"
         >
           <div className="space-y-2">
             <h2 className="text-base font-extrabold text-[#141416]">
@@ -288,7 +290,7 @@ export const DashboardView: React.FC = () => {
         {/* Card 3: Sage Green (#A9B882) */}
         <div
           onClick={() => setActiveTab('tasks')}
-          className="bg-[#A9B882] rounded-[28px] p-6 flex items-center justify-between gap-4 min-h-[160px] shadow-xs cursor-pointer hover:brightness-[1.01] transition-all group"
+          className="relative overflow-hidden bg-gradient-to-br from-[#A9B882]/95 via-[#A9B882]/80 to-[#A9B882]/70 backdrop-blur-xl rounded-[30px] p-6 flex items-center justify-between gap-4 min-h-[160px] shadow-[0_8px_30px_rgba(169,184,130,0.22)] border border-white/70 cursor-pointer hover:shadow-[0_12px_35px_rgba(169,184,130,0.35)] hover:-translate-y-0.5 transition-all duration-300 group"
         >
           <div className="space-y-2">
             <h2 className="text-base font-extrabold text-[#141416]">
@@ -318,7 +320,7 @@ export const DashboardView: React.FC = () => {
         {/* Card 4: Periwinkle Blue (#C5D1F5) */}
         <div
           onClick={() => setActiveTab('polls')}
-          className="bg-[#C5D1F5] rounded-[28px] p-6 flex items-center justify-between gap-4 min-h-[160px] shadow-xs cursor-pointer hover:brightness-[1.01] transition-all group"
+          className="relative overflow-hidden bg-gradient-to-br from-[#C5D1F5]/95 via-[#C5D1F5]/80 to-[#C5D1F5]/70 backdrop-blur-xl rounded-[30px] p-6 flex items-center justify-between gap-4 min-h-[160px] shadow-[0_8px_30px_rgba(197,209,245,0.22)] border border-white/70 cursor-pointer hover:shadow-[0_12px_35px_rgba(197,209,245,0.35)] hover:-translate-y-0.5 transition-all duration-300 group"
         >
           <div className="space-y-2">
             <h2 className="text-base font-extrabold text-[#141416]">
@@ -344,6 +346,33 @@ export const DashboardView: React.FC = () => {
             </svg>
           </div>
         </div>
+      </div>
+
+      {/* BRAINSTORMING & IDEEN-POOL CALLOUT BANNER */}
+      <div
+        onClick={() => setActiveTab('ideas')}
+        className="group relative overflow-hidden rounded-[26px] p-4 sm:p-5 bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-blue-500/10 backdrop-blur-xl border border-white/80 shadow-[0_4px_25px_rgba(0,0,0,0.03)] hover:shadow-lg transition-all duration-300 cursor-pointer flex items-center justify-between gap-4"
+      >
+        <div className="flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-2xl bg-amber-400/25 border border-amber-400/30 flex items-center justify-center text-amber-700 shadow-xs shrink-0 group-hover:scale-110 transition-transform">
+            <Lightbulb className="w-6 h-6 fill-amber-400 text-amber-600" />
+          </div>
+          <div>
+            <h4 className="text-sm font-black text-[#141416] flex items-center gap-2">
+              <span>Ideen-Pool & Brainstorming</span>
+              <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-200/70 text-amber-900">
+                {trip.ideas?.length || 0} Vorschläge
+              </span>
+            </h4>
+            <p className="text-xs text-[#141416]/65 mt-0.5">
+              Wünsche & Aktivitäten nach Personen geordnet – unverbindlich sammeln & gemeinsam abstimmen!
+            </p>
+          </div>
+        </div>
+        <span className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#141416] text-white text-xs font-extrabold shadow-sm group-hover:bg-black transition-colors whitespace-nowrap">
+          <span>Ideen ansehen</span>
+          <ArrowRight className="w-3.5 h-3.5 text-[#F4DF7B]" />
+        </span>
       </div>
 
       {/* Bottom Split View: Clean Proposals List (Left) & Detail Card (Right) */}
@@ -388,10 +417,10 @@ export const DashboardView: React.FC = () => {
                   <div
                     key={act.id}
                     onClick={() => setSelectedActivityId(act.id)}
-                    className={`flex items-center justify-between gap-3 p-4 rounded-[24px] cursor-pointer transition-all ${
+                    className={`flex items-center justify-between gap-3 p-4 rounded-[24px] cursor-pointer transition-all border ${
                       isSelected
-                        ? 'bg-[#E8C2E8] shadow-xs'
-                        : 'bg-[#EFECE6] hover:bg-[#e7e3db]'
+                        ? 'bg-gradient-to-r from-[#E8C2E8]/90 to-[#E8C2E8]/70 border-white/80 shadow-md backdrop-blur-md'
+                        : 'bg-white/70 hover:bg-white/90 border-white/60 shadow-xs backdrop-blur-md'
                     }`}
                   >
                     {/* 1. Icon + 2. Title & Time */}
@@ -447,7 +476,7 @@ export const DashboardView: React.FC = () => {
           </div>
 
           {activeActivity ? (
-            <div className="bg-[#E8C2E8] rounded-[28px] p-6 flex-1 flex flex-col justify-between shadow-xs space-y-6">
+            <div className="bg-gradient-to-br from-[#E8C2E8]/95 via-[#E8C2E8]/85 to-[#E8C2E8]/75 backdrop-blur-xl border border-white/80 rounded-[30px] p-6 flex-1 flex flex-col justify-between shadow-[0_8px_30px_rgba(232,194,232,0.25)] space-y-6">
               <div className="space-y-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>

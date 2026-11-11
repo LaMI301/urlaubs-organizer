@@ -11,6 +11,7 @@ import {
   Lock,
   Check,
   ArrowLeftRight,
+  Lightbulb,
 } from 'lucide-react';
 import { useVacation } from '../context/VacationContext';
 import { NavigationTab } from '../types/vacation';
@@ -49,6 +50,12 @@ export const Sidebar: React.FC = () => {
       icon: LayoutGrid,
     },
     {
+      id: 'ideas',
+      label: 'Ideen-Pool',
+      icon: Lightbulb,
+      badge: trip.ideas?.length ? trip.ideas.length : undefined,
+    },
+    {
       id: 'schedule',
       label: 'Tagesplaner',
       icon: CalendarRange,
@@ -80,7 +87,7 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="bg-[#141416] text-white rounded-[28px] p-5 flex flex-col justify-between h-full min-h-[640px] shadow-xl select-none">
+    <aside className="bg-[#141416]/95 backdrop-blur-2xl text-white rounded-[30px] p-5 flex flex-col justify-between h-full min-h-[640px] shadow-2xl border border-white/10 select-none">
       {/* Top: Brand Logo & Active Trip Chip */}
       <div>
         <div className="flex items-center justify-between px-1 pt-1 pb-6">

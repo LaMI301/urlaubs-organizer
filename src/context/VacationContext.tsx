@@ -7,6 +7,7 @@ import {
   MealPlan,
   Poll,
   TodoTask,
+  BrainstormIdea,
 } from '../types/vacation';
 import { DEMO_TRIP, createDemoTripClone } from '../data/demoTrip';
 
@@ -95,6 +96,10 @@ export interface VacationContextValue {
   toggleTaskCompleted: (taskId: string) => void;
   toggleTaskVote: (taskId: string) => void;
   deleteTask: (taskId: string) => void;
+  addIdea: (idea: Omit<BrainstormIdea, 'id' | 'votes' | 'createdAt' | 'createdBy'>) => void;
+  toggleIdeaVote: (ideaId: string) => void;
+  deleteIdea: (ideaId: string) => void;
+  scheduleIdeaToDay: (ideaId: string, dayNumber: number, timeSlot: string) => void;
 }
 
 const VacationContext = createContext<VacationContextValue | undefined>(undefined);
@@ -106,8 +111,12 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       if (raw) {
         const parsed = JSON.parse(raw) as Trip[];
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const hasDemo = parsed.some((t) => t.id === DEMO_TRIP.id || t.isDemo);
-          return hasDemo ? parsed : [createDemoTripClone(), ...parsed];
+          const withIdeas = parsed.map((t) => ({
+            ...t,
+            ideas: Array.isArray(t.ideas) && t.ideas.length > 0 ? t.ideas : (t.id === DEMO_TRIP.id || t.isDemo ? DEMO_TRIP.ideas : []),
+          }));
+          const hasDemo = withIdeas.some((t) => t.id === DEMO_TRIP.id || t.isDemo);
+          return hasDemo ? withIdeas : [createDemoTripClone(), ...withIdeas];
         }
       }
     } catch {
@@ -526,6 +535,7 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         meals: [initialMeal],
         polls: [initialPoll],
         tasks: initialTasks,
+        ideas: [],
       };
 
       setSavedTrips((prev) => [newTrip, ...prev]);
@@ -772,6 +782,82 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     [updateActiveTrip]
   );
 
+  const addIdea = useCallback(
+    (ideaData: Omit<BrainstormIdea, 'id' | 'votes' | 'createdAt' | 'createdBy'>) => {
+      const newIdea: BrainstormIdea = {
+        ...ideaData,
+        id: generateId('idea'),
+        createdBy: currentUser.id,
+        votes: [currentUser.id],
+        createdAt: new Date().toISOString(),
+      };
+      updateActiveTrip((curr) => ({
+        ...curr,
+        ideas: [newIdea, ...(curr.ideas || [])],
+      }));
+    },
+    [currentUser.id, updateActiveTrip]
+  );
+
+  const toggleIdeaVote = useCallback(
+    (ideaId: string) => {
+      updateActiveTrip((curr) => ({
+        ...curr,
+        ideas: (curr.ideas || []).map((idea) => {
+          if (idea.id !== ideaId) return idea;
+          const hasVoted = idea.votes.includes(currentUser.id);
+          return {
+            ...idea,
+            votes: hasVoted
+              ? idea.votes.filter((id) => id !== currentUser.id)
+              : [...idea.votes, currentUser.id],
+          };
+        }),
+      }));
+    },
+    [currentUser.id, updateActiveTrip]
+  );
+
+  const deleteIdea = useCallback(
+    (ideaId: string) => {
+      updateActiveTrip((curr) => ({
+        ...curr,
+        ideas: (curr.ideas || []).filter((idea) => idea.id !== ideaId),
+      }));
+    },
+    [updateActiveTrip]
+  );
+
+  const scheduleIdeaToDay = useCallback(
+    (ideaId: string, dayNumber: number, timeSlot: string) => {
+      const targetIdea = trip.ideas?.find((i) => i.id === ideaId);
+      if (!targetIdea) return;
+
+      const newActivity: DayActivity = {
+        id: generateId('act'),
+        dayNumber,
+        timeSlot: timeSlot || '10:00',
+        title: targetIdea.title,
+        category: (targetIdea.category === 'food' ? 'activity' : targetIdea.category) as DayActivity['category'],
+        location: targetIdea.location || 'Vor Ort',
+        description: targetIdea.description,
+        estimatedCost: targetIdea.estimatedCost || 0,
+        createdBy: targetIdea.createdBy,
+        votes: targetIdea.votes,
+        status: 'confirmed',
+      };
+
+      updateActiveTrip((curr) => ({
+        ...curr,
+        activities: [...curr.activities, newActivity],
+        ideas: (curr.ideas || []).map((i) =>
+          i.id === ideaId ? { ...i, assignedDay: dayNumber } : i
+        ),
+      }));
+    },
+    [trip.ideas, updateActiveTrip]
+  );
+
   return (
     <VacationContext.Provider
       value={{
@@ -816,6 +902,10 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         toggleTaskCompleted,
         toggleTaskVote,
         deleteTask,
+        addIdea,
+        toggleIdeaVote,
+        deleteIdea,
+        scheduleIdeaToDay,
       }}
     >
       {children}

@@ -3,6 +3,7 @@ import { VacationProvider, useVacation } from './context/VacationContext';
 import { Sidebar } from './components/Sidebar';
 import { TopBar } from './components/TopBar';
 import { DashboardView } from './components/DashboardView';
+import { IdeasPoolView } from './components/IdeasPoolView';
 import { ScheduleView, QuickAddModal } from './components/ScheduleView';
 import { MealsView } from './components/MealsView';
 import { PollsView, TasksView, BudgetView } from './components/PollsAndTasksView';
@@ -24,6 +25,8 @@ const AppShell: React.FC = () => {
     switch (activeTab) {
       case 'dashboard':
         return <DashboardView />;
+      case 'ideas':
+        return <IdeasPoolView />;
       case 'schedule':
         return <ScheduleView />;
       case 'meals':
@@ -41,10 +44,18 @@ const AppShell: React.FC = () => {
 
   return (
     <AccessAndWelcomeGate>
-      <div className="min-h-screen bg-[#EFEAE2] p-3 md:p-5 text-[#141416] font-sans">
+      <div className="relative min-h-screen bg-gradient-to-br from-[#F6F1E9] via-[#EFE6DC] to-[#F5ECE2] p-3 md:p-5 text-[#141416] font-sans overflow-x-hidden">
+        {/* Soft Colorful Ambient Glass Glows in Background */}
+        <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+          <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#F4DF7B]/30 rounded-full blur-3xl" />
+          <div className="absolute top-1/4 -right-32 w-[30rem] h-[30rem] bg-[#E8C2E8]/30 rounded-full blur-3xl" />
+          <div className="absolute -bottom-32 left-1/4 w-[28rem] h-[28rem] bg-[#C5D1F5]/30 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/3 right-1/4 w-72 h-72 bg-[#A9B882]/20 rounded-full blur-3xl" />
+        </div>
+
         {/* Sleek Top Testmodus Banner */}
         {trip.isDemo && (
-          <div className="max-w-[1600px] mx-auto mb-3 bg-[#141416] text-white rounded-2xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shadow-md border border-white/10">
+          <div className="relative z-10 max-w-[1600px] mx-auto mb-3 bg-[#141416]/90 backdrop-blur-xl text-white rounded-2xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shadow-lg border border-white/10">
             <div className="flex items-center gap-2.5 text-xs md:text-sm">
               <span className="inline-flex items-center gap-1.5 bg-[#F4DF7B] text-[#141416] font-bold px-2.5 py-0.5 rounded-full text-xs">
                 <Sparkles className="w-3.5 h-3.5" />
@@ -79,8 +90,8 @@ const AppShell: React.FC = () => {
           </div>
         )}
 
-        {/* Inner Rounded Dashboard Container */}
-        <div className="max-w-[1600px] mx-auto bg-[#F9F6F0] rounded-[34px] shadow-xl border border-black/5 p-3 md:p-5 grid grid-cols-1 lg:grid-cols-[240px_1fr_330px] gap-6 min-h-[calc(100vh-2.5rem)]">
+        {/* Inner Rounded Glassy Dashboard Container */}
+        <div className="relative z-10 max-w-[1600px] mx-auto bg-white/65 backdrop-blur-2xl rounded-[36px] shadow-[0_20px_60px_rgba(0,0,0,0.05)] border border-white/70 p-3 md:p-5 grid grid-cols-1 lg:grid-cols-[240px_1fr_330px] gap-6 min-h-[calc(100vh-2.5rem)]">
           {/* Left Navigation Column */}
           <Sidebar />
 

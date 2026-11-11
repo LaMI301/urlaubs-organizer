@@ -1,4 +1,11 @@
-export type NavigationTab = 'dashboard' | 'schedule' | 'meals' | 'polls' | 'tasks' | 'budget';
+export type NavigationTab =
+  | 'dashboard'
+  | 'ideas'
+  | 'schedule'
+  | 'meals'
+  | 'polls'
+  | 'tasks'
+  | 'budget';
 
 export interface Traveler {
   id: string;
@@ -64,6 +71,22 @@ export interface Poll {
 export type TaskCategory = 'before_trip' | 'packing' | 'shopping' | 'documents';
 export type TaskPriority = 'normal' | 'important' | 'critical';
 
+export type IdeaPriority = 'must_do' | 'nice_to_have' | 'chill';
+
+export interface BrainstormIdea {
+  id: string;
+  title: string;
+  description: string;
+  category: ActivityCategory | 'food';
+  priority: IdeaPriority;
+  location?: string;
+  estimatedCost?: number;
+  createdBy: string; // Traveler.id
+  votes: string[]; // Array of Traveler.id who voted for this
+  assignedDay?: number;
+  createdAt: string;
+}
+
 export interface TodoTask {
   id: string;
   title: string;
@@ -89,4 +112,5 @@ export interface Trip {
   meals: MealPlan[];
   polls: Poll[];
   tasks: TodoTask[];
+  ideas: BrainstormIdea[];
 }
