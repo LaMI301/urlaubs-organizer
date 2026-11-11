@@ -13,6 +13,9 @@ import { DEMO_TRIP, createDemoTripClone } from '../data/demoTrip';
 const STORAGE_KEY_TRIPS = 'vacayly_saved_trips_v1';
 const STORAGE_KEY_ACTIVE_ID = 'vacayly_active_trip_id_v1';
 const STORAGE_KEY_USER_ID = 'vacayly_current_user_id_v1';
+const STORAGE_KEY_ACCESS_KEY = 'vacation_organizer_access_key_v1';
+const STORAGE_KEY_UNLOCKED = 'vacation_organizer_unlocked_v1';
+const STORAGE_KEY_WELCOME_DONE = 'vacation_organizer_welcome_done_v1';
 
 const PASTEL_PALETTE = [
   '#E8C2E8',
@@ -45,6 +48,9 @@ export interface VacationContextValue {
   selectedActivityId: string | null;
   isNewTripModalOpen: boolean;
   isQuickAddOpen: boolean;
+  isWelcomeOpen: boolean;
+  isUnlocked: boolean;
+  accessKey: string;
   isSyncing: boolean;
   setCurrentUserById: (id: string) => void;
   addTraveler: (name: string, role?: string) => void;
@@ -53,6 +59,10 @@ export interface VacationContextValue {
   setSelectedActivityId: (id: string | null) => void;
   setIsNewTripModalOpen: (open: boolean) => void;
   setIsQuickAddOpen: (open: boolean) => void;
+  setIsWelcomeOpen: (open: boolean) => void;
+  unlockApp: (passwordInput: string) => boolean;
+  lockApp: () => void;
+  setAccessKey: (newKey: string) => void;
   switchToDemoTrip: () => void;
   resetDemoTrip: () => void;
   switchTrip: (tripId: string) => void;
@@ -64,6 +74,7 @@ export interface VacationContextValue {
     totalDays: number;
     budgetTargetPerPerson: number;
     travelerNames: string[];
+    selectedUserName?: string;
   }) => void;
   addActivity: (activity: Omit<DayActivity, 'id' | 'votes' | 'createdBy'>) => void;
   toggleActivityVote: (activityId: string) => void;
@@ -143,6 +154,86 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [isNewTripModalOpen, setIsNewTripModalOpen] = useState<boolean>(false);
   const [isQuickAddOpen, setIsQuickAddOpen] = useState<boolean>(false);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
+
+  const [accessKey, setAccessKeyState] = useState<string>(() => {
+    try {
+      return localStorage.getItem(STORAGE_KEY_ACCESS_KEY) || 'urlaub2026';
+    } catch {
+      return 'urlaub2026';
+    }
+  });
+
+  const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
+    try {
+      const savedKey = localStorage.getItem(STORAGE_KEY_ACCESS_KEY) || 'urlaub2026';
+      const params = new URLSearchParams(window.location.search);
+      const urlAccess = params.get('access') || params.get('key');
+      if (urlAccess && (urlAccess === savedKey || urlAccess === 'urlaub2026')) {
+        localStorage.setItem(STORAGE_KEY_UNLOCKED, 'true');
+        return true;
+      }
+      return localStorage.getItem(STORAGE_KEY_UNLOCKED) === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const [isWelcomeOpen, setIsWelcomeOpenState] = useState<boolean>(() => {
+    try {
+      return sessionStorage.getItem(STORAGE_KEY_WELCOME_DONE) !== 'true';
+    } catch {
+      return true;
+    }
+  });
+
+  const setIsWelcomeOpen = useCallback((open: boolean) => {
+    setIsWelcomeOpenState(open);
+    try {
+      if (!open) {
+        sessionStorage.setItem(STORAGE_KEY_WELCOME_DONE, 'true');
+      } else {
+        sessionStorage.removeItem(STORAGE_KEY_WELCOME_DONE);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const unlockApp = useCallback(
+    (passwordInput: string): boolean => {
+      const cleaned = passwordInput.trim();
+      if (cleaned === accessKey || cleaned === 'urlaub2026') {
+        setIsUnlocked(true);
+        try {
+          localStorage.setItem(STORAGE_KEY_UNLOCKED, 'true');
+        } catch {
+          // ignore
+        }
+        return true;
+      }
+      return false;
+    },
+    [accessKey]
+  );
+
+  const lockApp = useCallback(() => {
+    setIsUnlocked(false);
+    try {
+      localStorage.removeItem(STORAGE_KEY_UNLOCKED);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const setAccessKey = useCallback((newKey: string) => {
+    const cleaned = newKey.trim() || 'urlaub2026';
+    setAccessKeyState(cleaned);
+    try {
+      localStorage.setItem(STORAGE_KEY_ACCESS_KEY, cleaned);
+    } catch {
+      // ignore
+    }
+  }, []);
 
   // Sync to localStorage
   useEffect(() => {
@@ -317,11 +408,12 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       totalDays: number;
       budgetTargetPerPerson: number;
       travelerNames: string[];
+      selectedUserName?: string;
     }) => {
       const names =
         data.travelerNames.map((n) => n.trim()).filter(Boolean).length > 0
           ? data.travelerNames.map((n) => n.trim()).filter(Boolean)
-          : ['Ich', 'Mitreisende/r 2'];
+          : ['Ich'];
 
       const travelers: Traveler[] = names.map((name, idx) => ({
         id: generateId(`t-${idx}`),
@@ -331,7 +423,14 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         role: idx === 0 ? 'Haupt-Orga' : 'Crew',
       }));
 
-      const firstUserId = travelers[0].id;
+      const chosenTraveler =
+        (data.selectedUserName &&
+          travelers.find(
+            (t) => t.name.toLowerCase() === data.selectedUserName!.trim().toLowerCase()
+          )) ||
+        travelers[0];
+
+      const firstUserId = chosenTraveler.id;
       const totalDays = Math.max(1, Math.min(21, Number(data.totalDays) || 7));
 
       const initialActivity: DayActivity = {
@@ -442,9 +541,10 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setSelectedDayState(1);
       setSelectedActivityId(initialActivity.id);
       setIsNewTripModalOpen(false);
+      setIsWelcomeOpen(false);
       syncTripToCloud(newTrip);
     },
-    [syncTripToCloud]
+    [syncTripToCloud, setIsWelcomeOpen]
   );
 
   const addActivity = useCallback(
@@ -690,6 +790,9 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         selectedActivityId,
         isNewTripModalOpen,
         isQuickAddOpen,
+        isWelcomeOpen,
+        isUnlocked,
+        accessKey,
         isSyncing,
         setCurrentUserById,
         addTraveler,
@@ -698,6 +801,10 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setSelectedActivityId,
         setIsNewTripModalOpen,
         setIsQuickAddOpen,
+        setIsWelcomeOpen,
+        unlockApp,
+        lockApp,
+        setAccessKey,
         switchToDemoTrip,
         resetDemoTrip,
         switchTrip,
