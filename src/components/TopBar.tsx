@@ -37,9 +37,7 @@ export const TopBar: React.FC = () => {
   };
 
   const handleCopyPrivateLink = () => {
-    const url = `${window.location.origin}${window.location.pathname}?access=${encodeURIComponent(
-      accessKey
-    )}`;
+    const url = `${window.location.origin}${window.location.pathname}`;
     navigator.clipboard?.writeText(url);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2500);

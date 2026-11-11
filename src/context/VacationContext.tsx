@@ -165,13 +165,6 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
     try {
-      const savedKey = localStorage.getItem(STORAGE_KEY_ACCESS_KEY) || 'urlaub2026';
-      const params = new URLSearchParams(window.location.search);
-      const urlAccess = params.get('access') || params.get('key');
-      if (urlAccess && (urlAccess === savedKey || urlAccess === 'urlaub2026')) {
-        localStorage.setItem(STORAGE_KEY_UNLOCKED, 'true');
-        return true;
-      }
       return localStorage.getItem(STORAGE_KEY_UNLOCKED) === 'true';
     } catch {
       return false;

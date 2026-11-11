@@ -31,9 +31,7 @@ export const Sidebar: React.FC = () => {
   const openTasksCount = trip.tasks.filter((t) => !t.completed).length;
 
   const handleCopyInviteLink = () => {
-    const url = `${window.location.origin}${window.location.pathname}?access=${encodeURIComponent(
-      accessKey
-    )}`;
+    const url = `${window.location.origin}${window.location.pathname}`;
     navigator.clipboard?.writeText(url);
     setCopiedPrivateLink(true);
     setTimeout(() => setCopiedPrivateLink(false), 2500);

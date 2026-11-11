@@ -106,8 +106,7 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
 
           <p className="text-sm text-[#141416]/75 leading-relaxed">
             Dieser Urlaubsplaner ist privat geschützt. Bitte gib das
-            Gruppen-Passwort ein oder öffne die Seite über euren persönlichen
-            Einladungslink.
+            Zugangs-Passwort ein, um fortzufahren.
           </p>
 
           <form onSubmit={handlePasswordSubmit} className="space-y-4">
@@ -131,7 +130,7 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
               </div>
               {passwordError && (
                 <p className="text-xs font-bold text-red-600 mt-1.5">
-                  Falsches Passwort. Tipp: Standard-Passwort ist „urlaub2026“.
+                  Falsches Passwort. Bitte überprüfe deine Eingabe.
                 </p>
               )}
             </div>
@@ -144,19 +143,6 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
               <ArrowRight className="w-4 h-4 text-[#F4DF7B]" />
             </button>
           </form>
-
-          <div className="pt-4 border-t border-black/10 flex items-center justify-between text-xs text-[#141416]/60">
-            <span>Standard-Code: urlaub2026</span>
-            <button
-              type="button"
-              onClick={() => {
-                unlockApp('urlaub2026');
-              }}
-              className="font-bold text-[#141416] underline hover:opacity-75 cursor-pointer"
-            >
-              Direkt entsperren
-            </button>
-          </div>
         </div>
       </div>
     );
