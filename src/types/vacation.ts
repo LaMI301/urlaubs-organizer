@@ -2,6 +2,7 @@ export type NavigationTab =
   | 'dashboard'
   | 'ideas'
   | 'schedule'
+  | 'week'
   | 'meals'
   | 'polls'
   | 'tasks'

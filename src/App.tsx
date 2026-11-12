@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { VacationProvider, useVacation } from './context/VacationContext';
 import { Sidebar } from './components/Sidebar';
 import { TopBar } from './components/TopBar';
 import { DashboardView } from './components/DashboardView';
 import { IdeasPoolView } from './components/IdeasPoolView';
 import { ScheduleView, QuickAddModal } from './components/ScheduleView';
+import { WeekOverviewView } from './components/WeekOverviewView';
 import { MealsView } from './components/MealsView';
 import { PollsView, TasksView, BudgetView } from './components/PollsAndTasksView';
 import { RightCalendarPanel } from './components/RightCalendarPanel';
@@ -21,6 +22,54 @@ const AppShell: React.FC = () => {
     isSyncing,
   } = useVacation();
 
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('vo_sidebar_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const [isCalendarCollapsed, setIsCalendarCollapsed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('vo_calendar_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('vo_sidebar_collapsed', String(next));
+      } catch {
+        // ignore storage errors
+      }
+      return next;
+    });
+  };
+
+  const toggleCalendar = () => {
+    setIsCalendarCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('vo_calendar_collapsed', String(next));
+      } catch {
+        // ignore storage errors
+      }
+      return next;
+    });
+  };
+
+  const gridColumnsClass = isSidebarCollapsed
+    ? isCalendarCollapsed
+      ? 'lg:grid-cols-[76px_1fr_58px]'
+      : 'lg:grid-cols-[76px_1fr_330px]'
+    : isCalendarCollapsed
+    ? 'lg:grid-cols-[240px_1fr_58px]'
+    : 'lg:grid-cols-[240px_1fr_330px]';
+
   const renderMainContent = () => {
     switch (activeTab) {
       case 'dashboard':
@@ -29,6 +78,8 @@ const AppShell: React.FC = () => {
         return <IdeasPoolView />;
       case 'schedule':
         return <ScheduleView />;
+      case 'week':
+        return <WeekOverviewView />;
       case 'meals':
         return <MealsView />;
       case 'polls':
@@ -91,9 +142,14 @@ const AppShell: React.FC = () => {
         )}
 
         {/* Inner Rounded Glassy Dashboard Container */}
-        <div className="relative z-10 max-w-[1600px] mx-auto bg-white/65 backdrop-blur-2xl rounded-[36px] shadow-[0_20px_60px_rgba(0,0,0,0.05)] border border-white/70 p-3 md:p-5 grid grid-cols-1 lg:grid-cols-[240px_1fr_330px] gap-6 min-h-[calc(100vh-2.5rem)]">
+        <div
+          className={`relative z-10 max-w-[1600px] mx-auto bg-white/65 backdrop-blur-2xl rounded-[36px] shadow-[0_20px_60px_rgba(0,0,0,0.05)] border border-white/70 p-3 md:p-5 grid grid-cols-1 ${gridColumnsClass} gap-6 min-h-[calc(100vh-2.5rem)] transition-all duration-200`}
+        >
           {/* Left Navigation Column */}
-          <Sidebar />
+          <Sidebar
+            collapsed={isSidebarCollapsed}
+            onToggleCollapse={toggleSidebar}
+          />
 
           {/* Center Main Content Column */}
           <main className="flex flex-col gap-5 min-w-0">
@@ -104,7 +160,10 @@ const AppShell: React.FC = () => {
           </main>
 
           {/* Right Calendar & Timeline Column */}
-          <RightCalendarPanel />
+          <RightCalendarPanel
+            collapsed={isCalendarCollapsed}
+            onToggleCollapse={toggleCalendar}
+          />
         </div>
 
         {/* Modals */}

@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import {
   Calendar as CalendarIcon,
+  CalendarDays,
   Plus,
   ThumbsUp,
   Utensils,
@@ -77,7 +78,15 @@ const MONTH_NAMES = [
   'Dezember',
 ];
 
-export const RightCalendarPanel: React.FC = () => {
+interface RightCalendarPanelProps {
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
+}
+
+export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
+  collapsed = false,
+  onToggleCollapse,
+}) => {
   const {
     trip,
     currentUser,
@@ -88,6 +97,7 @@ export const RightCalendarPanel: React.FC = () => {
     toggleActivityVote,
     toggleMealVote,
     setIsQuickAddOpen,
+    setActiveTab,
   } = useVacation();
 
   // Parse startDate and compute calendar cells
@@ -193,22 +203,75 @@ export const RightCalendarPanel: React.FC = () => {
     );
   }, [trip.activities, trip.meals, selectedDay]);
 
+  if (collapsed) {
+    return (
+      <aside className="bg-white/50 backdrop-blur-xl rounded-[30px] p-2.5 flex flex-col items-center justify-between border border-white/70 shadow-sm h-full select-none">
+        <div className="flex flex-col items-center gap-3 pt-1">
+          {onToggleCollapse && (
+            <button
+              type="button"
+              onClick={onToggleCollapse}
+              title="Kalender ausklappen"
+              className="w-8 h-8 rounded-full bg-[#EFECE6] hover:bg-[#E8C2E8] text-[#141416] flex items-center justify-center transition-colors cursor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => setActiveTab('week')}
+            title="Wochenübersicht öffnen"
+            className="w-9 h-9 rounded-2xl bg-[#141416] text-[#F4DF7B] hover:scale-105 flex items-center justify-center transition-transform cursor-pointer shadow-xs"
+          >
+            <CalendarDays className="w-4 h-4" />
+          </button>
+        </div>
+
+        <button
+          type="button"
+          onClick={onToggleCollapse}
+          title={`Tag ${selectedDay} — Kalender öffnen`}
+          className="px-2 py-2.5 rounded-2xl bg-white/80 border border-white text-[11px] font-extrabold text-[#141416] cursor-pointer hover:bg-white transition-colors"
+        >
+          T{selectedDay}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setIsQuickAddOpen(true)}
+          title="Neuer Termin"
+          className="w-9 h-9 rounded-full bg-[#F4DF7B] hover:bg-[#f2d654] text-[#141416] flex items-center justify-center transition-colors cursor-pointer shadow-xs mb-1"
+        >
+          <Plus className="w-4 h-4 stroke-[2.5]" />
+        </button>
+      </aside>
+    );
+  }
+
   return (
     <aside className="bg-white/50 backdrop-blur-xl rounded-[30px] p-5 flex flex-col gap-5 border border-white/70 shadow-sm h-full">
       {/* Calendar Header & Month Grid */}
       <div className="bg-white/70 backdrop-blur-lg rounded-[26px] p-4 shadow-xs border border-white/80">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <span className="text-[11px] uppercase tracking-wider text-neutral-500 font-semibold block">
+        <div className="flex items-center justify-between mb-3 gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveTab('week')}
+            title="Zur Wochen- & Mehrtagesübersicht"
+            className="text-left group cursor-pointer rounded-xl px-1.5 py-1 -ml-1.5 hover:bg-[#EFECE6]/70 transition-colors"
+          >
+            <span className="text-[11px] uppercase tracking-wider text-neutral-500 font-semibold flex items-center gap-1">
               Reisezeitraum
+              <span className="text-[10px] font-bold text-[#141416] bg-[#F4DF7B]/70 px-1.5 py-0.2 rounded-full opacity-80 group-hover:opacity-100">
+                Wochenplan
+              </span>
             </span>
-            <h2 className="text-base font-extrabold text-[#141416] flex items-center gap-1.5">
+            <h2 className="text-base font-extrabold text-[#141416] flex items-center gap-1.5 group-hover:underline decoration-[#F4DF7B] decoration-2 underline-offset-4">
               <CalendarIcon className="w-4 h-4 text-[#141416]" />
               {calendarData.monthLabel}
             </h2>
-          </div>
+          </button>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 shrink-0">
             <button
               type="button"
               onClick={() => setSelectedDay(Math.max(1, selectedDay - 1))}
@@ -229,6 +292,16 @@ export const RightCalendarPanel: React.FC = () => {
             >
               <ChevronRight className="w-4 h-4" />
             </button>
+            {onToggleCollapse && (
+              <button
+                type="button"
+                onClick={onToggleCollapse}
+                title="Kalender einklappen"
+                className="w-7 h-7 rounded-full bg-[#EFECE6] hover:bg-[#141416] hover:text-white flex items-center justify-center transition-colors cursor-pointer ml-0.5"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </div>
 
