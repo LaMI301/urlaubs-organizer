@@ -17,6 +17,10 @@ import {
   Star,
   Coffee,
   Filter,
+  Pencil,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
 } from 'lucide-react';
 import { useVacation } from '../context/VacationContext';
 import {
@@ -30,6 +34,7 @@ export const IdeasPoolView: React.FC = () => {
     trip,
     currentUser,
     addIdea,
+    updateIdea,
     toggleIdeaVote,
     deleteIdea,
     scheduleIdeaToDay,
@@ -41,6 +46,9 @@ export const IdeasPoolView: React.FC = () => {
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [isAddIdeaOpen, setIsAddIdeaOpen] = useState(false);
+  const [editingIdeaId, setEditingIdeaId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [collapsedTravelers, setCollapsedTravelers] = useState<Record<string, boolean>>({});
 
   // Transfer to schedule modal state
   const [schedulingIdea, setSchedulingIdea] = useState<BrainstormIdea | null>(null);
@@ -57,24 +65,52 @@ export const IdeasPoolView: React.FC = () => {
 
   const ideas = trip.ideas || [];
 
+  const resetIdeaForm = () => {
+    setNewTitle('');
+    setNewDesc('');
+    setNewCategory('activity');
+    setNewPriority('must_do');
+    setNewLocation('');
+    setNewCost('');
+    setEditingIdeaId(null);
+  };
+
+  const handleStartEditIdea = (idea: BrainstormIdea) => {
+    setEditingIdeaId(idea.id);
+    setNewTitle(idea.title);
+    setNewDesc(idea.description || '');
+    setNewCategory(idea.category);
+    setNewPriority(idea.priority);
+    setNewLocation(idea.location || '');
+    setNewCost(idea.estimatedCost !== undefined ? String(idea.estimatedCost) : '');
+    setIsAddIdeaOpen(true);
+  };
+
   const handleCreateIdea = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle.trim()) return;
 
-    addIdea({
+    const payload = {
       title: newTitle.trim(),
       description: newDesc.trim(),
       category: newCategory,
       priority: newPriority,
       location: newLocation.trim() || undefined,
       estimatedCost: newCost ? Number(newCost) : undefined,
-    });
+    };
 
-    setNewTitle('');
-    setNewDesc('');
-    setNewLocation('');
-    setNewCost('');
+    if (editingIdeaId) {
+      updateIdea(editingIdeaId, payload);
+    } else {
+      addIdea(payload);
+    }
+
+    resetIdeaForm();
     setIsAddIdeaOpen(false);
+  };
+
+  const toggleTravelerCollapse = (travelerId: string) => {
+    setCollapsedTravelers((prev) => ({ ...prev, [travelerId]: !prev[travelerId] }));
   };
 
   const handleConfirmSchedule = (e: React.FormEvent) => {
@@ -180,7 +216,10 @@ export const IdeasPoolView: React.FC = () => {
           </div>
 
           <button
-            onClick={() => setIsAddIdeaOpen(true)}
+            onClick={() => {
+              resetIdeaForm();
+              setIsAddIdeaOpen(true);
+            }}
             className="self-start md:self-center px-6 py-3.5 rounded-full bg-[#141416] hover:bg-black/85 text-white font-extrabold text-sm shadow-xl flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer whitespace-nowrap"
           >
             <Plus className="w-4 h-4 text-[#F4DF7B]" />
@@ -285,157 +324,221 @@ export const IdeasPoolView: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-8">
-          {groupedByTraveler.map(({ traveler, ideas: travelerIdeas }) => (
-            <div key={traveler.id} className="space-y-4">
-              {/* TRAVELER SECTION HEADER */}
-              <div className="flex items-center gap-3 px-2">
-                <div
-                  className="w-9 h-9 rounded-2xl flex items-center justify-center font-black text-sm text-[#141416] shadow-sm border border-black/10"
-                  style={{ backgroundColor: traveler.color }}
+          {groupedByTraveler.map(({ traveler, ideas: travelerIdeas }) => {
+            const isCollapsed = !!collapsedTravelers[traveler.id];
+
+            return (
+              <div key={traveler.id} className="space-y-4">
+                {/* TRAVELER SECTION HEADER (COLLAPSIBLE) */}
+                <button
+                  type="button"
+                  onClick={() => toggleTravelerCollapse(traveler.id)}
+                  className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-[22px] bg-white/60 hover:bg-white/80 backdrop-blur-md border border-black/5 transition-all text-left cursor-pointer"
                 >
-                  {traveler.initials}
-                </div>
-                <div>
-                  <h2 className="text-lg font-black text-[#141416] flex items-center gap-2">
-                    <span>Ideen von {traveler.name}</span>
-                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-white/70 border border-black/5 text-[#141416]/70">
-                      {travelerIdeas.length}
-                    </span>
-                  </h2>
-                  {traveler.role && (
-                    <p className="text-xs text-[#141416]/50">{traveler.role}</p>
-                  )}
-                </div>
-              </div>
-
-              {/* IDEAS CARDS GRID */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {travelerIdeas.map((idea) => {
-                  const hasVoted = idea.votes.includes(currentUser.id);
-                  const isAssigned = typeof idea.assignedDay === 'number';
-
-                  return (
+                  <div className="flex items-center gap-3">
                     <div
-                      key={idea.id}
-                      className="group relative rounded-[28px] p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white/70 hover:bg-white/85 backdrop-blur-xl border border-white/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)]"
+                      className="w-9 h-9 rounded-2xl flex items-center justify-center font-black text-sm text-[#141416] shadow-sm border border-black/10"
+                      style={{ backgroundColor: traveler.color }}
                     >
-                      {/* TOP ROW: PRIORITY & CATEGORY */}
-                      <div>
-                        <div className="flex items-center justify-between gap-2 mb-3">
-                          {getPriorityBadge(idea.priority)}
-                          <div className="flex items-center gap-1.5">
-                            <span className="p-1.5 rounded-full bg-white/80 border border-black/5 shadow-xs">
-                              {getCategoryIcon(idea.category)}
-                            </span>
-                            <button
-                              onClick={() => deleteIdea(idea.id)}
-                              title="Idee löschen"
-                              className="opacity-0 group-hover:opacity-100 p-1.5 rounded-full hover:bg-red-50 text-red-500 transition-all cursor-pointer"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* TITLE & DESCRIPTION */}
-                        <h3 className="text-base font-black text-[#141416] leading-snug tracking-tight">
-                          {idea.title}
-                        </h3>
-
-                        {idea.description && (
-                          <p className="text-xs text-[#141416]/70 mt-2 leading-relaxed line-clamp-3">
-                            {idea.description}
-                          </p>
-                        )}
-
-                        {/* META PILLS (ORT & KOSTEN) */}
-                        <div className="flex flex-wrap items-center gap-2 mt-3 text-[11px] font-bold text-[#141416]/70">
-                          {idea.location && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-black/[0.03] border border-black/5">
-                              <MapPin className="w-3 h-3 text-[#141416]/50" />
-                              {idea.location}
-                            </span>
-                          )}
-                          {typeof idea.estimatedCost === 'number' && idea.estimatedCost > 0 && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-black/[0.03] border border-black/5">
-                              <Euro className="w-3 h-3 text-[#141416]/50" />
-                              ca. {idea.estimatedCost} € p.P.
-                            </span>
-                          )}
-                          {isAssigned && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-100 text-emerald-900 border border-emerald-300/60 font-black">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-700" />
-                              Tag {idea.assignedDay} eingeplant
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* BOTTOM ROW: VOTERS & ACTIONS */}
-                      <div className="mt-5 pt-4 border-t border-black/5 flex items-center justify-between gap-3">
-                        {/* VOTER AVATARS */}
-                        <div className="flex items-center gap-1.5">
-                          <div className="flex -space-x-1.5">
-                            {idea.votes.slice(0, 4).map((voterId) => {
-                              const voter = trip.travelers.find((t) => t.id === voterId);
-                              if (!voter) return null;
-                              return (
-                                <span
-                                  key={voterId}
-                                  title={voter.name}
-                                  className="w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-[9px] font-black text-[#141416] shadow-xs"
-                                  style={{ backgroundColor: voter.color }}
-                                >
-                                  {voter.initials}
-                                </span>
-                              );
-                            })}
-                          </div>
-                          {idea.votes.length > 4 && (
-                            <span className="text-[10px] font-bold text-[#141416]/50">
-                              +{idea.votes.length - 4}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* BUTTONS: VOTE & SCHEDULE */}
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            onClick={() => toggleIdeaVote(idea.id)}
-                            className={`px-3 py-1.5 rounded-full text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer ${
-                              hasVoted
-                                ? 'bg-[#141416] text-white shadow-sm'
-                                : 'bg-white/80 hover:bg-white text-[#141416] border border-black/10'
-                            }`}
-                            title={hasVoted ? 'Deine Stimme zurückziehen' : 'Dafür stimmen'}
-                          >
-                            <ThumbsUp
-                              className={`w-3.5 h-3.5 ${
-                                hasVoted ? 'fill-[#F4DF7B] text-[#F4DF7B]' : 'text-[#141416]/60'
-                              }`}
-                            />
-                            <span>{idea.votes.length}</span>
-                          </button>
-
-                          <button
-                            onClick={() => {
-                              setSchedulingIdea(idea);
-                              setScheduleDay(1);
-                              setScheduleTime('10:00');
-                            }}
-                            className="p-1.5 rounded-full bg-white/80 hover:bg-white border border-black/10 text-[#141416] hover:scale-105 transition-all cursor-pointer shadow-xs"
-                            title="In den Tagesplan übernehmen"
-                          >
-                            <CalendarPlus className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </div>
+                      {traveler.initials}
                     </div>
-                  );
-                })}
+                    <div>
+                      <h2 className="text-lg font-black text-[#141416] flex items-center gap-2">
+                        <span>Ideen von {traveler.name}</span>
+                        <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-white/80 border border-black/5 text-[#141416]/70">
+                          {travelerIdeas.length}
+                        </span>
+                      </h2>
+                      {traveler.role && (
+                        <p className="text-xs text-[#141416]/50">{traveler.role}</p>
+                      )}
+                    </div>
+                  </div>
+                  {isCollapsed ? (
+                    <ChevronDown className="w-5 h-5 text-[#141416]/60 shrink-0" />
+                  ) : (
+                    <ChevronUp className="w-5 h-5 text-[#141416]/60 shrink-0" />
+                  )}
+                </button>
+
+                {/* IDEAS CARDS GRID */}
+                {!isCollapsed && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {travelerIdeas.map((idea) => {
+                      const hasVoted = idea.votes.includes(currentUser.id);
+                      const isAssigned = typeof idea.assignedDay === 'number';
+                      const isConfirmingDelete = confirmDeleteId === idea.id;
+
+                      return (
+                        <div
+                          key={idea.id}
+                          className="group relative rounded-[28px] p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white/70 hover:bg-white/85 backdrop-blur-xl border border-white/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)]"
+                        >
+                          {/* TOP ROW: PRIORITY & CATEGORY */}
+                          <div>
+                            <div className="flex items-center justify-between gap-2 mb-3">
+                              {getPriorityBadge(idea.priority)}
+                              <div className="flex items-center gap-1">
+                                <span className="p-1.5 rounded-full bg-white/80 border border-black/5 shadow-xs">
+                                  {getCategoryIcon(idea.category)}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleStartEditIdea(idea)}
+                                  title="Idee bearbeiten"
+                                  className="p-1.5 rounded-full hover:bg-black/5 text-neutral-500 hover:text-[#141416] transition-all cursor-pointer"
+                                >
+                                  <Pencil className="w-3.5 h-3.5" />
+                                </button>
+                                {isConfirmingDelete ? (
+                                  <div className="inline-flex items-center gap-1 bg-red-50 border border-red-200 rounded-full px-2 py-0.5 text-[10px] font-bold">
+                                    <span className="text-red-700">Löschen?</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        deleteIdea(idea.id);
+                                        setConfirmDeleteId(null);
+                                      }}
+                                      className="px-1.5 py-0.5 rounded-full bg-red-600 text-white hover:bg-red-700 cursor-pointer"
+                                    >
+                                      Ja
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => setConfirmDeleteId(null)}
+                                      className="px-1.5 py-0.5 rounded-full bg-white text-neutral-700 hover:bg-neutral-100 cursor-pointer"
+                                    >
+                                      Nein
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() => setConfirmDeleteId(idea.id)}
+                                    title="Idee löschen"
+                                    className="p-1.5 rounded-full hover:bg-red-50 text-neutral-400 hover:text-red-500 transition-all cursor-pointer"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* TITLE & DESCRIPTION */}
+                            <h3 className="text-base font-black text-[#141416] leading-snug tracking-tight">
+                              {idea.title}
+                            </h3>
+
+                            {idea.description && (
+                              <p className="text-xs text-[#141416]/70 mt-2 leading-relaxed line-clamp-3">
+                                {idea.description}
+                              </p>
+                            )}
+
+                            {/* META PILLS (ORT, MAPS & KOSTEN) */}
+                            <div className="flex flex-wrap items-center gap-2 mt-3 text-[11px] font-bold text-[#141416]/70">
+                              {idea.location && (
+                                <>
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-black/[0.03] border border-black/5">
+                                    <MapPin className="w-3 h-3 text-[#141416]/50" />
+                                    {idea.location}
+                                  </span>
+                                  <a
+                                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(idea.location)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-white/90 hover:bg-[#C5D1F5]/70 text-[#141416] border border-black/5 transition-colors"
+                                    title={`In Google Maps öffnen: ${idea.location}`}
+                                  >
+                                    <ExternalLink className="w-3 h-3" />
+                                    <span>Maps</span>
+                                  </a>
+                                </>
+                              )}
+                              {typeof idea.estimatedCost === 'number' && idea.estimatedCost > 0 && (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-black/[0.03] border border-black/5">
+                                  <Euro className="w-3 h-3 text-[#141416]/50" />
+                                  ca. {idea.estimatedCost} € p.P.
+                                </span>
+                              )}
+                              {isAssigned && (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-100 text-emerald-900 border border-emerald-300/60 font-black">
+                                  <CheckCircle2 className="w-3 h-3 text-emerald-700" />
+                                  Tag {idea.assignedDay} eingeplant
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* BOTTOM ROW: VOTERS & ACTIONS */}
+                          <div className="mt-5 pt-4 border-t border-black/5 flex items-center justify-between gap-3">
+                            {/* VOTER AVATARS */}
+                            <div className="flex items-center gap-1.5">
+                              <div className="flex -space-x-1.5">
+                                {idea.votes.slice(0, 4).map((voterId) => {
+                                  const voter = trip.travelers.find((t) => t.id === voterId);
+                                  if (!voter) return null;
+                                  return (
+                                    <span
+                                      key={voterId}
+                                      title={voter.name}
+                                      className="w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-[9px] font-black text-[#141416] shadow-xs"
+                                      style={{ backgroundColor: voter.color }}
+                                    >
+                                      {voter.initials}
+                                    </span>
+                                  );
+                                })}
+                              </div>
+                              {idea.votes.length > 4 && (
+                                <span className="text-[10px] font-bold text-[#141416]/50">
+                                  +{idea.votes.length - 4}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* BUTTONS: VOTE & SCHEDULE */}
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => toggleIdeaVote(idea.id)}
+                                className={`px-3 py-1.5 rounded-full text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer ${
+                                  hasVoted
+                                    ? 'bg-[#141416] text-white shadow-sm'
+                                    : 'bg-white/80 hover:bg-white text-[#141416] border border-black/10'
+                                }`}
+                                title={hasVoted ? 'Deine Stimme zurückziehen' : 'Dafür stimmen'}
+                              >
+                                <ThumbsUp
+                                  className={`w-3.5 h-3.5 ${
+                                    hasVoted ? 'fill-[#F4DF7B] text-[#F4DF7B]' : 'text-[#141416]/60'
+                                  }`}
+                                />
+                                <span>{idea.votes.length}</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSchedulingIdea(idea);
+                                  setScheduleDay(1);
+                                  setScheduleTime('10:00');
+                                }}
+                                className="p-1.5 rounded-full bg-white/80 hover:bg-white border border-black/10 text-[#141416] hover:scale-105 transition-all cursor-pointer shadow-xs"
+                                title="In den Tagesplan übernehmen"
+                              >
+                                <CalendarPlus className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -449,14 +552,22 @@ export const IdeasPoolView: React.FC = () => {
                   <Lightbulb className="w-5 h-5 fill-amber-500 text-amber-500" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black text-[#141416]">Neue Idee einreichen</h3>
+                  <h3 className="text-xl font-black text-[#141416]">
+                    {editingIdeaId ? 'Idee bearbeiten' : 'Neue Idee einreichen'}
+                  </h3>
                   <p className="text-xs text-[#141416]/60">
-                    Vorgeschlagen von: <strong className="text-[#141416]">{currentUser.name}</strong>
+                    {editingIdeaId
+                      ? 'Änderungen speichern – alle bisherigen Votes bleiben erhalten.'
+                      : <>Vorgeschlagen von: <strong className="text-[#141416]">{currentUser.name}</strong></>}
                   </p>
                 </div>
               </div>
               <button
-                onClick={() => setIsAddIdeaOpen(false)}
+                type="button"
+                onClick={() => {
+                  resetIdeaForm();
+                  setIsAddIdeaOpen(false);
+                }}
                 className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-[#141416] cursor-pointer"
               >
                 <X className="w-4 h-4" />
@@ -559,7 +670,10 @@ export const IdeasPoolView: React.FC = () => {
               <div className="pt-3 flex items-center justify-end gap-3">
                 <button
                   type="button"
-                  onClick={() => setIsAddIdeaOpen(false)}
+                  onClick={() => {
+                    resetIdeaForm();
+                    setIsAddIdeaOpen(false);
+                  }}
                   className="px-5 py-2.5 rounded-full text-xs font-bold text-[#141416]/70 hover:bg-black/5 cursor-pointer"
                 >
                   Abbrechen
@@ -569,7 +683,7 @@ export const IdeasPoolView: React.FC = () => {
                   className="px-6 py-2.5 rounded-full bg-[#141416] text-white font-extrabold text-xs shadow-lg hover:bg-black/85 cursor-pointer flex items-center gap-1.5"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-[#F4DF7B]" />
-                  <span>Idee einreichen</span>
+                  <span>{editingIdeaId ? 'Änderungen speichern' : 'Idee einreichen'}</span>
                 </button>
               </div>
             </form>

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   ThumbsUp,
   MapPin,
@@ -14,9 +14,13 @@ import {
   Euro,
   Lightbulb,
   ArrowRight,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
 } from 'lucide-react';
 import { useVacation } from '../context/VacationContext';
 import { ActivityCategory, DayActivity } from '../types/vacation';
+import { InfoBoardCard } from './InfoBoardCard';
 
 const CATEGORY_META: Record<
   ActivityCategory,
@@ -61,6 +65,26 @@ export const DashboardView: React.FC = () => {
     toggleActivityVote,
     updateActivityStatus,
   } = useVacation();
+
+  const [showBentoCards, setShowBentoCards] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('vo_show_bento_cards') !== 'false';
+    } catch {
+      return true;
+    }
+  });
+
+  const toggleBentoCards = () => {
+    setShowBentoCards((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('vo_show_bento_cards', String(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  };
 
   const getTraveler = (id: string) =>
     trip.travelers.find((t) => t.id === id) || trip.travelers[0];
@@ -170,17 +194,33 @@ export const DashboardView: React.FC = () => {
           </p>
         </div>
 
-        <button
-          onClick={() => setIsQuickAddOpen(true)}
-          className="inline-flex items-center gap-2 bg-[#141416] text-white text-xs font-bold px-5 py-3 rounded-full hover:bg-[#141416]/90 active:scale-95 transition-all shadow-sm self-start sm:self-auto cursor-pointer"
-        >
-          <Plus className="w-4 h-4 text-[#F4DF7B]" />
-          <span>Neuer Vorschlag</span>
-        </button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <button
+            onClick={toggleBentoCards}
+            className="w-9 h-9 rounded-full bg-white/75 hover:bg-white border border-black/5 shadow-2xs flex items-center justify-center text-[#141416]/80 transition-all cursor-pointer"
+            title={showBentoCards ? 'Übersichtskarten einklappen' : 'Übersichtskarten ausklappen'}
+            aria-label={showBentoCards ? 'Übersichtskarten einklappen' : 'Übersichtskarten ausklappen'}
+          >
+            {showBentoCards ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
+          </button>
+
+          <button
+            onClick={() => setIsQuickAddOpen(true)}
+            className="inline-flex items-center gap-2 bg-[#141416] text-white text-xs font-bold px-5 py-2.5 rounded-full hover:bg-[#141416]/90 active:scale-95 transition-all shadow-sm cursor-pointer"
+          >
+            <Plus className="w-4 h-4 text-[#F4DF7B]" />
+            <span>Neuer Vorschlag</span>
+          </button>
+        </div>
       </div>
 
       {/* 4 Simplified Pastel Bento Cards with Glassy Look */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      {showBentoCards && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 animate-fade-in">
         {/* Card 1: Sunny Yellow (#F4DF7B) */}
         <div
           onClick={() => setActiveTab('schedule')}
@@ -347,6 +387,7 @@ export const DashboardView: React.FC = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* BRAINSTORMING & IDEEN-POOL CALLOUT BANNER */}
       <div
@@ -374,6 +415,9 @@ export const DashboardView: React.FC = () => {
           <ArrowRight className="w-3.5 h-3.5 text-[#F4DF7B]" />
         </span>
       </div>
+
+      {/* Collapsible Finca & Travel Info Board */}
+      <InfoBoardCard />
 
       {/* Bottom Split View: Clean Proposals List (Left) & Detail Card (Right) */}
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_1fr] gap-6 pt-1">
@@ -508,6 +552,21 @@ export const DashboardView: React.FC = () => {
                     <MapPin className="w-3.5 h-3.5" />
                     {activeActivity.location}
                   </span>
+
+                  {activeActivity.location && (
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                        activeActivity.location
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="In Google Maps öffnen"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white/85 hover:bg-white text-[#141416] border border-black/5 shadow-2xs transition-colors"
+                    >
+                      <span>Maps</span>
+                      <ExternalLink className="w-3 h-3 text-[#141416]/70" />
+                    </a>
+                  )}
 
                   <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-white/75 text-[#141416]">
                     <Euro className="w-3.5 h-3.5" />

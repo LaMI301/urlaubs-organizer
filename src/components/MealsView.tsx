@@ -18,9 +18,14 @@ import {
   MapPin,
   X,
   Trophy,
+  Pencil,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
+  EyeOff,
 } from 'lucide-react';
 import { useVacation } from '../context/VacationContext';
-import { MealType, MealStyle } from '../types/vacation';
+import { MealType, MealStyle, MealPlan } from '../types/vacation';
 
 const MEAL_SLOTS: Array<{
   type: MealType;
@@ -92,12 +97,17 @@ export const MealsView: React.FC = () => {
     selectedDay,
     setSelectedDay,
     addMeal,
+    updateMeal,
     toggleMealVote,
     deleteMeal,
   } = useVacation();
 
   const [viewAllDays, setViewAllDays] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingMealId, setEditingMealId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [collapsedDays, setCollapsedDays] = useState<Record<number, boolean>>({});
+  const [hideEmptySlots, setHideEmptySlots] = useState(false);
 
   // Add Meal Form State
   const [formDay, setFormDay] = useState<number>(selectedDay);
@@ -123,7 +133,22 @@ export const MealsView: React.FC = () => {
     );
   };
 
+  const resetForm = () => {
+    setFormDay(selectedDay);
+    setMealType('dinner');
+    setStyle('cook');
+    setTitle('');
+    setTime('20:00');
+    setLocationOrRecipe('');
+    setDescription('');
+    setShoppingNotes('');
+    setEstimatedCostPerPerson('18');
+    setAssignedTeam([currentUser.id]);
+    setEditingMealId(null);
+  };
+
   const openSlotAdd = (dayNum: number, slotType: MealType, defaultTime: string) => {
+    resetForm();
     setFormDay(dayNum);
     setMealType(slotType);
     setTime(defaultTime);
@@ -133,11 +158,26 @@ export const MealsView: React.FC = () => {
     setShowAddForm(true);
   };
 
+  const handleStartEdit = (meal: MealPlan) => {
+    setEditingMealId(meal.id);
+    setFormDay(meal.dayNumber);
+    setMealType(meal.mealType);
+    setStyle(meal.style);
+    setTitle(meal.title);
+    setTime(meal.time);
+    setLocationOrRecipe(meal.locationOrRecipe);
+    setDescription(meal.description);
+    setShoppingNotes(meal.ShoppingNotes || '');
+    setEstimatedCostPerPerson(String(meal.estimatedCostPerPerson));
+    setAssignedTeam(meal.assignedTeam.length > 0 ? meal.assignedTeam : [currentUser.id]);
+    setShowAddForm(true);
+  };
+
   const handleCreateMeal = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
 
-    addMeal({
+    const payload = {
       dayNumber: formDay,
       mealType,
       style,
@@ -151,13 +191,20 @@ export const MealsView: React.FC = () => {
       ShoppingNotes: shoppingNotes.trim() || undefined,
       estimatedCostPerPerson: Math.max(0, Number(estimatedCostPerPerson) || 0),
       assignedTeam: assignedTeam.length > 0 ? assignedTeam : [currentUser.id],
-    });
+    };
 
-    setTitle('');
-    setLocationOrRecipe('');
-    setDescription('');
-    setShoppingNotes('');
+    if (editingMealId) {
+      updateMeal(editingMealId, payload);
+    } else {
+      addMeal(payload);
+    }
+
+    resetForm();
     setShowAddForm(false);
+  };
+
+  const toggleDayCollapse = (dayNum: number) => {
+    setCollapsedDays((prev) => ({ ...prev, [dayNum]: !prev[dayNum] }));
   };
 
   const getTraveler = (id: string) =>
@@ -209,7 +256,15 @@ export const MealsView: React.FC = () => {
 
           <button
             type="button"
-            onClick={() => setShowAddForm((prev) => !prev)}
+            onClick={() => {
+              if (showAddForm) {
+                resetForm();
+                setShowAddForm(false);
+              } else {
+                resetForm();
+                setShowAddForm(true);
+              }
+            }}
             className="bg-[#141416] hover:bg-neutral-800 text-white rounded-full px-5 py-3 text-xs font-bold flex items-center gap-2 shadow-sm transition-all"
           >
             <Plus className="w-4 h-4" />
@@ -218,45 +273,60 @@ export const MealsView: React.FC = () => {
         </div>
       </div>
 
-      {/* Day Selector Bar */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+      {/* Day Selector Bar + Empty Slots Toggle */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+          <button
+            type="button"
+            onClick={() => setViewAllDays(true)}
+            className={`px-4 py-2.5 rounded-full text-xs font-bold transition-all shrink-0 ${
+              viewAllDays
+                ? 'bg-[#141416] text-white shadow-sm'
+                : 'bg-[#EFECE6] text-[#141416] hover:bg-[#F4DF7B]/60'
+            }`}
+          >
+            Alle Tage Übersicht ({trip.meals.length})
+          </button>
+
+          {Array.from({ length: trip.totalDays }, (_, i) => i + 1).map((dayNum) => {
+            const isSelected = !viewAllDays && selectedDay === dayNum;
+            const count = trip.meals.filter((m) => m.dayNumber === dayNum).length;
+
+            return (
+              <button
+                key={dayNum}
+                type="button"
+                onClick={() => {
+                  setViewAllDays(false);
+                  setSelectedDay(dayNum);
+                }}
+                className={`px-4 py-2.5 rounded-full text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+                  isSelected
+                    ? 'bg-[#E8C2E8] text-[#141416] ring-2 ring-[#141416]/15 shadow-xs'
+                    : 'bg-[#EFECE6] text-neutral-700 hover:bg-[#E8C2E8]/50'
+                }`}
+              >
+                <span>Tag {dayNum}</span>
+                <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-black/10 text-[#141416]">
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
         <button
           type="button"
-          onClick={() => setViewAllDays(true)}
-          className={`px-4 py-2.5 rounded-full text-xs font-bold transition-all shrink-0 ${
-            viewAllDays
-              ? 'bg-[#141416] text-white shadow-sm'
-              : 'bg-[#EFECE6] text-[#141416] hover:bg-[#F4DF7B]/60'
+          onClick={() => setHideEmptySlots((prev) => !prev)}
+          className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold transition-all shrink-0 self-start sm:self-auto border ${
+            hideEmptySlots
+              ? 'bg-[#141416] text-white border-[#141416]'
+              : 'bg-[#EFECE6] text-[#141416] border-black/5 hover:bg-[#F4DF7B]/50'
           }`}
         >
-          Alle Tage Übersicht ({trip.meals.length})
+          <EyeOff className="w-3.5 h-3.5" />
+          <span>Leere Mahlzeiten ausblenden</span>
         </button>
-
-        {Array.from({ length: trip.totalDays }, (_, i) => i + 1).map((dayNum) => {
-          const isSelected = !viewAllDays && selectedDay === dayNum;
-          const count = trip.meals.filter((m) => m.dayNumber === dayNum).length;
-
-          return (
-            <button
-              key={dayNum}
-              type="button"
-              onClick={() => {
-                setViewAllDays(false);
-                setSelectedDay(dayNum);
-              }}
-              className={`px-4 py-2.5 rounded-full text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
-                isSelected
-                  ? 'bg-[#E8C2E8] text-[#141416] ring-2 ring-[#141416]/15 shadow-xs'
-                  : 'bg-[#EFECE6] text-neutral-700 hover:bg-[#E8C2E8]/50'
-              }`}
-            >
-              <span>Tag {dayNum}</span>
-              <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-black/10 text-[#141416]">
-                {count}
-              </span>
-            </button>
-          );
-        })}
       </div>
 
       {/* Add Meal Proposal Form */}
@@ -268,15 +338,22 @@ export const MealsView: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-base font-extrabold text-[#141416]">
-                Neuen Essens-Vorschlag hinzufügen
+                {editingMealId
+                  ? 'Essens-Vorschlag bearbeiten'
+                  : 'Neuen Essens-Vorschlag hinzufügen'}
               </h3>
               <p className="text-xs text-neutral-600">
-                Mehrere Vorschläge pro Mahlzeit sind möglich – die Gruppe stimmt einfach ab!
+                {editingMealId
+                  ? 'Änderungen speichern – alle bisherigen Votes bleiben erhalten.'
+                  : 'Mehrere Vorschläge pro Mahlzeit sind möglich – die Gruppe stimmt einfach ab!'}
               </p>
             </div>
             <button
               type="button"
-              onClick={() => setShowAddForm(false)}
+              onClick={() => {
+                resetForm();
+                setShowAddForm(false);
+              }}
               className="w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center"
             >
               <X className="w-4 h-4" />
@@ -456,7 +533,10 @@ export const MealsView: React.FC = () => {
           <div className="flex justify-end gap-2 pt-1">
             <button
               type="button"
-              onClick={() => setShowAddForm(false)}
+              onClick={() => {
+                resetForm();
+                setShowAddForm(false);
+              }}
               className="px-4 py-2 rounded-full text-xs font-bold bg-white/80 text-neutral-700"
             >
               Abbrechen
@@ -465,238 +545,314 @@ export const MealsView: React.FC = () => {
               type="submit"
               className="px-5 py-2.5 rounded-full text-xs font-bold bg-[#141416] text-white hover:bg-neutral-800"
             >
-              Essens-Vorschlag speichern
+              {editingMealId ? 'Änderungen speichern' : 'Essens-Vorschlag speichern'}
             </button>
           </div>
         </form>
       )}
 
       {/* Days & 4 Structured Meal Slots */}
-      <div className="space-y-8">
+      <div className="space-y-6">
         {daysToRender.map((dayNum) => {
           const dayMeals = trip.meals.filter((m) => m.dayNumber === dayNum);
+          const isCollapsed = viewAllDays && !!collapsedDays[dayNum];
+          const visibleSlots = MEAL_SLOTS.filter((slot) => {
+            if (!hideEmptySlots) return true;
+            return dayMeals.some((m) => m.mealType === slot.type);
+          });
 
           return (
             <div key={dayNum} className="space-y-4">
               {viewAllDays && (
-                <div className="flex items-center justify-between border-b border-black/10 pb-2">
-                  <h2 className="text-lg font-extrabold text-[#141416]">
-                    Tag {dayNum} – Kulinarischer Plan
-                  </h2>
-                  <span className="text-xs font-semibold text-neutral-500">
-                    {dayMeals.length} Einträge
-                  </span>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => toggleDayCollapse(dayNum)}
+                  className="w-full flex items-center justify-between bg-white/75 hover:bg-white/90 backdrop-blur-md border border-black/5 rounded-[20px] px-5 py-3.5 transition-all shadow-2xs text-left"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-extrabold bg-[#141416] text-white">
+                      Tag {dayNum}
+                    </span>
+                    <span className="text-sm font-extrabold text-[#141416]">
+                      Tag {dayNum} · {dayMeals.length} {dayMeals.length === 1 ? 'Mahlzeit' : 'Mahlzeiten'}
+                    </span>
+                  </div>
+                  {isCollapsed ? (
+                    <ChevronDown className="w-4 h-4 text-neutral-600 shrink-0" />
+                  ) : (
+                    <ChevronUp className="w-4 h-4 text-neutral-600 shrink-0" />
+                  )}
+                </button>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {MEAL_SLOTS.map((slot) => {
-                  const slotMeals = dayMeals
-                    .filter((m) => m.mealType === slot.type)
-                    .sort((a, b) => b.votes.length - a.votes.length);
+              {!isCollapsed && (
+                visibleSlots.length === 0 ? (
+                  <div className="bg-[#EFECE6]/50 rounded-[22px] p-5 text-center border border-dashed border-black/10 text-xs text-neutral-500">
+                    Keine eingetragenen Mahlzeiten für Tag {dayNum}.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {visibleSlots.map((slot) => {
+                      const slotMeals = dayMeals
+                        .filter((m) => m.mealType === slot.type)
+                        .sort((a, b) => b.votes.length - a.votes.length);
 
-                  const maxVotes =
-                    slotMeals.length > 1
-                      ? Math.max(...slotMeals.map((m) => m.votes.length))
-                      : 0;
+                      const maxVotes =
+                        slotMeals.length > 1
+                          ? Math.max(...slotMeals.map((m) => m.votes.length))
+                          : 0;
 
-                  return (
-                    <div
-                      key={slot.type}
-                      className="bg-[#EFECE6]/70 rounded-[26px] p-5 border border-black/5 flex flex-col justify-between gap-4"
-                    >
-                      <div>
-                        {/* Slot Header */}
-                        <div className="flex items-center justify-between mb-3.5">
-                          <div className="flex items-center gap-2.5">
-                            <div
-                              className={`w-9 h-9 rounded-2xl ${slot.accentBg} flex items-center justify-center shadow-2xs`}
-                            >
-                              {slot.icon}
-                            </div>
-                            <div>
-                              <h3 className="text-sm font-extrabold text-[#141416]">
-                                {slot.label}
-                              </h3>
-                              <span className="text-[11px] text-neutral-500">
-                                {slotMeals.length === 0
-                                  ? 'Noch offen'
-                                  : slotMeals.length === 1
-                                  ? '1 Vorschlag'
-                                  : `${slotMeals.length} Optionen zur Abstimmung`}
-                              </span>
-                            </div>
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={() =>
-                              openSlotAdd(dayNum, slot.type, slot.defaultTime)
-                            }
-                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-bold bg-white hover:bg-[#141416] hover:text-white text-[#141416] transition-colors border border-black/5"
-                          >
-                            <Plus className="w-3.5 h-3.5" />
-                            <span>Option</span>
-                          </button>
-                        </div>
-
-                        {/* Proposals inside this slot */}
-                        {slotMeals.length === 0 ? (
-                          <div className="bg-[#F9F6F0]/80 rounded-2xl p-5 text-center border border-dashed border-black/10">
-                            <p className="text-xs font-semibold text-neutral-500">
-                              Noch kein {slot.label} für Tag {dayNum} geplant.
-                            </p>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                openSlotAdd(dayNum, slot.type, slot.defaultTime)
-                              }
-                              className="mt-2 text-xs font-bold text-[#141416] underline hover:no-underline"
-                            >
-                              + Jetzt Vorschlag eintragen
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="space-y-3">
-                            {slotMeals.map((meal) => {
-                              const styleMeta = STYLE_META[meal.style];
-                              const proposer = getTraveler(meal.proposedBy);
-                              const hasVoted = meal.votes.includes(currentUser.id);
-                              const isLeading =
-                                slotMeals.length > 1 &&
-                                meal.votes.length === maxVotes &&
-                                maxVotes > 0;
-
-                              return (
+                      return (
+                        <div
+                          key={slot.type}
+                          className="bg-[#EFECE6]/70 rounded-[26px] p-5 border border-black/5 flex flex-col justify-between gap-4"
+                        >
+                          <div>
+                            {/* Slot Header */}
+                            <div className="flex items-center justify-between mb-3.5">
+                              <div className="flex items-center gap-2.5">
                                 <div
-                                  key={meal.id}
-                                  className={`rounded-[20px] p-4 transition-all border ${
-                                    isLeading
-                                      ? 'bg-white border-[#141416]/20 shadow-xs'
-                                      : 'bg-[#F9F6F0] border-black/5'
-                                  }`}
+                                  className={`w-9 h-9 rounded-2xl ${slot.accentBg} flex items-center justify-center shadow-2xs`}
                                 >
-                                  <div className="flex items-start justify-between gap-2">
-                                    <div className="flex items-center gap-1.5 flex-wrap">
-                                      <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-[#EFECE6] px-2.5 py-0.5 rounded-full text-[#141416]">
-                                        <Clock className="w-3 h-3 text-neutral-500" />
-                                        {meal.time}
-                                      </span>
-                                      <span
-                                        className={`inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full ${styleMeta.badgeClass}`}
-                                      >
-                                        {styleMeta.icon}
-                                        <span>{styleMeta.label}</span>
-                                      </span>
-                                      {isLeading && (
-                                        <span className="inline-flex items-center gap-1 text-[10px] font-extrabold bg-[#F4DF7B] text-[#141416] px-2 py-0.5 rounded-full">
-                                          <Trophy className="w-3 h-3" /> Favorit
-                                        </span>
-                                      )}
-                                    </div>
-
-                                    <button
-                                      type="button"
-                                      onClick={() => deleteMeal(meal.id)}
-                                      className="text-neutral-400 hover:text-red-600 p-1"
-                                      title="Essensvorschlag löschen"
-                                    >
-                                      <Trash2 className="w-3.5 h-3.5" />
-                                    </button>
-                                  </div>
-
-                                  <h4 className="text-sm font-extrabold text-[#141416] mt-2">
-                                    {meal.title}
-                                  </h4>
-
-                                  <p className="text-xs text-neutral-600 mt-1 flex items-center gap-1">
-                                    <MapPin className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-                                    <span className="font-semibold text-[#141416]">
-                                      {meal.locationOrRecipe}
-                                    </span>
-                                    <span>• ca. {meal.estimatedCostPerPerson} € p.P.</span>
-                                  </p>
-
-                                  <p className="text-xs text-neutral-600 mt-1.5 leading-relaxed">
-                                    {meal.description}
-                                  </p>
-
-                                  {meal.ShoppingNotes && (
-                                    <div className="mt-2.5 bg-[#F4DF7B]/30 rounded-xl px-3 py-2 text-[11px] text-[#141416] flex items-start gap-2">
-                                      <ShoppingBag className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                                      <div>
-                                        <strong className="font-bold">Einkaufsnotiz: </strong>
-                                        {meal.ShoppingNotes}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {/* Team & Voting Footer */}
-                                  <div className="mt-3 pt-2.5 border-t border-black/5 flex flex-wrap items-center justify-between gap-2">
-                                    <div className="flex items-center gap-1.5 text-[11px] text-neutral-600">
-                                      <Users className="w-3.5 h-3.5 text-neutral-400" />
-                                      <span>Team:</span>
-                                      <div className="flex items-center -space-x-1">
-                                        {meal.assignedTeam.map((tId) => {
-                                          const member = getTraveler(tId);
-                                          return (
-                                            <span
-                                              key={tId}
-                                              style={{ backgroundColor: member.color }}
-                                              className="w-5 h-5 rounded-full text-[9px] font-bold text-[#141416] flex items-center justify-center ring-1 ring-white"
-                                              title={`Orga/Koch-Team: ${member.name}`}
-                                            >
-                                              {member.initials}
-                                            </span>
-                                          );
-                                        })}
-                                      </div>
-                                      <span className="text-[10px] text-neutral-400 ml-1">
-                                        (von {proposer.name})
-                                      </span>
-                                    </div>
-
-                                    <div className="flex items-center gap-2">
-                                      <div className="flex items-center -space-x-1.5">
-                                        {meal.votes.map((vId) => {
-                                          const voter = getTraveler(vId);
-                                          return (
-                                            <span
-                                              key={vId}
-                                              style={{ backgroundColor: voter.color }}
-                                              className="w-5 h-5 rounded-full text-[9px] font-bold text-[#141416] flex items-center justify-center ring-1 ring-white"
-                                              title={`${voter.name} stimmt dafür`}
-                                            >
-                                              {voter.initials}
-                                            </span>
-                                          );
-                                        })}
-                                      </div>
-
-                                      <button
-                                        type="button"
-                                        onClick={() => toggleMealVote(meal.id)}
-                                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold transition-all ${
-                                          hasVoted
-                                            ? 'bg-[#141416] text-white'
-                                            : 'bg-[#EFECE6] hover:bg-[#E8C2E8] text-[#141416]'
-                                        }`}
-                                      >
-                                        <ThumbsUp className="w-3 h-3" />
-                                        <span>{meal.votes.length}</span>
-                                      </button>
-                                    </div>
-                                  </div>
+                                  {slot.icon}
                                 </div>
-                              );
-                            })}
+                                <div>
+                                  <h3 className="text-sm font-extrabold text-[#141416]">
+                                    {slot.label}
+                                  </h3>
+                                  <span className="text-[11px] text-neutral-500">
+                                    {slotMeals.length === 0
+                                      ? 'Noch offen'
+                                      : slotMeals.length === 1
+                                      ? '1 Vorschlag'
+                                      : `${slotMeals.length} Optionen zur Abstimmung`}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  openSlotAdd(dayNum, slot.type, slot.defaultTime)
+                                }
+                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-bold bg-white hover:bg-[#141416] hover:text-white text-[#141416] transition-colors border border-black/5"
+                              >
+                                <Plus className="w-3.5 h-3.5" />
+                                <span>Option</span>
+                              </button>
+                            </div>
+
+                            {/* Proposals inside this slot */}
+                            {slotMeals.length === 0 ? (
+                              <div className="bg-[#F9F6F0]/80 rounded-2xl p-5 text-center border border-dashed border-black/10">
+                                <p className="text-xs font-semibold text-neutral-500">
+                                  Noch kein {slot.label} für Tag {dayNum} geplant.
+                                </p>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    openSlotAdd(dayNum, slot.type, slot.defaultTime)
+                                  }
+                                  className="mt-2 text-xs font-bold text-[#141416] underline hover:no-underline"
+                                >
+                                  + Jetzt Vorschlag eintragen
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="space-y-3">
+                                {slotMeals.map((meal) => {
+                                  const styleMeta = STYLE_META[meal.style];
+                                  const proposer = getTraveler(meal.proposedBy);
+                                  const hasVoted = meal.votes.includes(currentUser.id);
+                                  const isLeading =
+                                    slotMeals.length > 1 &&
+                                    meal.votes.length === maxVotes &&
+                                    maxVotes > 0;
+                                  const isConfirmingDelete = confirmDeleteId === meal.id;
+                                  const showMapsLink =
+                                    (meal.style === 'restaurant' || meal.style === 'bakery') &&
+                                    !!meal.locationOrRecipe;
+
+                                  return (
+                                    <div
+                                      key={meal.id}
+                                      className={`rounded-[20px] p-4 transition-all border ${
+                                        isLeading
+                                          ? 'bg-white border-[#141416]/20 shadow-xs'
+                                          : 'bg-[#F9F6F0] border-black/5'
+                                      }`}
+                                    >
+                                      <div className="flex items-start justify-between gap-2">
+                                        <div className="flex items-center gap-1.5 flex-wrap">
+                                          <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-[#EFECE6] px-2.5 py-0.5 rounded-full text-[#141416]">
+                                            <Clock className="w-3 h-3 text-neutral-500" />
+                                            {meal.time}
+                                          </span>
+                                          <span
+                                            className={`inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full ${styleMeta.badgeClass}`}
+                                          >
+                                            {styleMeta.icon}
+                                            <span>{styleMeta.label}</span>
+                                          </span>
+                                          {isLeading && (
+                                            <span className="inline-flex items-center gap-1 text-[10px] font-extrabold bg-[#F4DF7B] text-[#141416] px-2 py-0.5 rounded-full">
+                                              <Trophy className="w-3 h-3" /> Favorit
+                                            </span>
+                                          )}
+                                        </div>
+
+                                        <div className="flex items-center gap-1 shrink-0">
+                                          <button
+                                            type="button"
+                                            onClick={() => handleStartEdit(meal)}
+                                            className="text-neutral-500 hover:text-[#141416] p-1 rounded-full hover:bg-black/5 transition-colors"
+                                            title="Essensvorschlag bearbeiten"
+                                          >
+                                            <Pencil className="w-3.5 h-3.5" />
+                                          </button>
+
+                                          {isConfirmingDelete ? (
+                                            <div className="inline-flex items-center gap-1 bg-red-50 border border-red-200 rounded-full px-2 py-0.5 text-[10px] font-bold">
+                                              <span className="text-red-700">Löschen?</span>
+                                              <button
+                                                type="button"
+                                                onClick={() => {
+                                                  deleteMeal(meal.id);
+                                                  setConfirmDeleteId(null);
+                                                }}
+                                                className="px-1.5 py-0.5 rounded-full bg-red-600 text-white hover:bg-red-700"
+                                              >
+                                                Ja
+                                              </button>
+                                              <button
+                                                type="button"
+                                                onClick={() => setConfirmDeleteId(null)}
+                                                className="px-1.5 py-0.5 rounded-full bg-white text-neutral-700 hover:bg-neutral-100"
+                                              >
+                                                Nein
+                                              </button>
+                                            </div>
+                                          ) : (
+                                            <button
+                                              type="button"
+                                              onClick={() => setConfirmDeleteId(meal.id)}
+                                              className="text-neutral-400 hover:text-red-600 p-1 rounded-full hover:bg-red-50 transition-colors"
+                                              title="Essensvorschlag löschen"
+                                            >
+                                              <Trash2 className="w-3.5 h-3.5" />
+                                            </button>
+                                          )}
+                                        </div>
+                                      </div>
+
+                                      <h4 className="text-sm font-extrabold text-[#141416] mt-2">
+                                        {meal.title}
+                                      </h4>
+
+                                      <div className="text-xs text-neutral-600 mt-1 flex flex-wrap items-center gap-1.5">
+                                        <span className="inline-flex items-center gap-1">
+                                          <MapPin className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+                                          <span className="font-semibold text-[#141416]">
+                                            {meal.locationOrRecipe}
+                                          </span>
+                                        </span>
+                                        {showMapsLink && (
+                                          <a
+                                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(meal.locationOrRecipe)}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1 text-[10px] font-bold text-[#141416] bg-white hover:bg-[#C5D1F5]/70 px-2 py-0.5 rounded-full border border-black/10 transition-colors"
+                                            title={`In Google Maps öffnen: ${meal.locationOrRecipe}`}
+                                          >
+                                            <ExternalLink className="w-2.5 h-2.5" />
+                                            <span>Maps</span>
+                                          </a>
+                                        )}
+                                        <span>• ca. {meal.estimatedCostPerPerson} € p.P.</span>
+                                      </div>
+
+                                      <p className="text-xs text-neutral-600 mt-1.5 leading-relaxed">
+                                        {meal.description}
+                                      </p>
+
+                                      {meal.ShoppingNotes && (
+                                        <div className="mt-2.5 bg-[#F4DF7B]/30 rounded-xl px-3 py-2 text-[11px] text-[#141416] flex items-start gap-2">
+                                          <ShoppingBag className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                                          <div>
+                                            <strong className="font-bold">Einkaufsnotiz: </strong>
+                                            {meal.ShoppingNotes}
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {/* Team & Voting Footer */}
+                                      <div className="mt-3 pt-2.5 border-t border-black/5 flex flex-wrap items-center justify-between gap-2">
+                                        <div className="flex items-center gap-1.5 text-[11px] text-neutral-600">
+                                          <Users className="w-3.5 h-3.5 text-neutral-400" />
+                                          <span>Team:</span>
+                                          <div className="flex items-center -space-x-1">
+                                            {meal.assignedTeam.map((tId) => {
+                                              const member = getTraveler(tId);
+                                              return (
+                                                <span
+                                                  key={tId}
+                                                  style={{ backgroundColor: member.color }}
+                                                  className="w-5 h-5 rounded-full text-[9px] font-bold text-[#141416] flex items-center justify-center ring-1 ring-white"
+                                                  title={`Orga/Koch-Team: ${member.name}`}
+                                                >
+                                                  {member.initials}
+                                                </span>
+                                              );
+                                            })}
+                                          </div>
+                                          <span className="text-[10px] text-neutral-400 ml-1">
+                                            (von {proposer.name})
+                                          </span>
+                                        </div>
+
+                                        <div className="flex items-center gap-2">
+                                          <div className="flex items-center -space-x-1.5">
+                                            {meal.votes.map((vId) => {
+                                              const voter = getTraveler(vId);
+                                              return (
+                                                <span
+                                                  key={vId}
+                                                  style={{ backgroundColor: voter.color }}
+                                                  className="w-5 h-5 rounded-full text-[9px] font-bold text-[#141416] flex items-center justify-center ring-1 ring-white"
+                                                  title={`${voter.name} stimmt dafür`}
+                                                >
+                                                  {voter.initials}
+                                                </span>
+                                              );
+                                            })}
+                                          </div>
+
+                                          <button
+                                            type="button"
+                                            onClick={() => toggleMealVote(meal.id)}
+                                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold transition-all ${
+                                              hasVoted
+                                                ? 'bg-[#141416] text-white'
+                                                : 'bg-[#EFECE6] hover:bg-[#E8C2E8] text-[#141416]'
+                                            }`}
+                                          >
+                                            <ThumbsUp className="w-3 h-3" />
+                                            <span>{meal.votes.length}</span>
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )
+              )}
             </div>
           );
         })}

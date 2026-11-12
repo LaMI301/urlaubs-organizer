@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import {
   Trip,
+  TripInfo,
   Traveler,
   NavigationTab,
   DayActivity,
@@ -67,6 +68,8 @@ export interface VacationContextValue {
   switchToDemoTrip: () => void;
   resetDemoTrip: () => void;
   switchTrip: (tripId: string) => void;
+  deleteTrip: (tripId: string) => void;
+  updateTripInfo: (info: TripInfo) => void;
   createNewTrip: (data: {
     title: string;
     destination: string;
@@ -78,10 +81,12 @@ export interface VacationContextValue {
     selectedUserName?: string;
   }) => void;
   addActivity: (activity: Omit<DayActivity, 'id' | 'votes' | 'createdBy'>) => void;
+  updateActivity: (activityId: string, updates: Partial<Omit<DayActivity, 'id'>>) => void;
   toggleActivityVote: (activityId: string) => void;
   updateActivityStatus: (activityId: string, status: DayActivity['status']) => void;
   deleteActivity: (activityId: string) => void;
   addMeal: (meal: Omit<MealPlan, 'id' | 'votes' | 'proposedBy'>) => void;
+  updateMeal: (mealId: string, updates: Partial<Omit<MealPlan, 'id'>>) => void;
   toggleMealVote: (mealId: string) => void;
   deleteMeal: (mealId: string) => void;
   addPoll: (
@@ -90,13 +95,23 @@ export interface VacationContextValue {
     optionTexts: string[],
     dayNumber?: number
   ) => void;
+  updatePoll: (
+    pollId: string,
+    question: string,
+    category: Poll['category'],
+    optionTexts: string[],
+    dayNumber?: number
+  ) => void;
   togglePollVote: (pollId: string, optionId: string) => void;
   togglePollClosed: (pollId: string) => void;
+  deletePoll: (pollId: string) => void;
   addTask: (task: Omit<TodoTask, 'id' | 'completed' | 'votes'>) => void;
+  updateTask: (taskId: string, updates: Partial<Omit<TodoTask, 'id'>>) => void;
   toggleTaskCompleted: (taskId: string) => void;
   toggleTaskVote: (taskId: string) => void;
   deleteTask: (taskId: string) => void;
   addIdea: (idea: Omit<BrainstormIdea, 'id' | 'votes' | 'createdAt' | 'createdBy'>) => void;
+  updateIdea: (ideaId: string, updates: Partial<Omit<BrainstormIdea, 'id'>>) => void;
   toggleIdeaVote: (ideaId: string) => void;
   deleteIdea: (ideaId: string) => void;
   scheduleIdeaToDay: (ideaId: string, dayNumber: number, timeSlot: string) => void;
@@ -113,6 +128,7 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         if (Array.isArray(parsed) && parsed.length > 0) {
           const withIdeas = parsed.map((t) => ({
             ...t,
+            info: t.info || (t.id === DEMO_TRIP.id || t.isDemo ? DEMO_TRIP.info : undefined),
             ideas: Array.isArray(t.ideas) && t.ideas.length > 0 ? t.ideas : (t.id === DEMO_TRIP.id || t.isDemo ? DEMO_TRIP.ideas : []),
           }));
           const hasDemo = withIdeas.some((t) => t.id === DEMO_TRIP.id || t.isDemo);
@@ -401,6 +417,41 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     [savedTrips]
   );
 
+  const deleteTrip = useCallback(
+    (tripId: string) => {
+      if (savedTrips.length <= 1) return;
+      const remaining = savedTrips.filter((t) => t.id !== tripId);
+      if (remaining.length === savedTrips.length) return;
+
+      setSavedTrips(remaining);
+
+      if (trip.id === tripId) {
+        const nextTrip =
+          remaining.find((t) => t.id === DEMO_TRIP.id || t.isDemo) || remaining[0];
+        if (nextTrip) {
+          setActiveTripId(nextTrip.id);
+          setSelectedDayState(1);
+          setSelectedActivityId(nextTrip.activities[0]?.id || null);
+          setCurrentUserId(nextTrip.travelers[0]?.id || '');
+        }
+      }
+    },
+    [savedTrips, trip.id]
+  );
+
+  const updateTripInfo = useCallback(
+    (info: TripInfo) => {
+      updateActiveTrip((curr) => ({
+        ...curr,
+        info: {
+          ...(curr.info || {}),
+          ...info,
+        },
+      }));
+    },
+    [updateActiveTrip]
+  );
+
   const createNewTrip = useCallback(
     (data: {
       title: string;
@@ -567,6 +618,18 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     [currentUser.id, updateActiveTrip]
   );
 
+  const updateActivity = useCallback(
+    (activityId: string, updates: Partial<Omit<DayActivity, 'id'>>) => {
+      updateActiveTrip((curr) => ({
+        ...curr,
+        activities: curr.activities.map((act) =>
+          act.id === activityId ? { ...act, ...updates } : act
+        ),
+      }));
+    },
+    [updateActiveTrip]
+  );
+
   const toggleActivityVote = useCallback(
     (activityId: string) => {
       updateActiveTrip((curr) => ({
@@ -625,6 +688,18 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }));
     },
     [currentUser.id, updateActiveTrip]
+  );
+
+  const updateMeal = useCallback(
+    (mealId: string, updates: Partial<Omit<MealPlan, 'id'>>) => {
+      updateActiveTrip((curr) => ({
+        ...curr,
+        meals: curr.meals.map((meal) =>
+          meal.id === mealId ? { ...meal, ...updates } : meal
+        ),
+      }));
+    },
+    [updateActiveTrip]
   );
 
   const toggleMealVote = useCallback(
@@ -725,6 +800,61 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     [updateActiveTrip]
   );
 
+  const updatePoll = useCallback(
+    (
+      pollId: string,
+      question: string,
+      category: Poll['category'],
+      optionTexts: string[],
+      dayNumber?: number
+    ) => {
+      const cleanOptions = optionTexts.map((t) => t.trim()).filter(Boolean);
+      if (!question.trim() || cleanOptions.length === 0) return;
+
+      updateActiveTrip((curr) => ({
+        ...curr,
+        polls: curr.polls.map((poll) => {
+          if (poll.id !== pollId) return poll;
+          const existingByText = new Map<string, Poll['options'][number]>();
+          poll.options.forEach((opt) => {
+            existingByText.set(opt.text.trim().toLowerCase(), opt);
+          });
+          return {
+            ...poll,
+            question: question.trim(),
+            category,
+            dayNumber,
+            options: cleanOptions.map((text, idx) => {
+              const matched = existingByText.get(text.toLowerCase());
+              if (matched) {
+                return {
+                  ...matched,
+                  text,
+                };
+              }
+              return {
+                id: generateId(`opt-${idx}`),
+                text,
+                votes: [],
+              };
+            }),
+          };
+        }),
+      }));
+    },
+    [updateActiveTrip]
+  );
+
+  const deletePoll = useCallback(
+    (pollId: string) => {
+      updateActiveTrip((curr) => ({
+        ...curr,
+        polls: curr.polls.filter((poll) => poll.id !== pollId),
+      }));
+    },
+    [updateActiveTrip]
+  );
+
   const addTask = useCallback(
     (taskData: Omit<TodoTask, 'id' | 'completed' | 'votes'>) => {
       const newTask: TodoTask = {
@@ -739,6 +869,18 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }));
     },
     [currentUser.id, updateActiveTrip]
+  );
+
+  const updateTask = useCallback(
+    (taskId: string, updates: Partial<Omit<TodoTask, 'id'>>) => {
+      updateActiveTrip((curr) => ({
+        ...curr,
+        tasks: curr.tasks.map((task) =>
+          task.id === taskId ? { ...task, ...updates } : task
+        ),
+      }));
+    },
+    [updateActiveTrip]
   );
 
   const toggleTaskCompleted = useCallback(
@@ -797,6 +939,18 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }));
     },
     [currentUser.id, updateActiveTrip]
+  );
+
+  const updateIdea = useCallback(
+    (ideaId: string, updates: Partial<Omit<BrainstormIdea, 'id'>>) => {
+      updateActiveTrip((curr) => ({
+        ...curr,
+        ideas: (curr.ideas || []).map((idea) =>
+          idea.id === ideaId ? { ...idea, ...updates } : idea
+        ),
+      }));
+    },
+    [updateActiveTrip]
   );
 
   const toggleIdeaVote = useCallback(
@@ -887,22 +1041,30 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         switchToDemoTrip,
         resetDemoTrip,
         switchTrip,
+        deleteTrip,
+        updateTripInfo,
         createNewTrip,
         addActivity,
+        updateActivity,
         toggleActivityVote,
         updateActivityStatus,
         deleteActivity,
         addMeal,
+        updateMeal,
         toggleMealVote,
         deleteMeal,
         addPoll,
+        updatePoll,
         togglePollVote,
         togglePollClosed,
+        deletePoll,
         addTask,
+        updateTask,
         toggleTaskCompleted,
         toggleTaskVote,
         deleteTask,
         addIdea,
+        updateIdea,
         toggleIdeaVote,
         deleteIdea,
         scheduleIdeaToDay,

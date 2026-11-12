@@ -68,7 +68,7 @@ export interface Poll {
   options: PollOption[];
 }
 
-export type TaskCategory = 'before_trip' | 'packing' | 'shopping' | 'documents';
+export type TaskCategory = 'before_trip' | 'shared_equipment' | 'packing' | 'shopping' | 'documents';
 export type TaskPriority = 'normal' | 'important' | 'critical';
 
 export type IdeaPriority = 'must_do' | 'nice_to_have' | 'chill';
@@ -98,6 +98,15 @@ export interface TodoTask {
   votes: string[]; // Array of Traveler.id who think this is important
 }
 
+export interface TripInfo {
+  accommodationName?: string;
+  address?: string;
+  wifiName?: string;
+  wifiPassword?: string;
+  checkinCode?: string;
+  emergencyNotes?: string;
+}
+
 export interface Trip {
   id: string;
   title: string;
@@ -107,6 +116,7 @@ export interface Trip {
   totalDays: number;
   budgetTargetPerPerson: number;
   isDemo: boolean;
+  info?: TripInfo;
   travelers: Traveler[];
   activities: DayActivity[];
   meals: MealPlan[];

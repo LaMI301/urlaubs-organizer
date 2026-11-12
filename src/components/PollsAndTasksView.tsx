@@ -22,10 +22,15 @@ import {
   CheckCircle2,
   Utensils,
   Compass,
+  Pencil,
+  ChevronDown,
+  ChevronUp,
+  Package,
 } from 'lucide-react';
 import { useVacation } from '../context/VacationContext';
 import {
   Poll,
+  TodoTask,
   TaskCategory,
   TaskPriority,
   ActivityCategory,
@@ -51,16 +56,38 @@ export const PollsView: React.FC = () => {
     trip,
     currentUser,
     addPoll,
+    updatePoll,
+    deletePoll,
     togglePollVote,
     togglePollClosed,
   } = useVacation();
 
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingPollId, setEditingPollId] = useState<string | null>(null);
+  const [confirmDeletePollId, setConfirmDeletePollId] = useState<string | null>(null);
+  const [showClosedPolls, setShowClosedPolls] = useState(false);
   const [question, setQuestion] = useState('');
   const [category, setCategory] = useState<Poll['category']>('general');
   const [dayNumber, setDayNumber] = useState<string>('');
   const [options, setOptions] = useState<string[]>(['', '', '']);
   const [filterStatus, setFilterStatus] = useState<'all' | 'open' | 'closed'>('all');
+
+  const resetPollForm = () => {
+    setQuestion('');
+    setCategory('general');
+    setDayNumber('');
+    setOptions(['', '', '']);
+    setEditingPollId(null);
+  };
+
+  const handleStartEditPoll = (poll: Poll) => {
+    setEditingPollId(poll.id);
+    setQuestion(poll.question);
+    setCategory(poll.category);
+    setDayNumber(poll.dayNumber ? String(poll.dayNumber) : '');
+    setOptions(poll.options.length >= 2 ? poll.options.map((o) => o.text) : ['', '']);
+    setShowCreateForm(true);
+  };
 
   const handleOptionChange = (idx: number, val: string) => {
     setOptions((prev) => prev.map((item, i) => (i === idx ? val : item)));
@@ -80,16 +107,24 @@ export const PollsView: React.FC = () => {
     const validOptions = options.map((o) => o.trim()).filter(Boolean);
     if (!question.trim() || validOptions.length < 2) return;
 
-    addPoll(
-      question.trim(),
-      category,
-      validOptions,
-      dayNumber ? Number(dayNumber) : undefined
-    );
+    if (editingPollId) {
+      updatePoll(
+        editingPollId,
+        question.trim(),
+        category,
+        validOptions,
+        dayNumber ? Number(dayNumber) : undefined
+      );
+    } else {
+      addPoll(
+        question.trim(),
+        category,
+        validOptions,
+        dayNumber ? Number(dayNumber) : undefined
+      );
+    }
 
-    setQuestion('');
-    setOptions(['', '', '']);
-    setDayNumber('');
+    resetPollForm();
     setShowCreateForm(false);
   };
 
@@ -128,7 +163,15 @@ export const PollsView: React.FC = () => {
 
         <button
           type="button"
-          onClick={() => setShowCreateForm((prev) => !prev)}
+          onClick={() => {
+            if (showCreateForm) {
+              resetPollForm();
+              setShowCreateForm(false);
+            } else {
+              resetPollForm();
+              setShowCreateForm(true);
+            }
+          }}
           className="bg-[#141416] hover:bg-neutral-800 text-white rounded-full px-5 py-3 text-xs font-bold flex items-center gap-2 self-start md:self-auto shadow-sm transition-all shrink-0"
         >
           <Plus className="w-4 h-4" />
@@ -136,7 +179,7 @@ export const PollsView: React.FC = () => {
         </button>
       </div>
 
-      {/* Create New Poll Form */}
+      {/* Create / Edit Poll Form */}
       {showCreateForm && (
         <form
           onSubmit={handleCreatePoll}
@@ -145,15 +188,20 @@ export const PollsView: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-base font-extrabold text-[#141416]">
-                Neue Abstimmung starten
+                {editingPollId ? 'Abstimmung bearbeiten' : 'Neue Abstimmung starten'}
               </h3>
               <p className="text-xs text-neutral-600">
-                Erstellt von <strong>{currentUser.name}</strong>
+                {editingPollId
+                  ? 'Änderungen speichern – bestehende Stimmen für unveränderte Optionen bleiben erhalten.'
+                  : <>Erstellt von <strong>{currentUser.name}</strong></>}
               </p>
             </div>
             <button
               type="button"
-              onClick={() => setShowCreateForm(false)}
+              onClick={() => {
+                resetPollForm();
+                setShowCreateForm(false);
+              }}
               className="w-8 h-8 rounded-full bg-white hover:bg-black/10 flex items-center justify-center"
             >
               <X className="w-4 h-4" />
@@ -248,7 +296,10 @@ export const PollsView: React.FC = () => {
           <div className="flex justify-end gap-2 pt-2">
             <button
               type="button"
-              onClick={() => setShowCreateForm(false)}
+              onClick={() => {
+                resetPollForm();
+                setShowCreateForm(false);
+              }}
               className="px-4 py-2 rounded-full text-xs font-bold bg-white text-neutral-700"
             >
               Abbrechen
@@ -257,7 +308,7 @@ export const PollsView: React.FC = () => {
               type="submit"
               className="px-5 py-2.5 rounded-full text-xs font-bold bg-[#141416] text-white hover:bg-neutral-800"
             >
-              Umfrage veröffentlichen
+              {editingPollId ? 'Änderungen speichern' : 'Umfrage veröffentlichen'}
             </button>
           </div>
         </form>
@@ -293,9 +344,9 @@ export const PollsView: React.FC = () => {
         ))}
       </div>
 
-      {/* Polls Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {filteredPolls.map((poll) => {
+      {/* Polls Grid + Collapsible Closed Polls Accordion */}
+      {(() => {
+        const renderPollCard = (poll: Poll) => {
           const catMeta = POLL_CATEGORY_META[poll.category];
           const creator = getTraveler(poll.createdBy);
           const totalVotes = poll.options.reduce(
@@ -303,6 +354,7 @@ export const PollsView: React.FC = () => {
             0
           );
           const maxVotes = Math.max(...poll.options.map((o) => o.votes.length), 0);
+          const isConfirmingDelete = confirmDeletePollId === poll.id;
 
           return (
             <div
@@ -338,26 +390,69 @@ export const PollsView: React.FC = () => {
                     )}
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => togglePollClosed(poll.id)}
-                    className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/80 hover:bg-white text-neutral-700 transition-colors"
-                    title={
-                      poll.isClosed
-                        ? 'Abstimmung wieder öffnen'
-                        : 'Abstimmung abschließen'
-                    }
-                  >
-                    {poll.isClosed ? (
-                      <>
-                        <Unlock className="w-3 h-3" /> Öffnen
-                      </>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => togglePollClosed(poll.id)}
+                      className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/80 hover:bg-white text-neutral-700 transition-colors"
+                      title={
+                        poll.isClosed
+                          ? 'Abstimmung wieder öffnen'
+                          : 'Abstimmung abschließen'
+                      }
+                    >
+                      {poll.isClosed ? (
+                        <>
+                          <Unlock className="w-3 h-3" /> Öffnen
+                        </>
+                      ) : (
+                        <>
+                          <Lock className="w-3 h-3" /> Abschließen
+                        </>
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleStartEditPoll(poll)}
+                      className="w-7 h-7 rounded-full hover:bg-black/10 text-neutral-500 hover:text-[#141416] flex items-center justify-center transition-colors"
+                      title="Abstimmung bearbeiten"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+
+                    {isConfirmingDelete ? (
+                      <div className="inline-flex items-center gap-1 bg-red-50 border border-red-200 rounded-full px-2 py-0.5 text-[10px] font-bold">
+                        <span className="text-red-700">Löschen?</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            deletePoll(poll.id);
+                            setConfirmDeletePollId(null);
+                          }}
+                          className="px-1.5 py-0.5 rounded-full bg-red-600 text-white hover:bg-red-700"
+                        >
+                          Ja
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setConfirmDeletePollId(null)}
+                          className="px-1.5 py-0.5 rounded-full bg-white text-neutral-700 hover:bg-neutral-100"
+                        >
+                          Nein
+                        </button>
+                      </div>
                     ) : (
-                      <>
-                        <Lock className="w-3 h-3" /> Abschließen
-                      </>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmDeletePollId(poll.id)}
+                        className="w-7 h-7 rounded-full hover:bg-red-100 text-neutral-400 hover:text-red-600 flex items-center justify-center transition-colors"
+                        title="Abstimmung löschen"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     )}
-                  </button>
+                  </div>
                 </div>
 
                 <h3 className="text-base font-extrabold text-[#141416] leading-snug mb-1">
@@ -451,8 +546,55 @@ export const PollsView: React.FC = () => {
               </div>
             </div>
           );
-        })}
-      </div>
+        };
+
+        if (filterStatus === 'all') {
+          const openPolls = filteredPolls.filter((p) => !p.isClosed);
+          const closedPolls = filteredPolls.filter((p) => !!p.isClosed);
+
+          return (
+            <div className="space-y-6">
+              {openPolls.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {openPolls.map(renderPollCard)}
+                </div>
+              )}
+
+              {closedPolls.length > 0 && (
+                <div className="space-y-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowClosedPolls((prev) => !prev)}
+                    className="w-full flex items-center justify-between bg-white/75 hover:bg-white/90 backdrop-blur-md border border-black/5 rounded-[20px] px-5 py-3.5 transition-all text-left"
+                  >
+                    <span className="text-xs font-extrabold text-[#141416] flex items-center gap-2">
+                      <Lock className="w-3.5 h-3.5 text-neutral-500" />
+                      Bereits entschiedene Abstimmungen ({closedPolls.length})
+                    </span>
+                    {showClosedPolls ? (
+                      <ChevronUp className="w-4 h-4 text-neutral-600 shrink-0" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-neutral-600 shrink-0" />
+                    )}
+                  </button>
+
+                  {showClosedPolls && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      {closedPolls.map(renderPollCard)}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {filteredPolls.map(renderPollCard)}
+          </div>
+        );
+      })()}
     </div>
   );
 };
@@ -489,6 +631,12 @@ const TASK_CATEGORY_META: Record<
     bg: 'bg-[#E8C2E8]',
     icon: <FileText className="w-4 h-4 text-[#141416]" />,
   },
+  shared_equipment: {
+    label: 'Gemeinschafts-Equipment',
+    shortLabel: 'Equipment',
+    bg: 'bg-[#F7C59F]',
+    icon: <Package className="w-4 h-4 text-[#141416]" />,
+  },
 };
 
 const PRIORITY_META: Record<
@@ -514,6 +662,7 @@ export const TasksView: React.FC = () => {
     trip,
     currentUser,
     addTask,
+    updateTask,
     toggleTaskCompleted,
     toggleTaskVote,
     deleteTask,
@@ -521,6 +670,16 @@ export const TasksView: React.FC = () => {
 
   const [categoryFilter, setCategoryFilter] = useState<TaskCategory | 'all'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'done'>('all');
+  const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
+  const [confirmDeleteTaskId, setConfirmDeleteTaskId] = useState<string | null>(null);
+
+  // Inline Edit Task State
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editCategory, setEditCategory] = useState<TaskCategory>('before_trip');
+  const [editPriority, setEditPriority] = useState<TaskPriority>('important');
+  const [editAssignedTo, setEditAssignedTo] = useState<string>('');
 
   // New Task Form State
   const [title, setTitle] = useState('');
@@ -528,6 +687,32 @@ export const TasksView: React.FC = () => {
   const [category, setCategory] = useState<TaskCategory>('before_trip');
   const [priority, setPriority] = useState<TaskPriority>('important');
   const [assignedTo, setAssignedTo] = useState<string>('');
+
+  const handleStartEditTask = (task: TodoTask) => {
+    setEditingTaskId(task.id);
+    setEditTitle(task.title);
+    setEditDescription(task.description || '');
+    setEditCategory(task.category);
+    setEditPriority(task.priority);
+    setEditAssignedTo(task.assignedTo || '');
+  };
+
+  const handleSaveEditTask = (e: React.FormEvent, taskId: string) => {
+    e.preventDefault();
+    if (!editTitle.trim()) return;
+    updateTask(taskId, {
+      title: editTitle.trim(),
+      description: editDescription.trim() || undefined,
+      category: editCategory,
+      priority: editPriority,
+      assignedTo: editAssignedTo || undefined,
+    });
+    setEditingTaskId(null);
+  };
+
+  const toggleCategoryCollapse = (catKey: string) => {
+    setCollapsedCategories((prev) => ({ ...prev, [catKey]: !prev[catKey] }));
+  };
 
   const handleAddTask = (e: React.FormEvent) => {
     e.preventDefault();
@@ -630,6 +815,7 @@ export const TasksView: React.FC = () => {
             className="bg-white rounded-2xl px-3 py-2.5 text-xs font-semibold border border-black/10"
           >
             <option value="before_trip">Vor der Reise (Buchungen & Orga)</option>
+            <option value="shared_equipment">Gemeinschafts-Equipment</option>
             <option value="packing">Packliste & Gemeinschaftsgepäck</option>
             <option value="shopping">Einkaufsliste vor Ort</option>
             <option value="documents">Dokumente & Wichtiges</option>
@@ -744,114 +930,323 @@ export const TasksView: React.FC = () => {
         </div>
       </div>
 
-      {/* Tasks List */}
-      <div className="space-y-2.5">
-        {filteredTasks.map((task) => {
-          const catMeta = TASK_CATEGORY_META[task.category];
-          const prioMeta = PRIORITY_META[task.priority];
-          const assignee = task.assignedTo ? getTraveler(task.assignedTo) : null;
-          const hasVoted = task.votes.includes(currentUser.id);
+      {/* Tasks Grouped by Collapsible Category Accordions */}
+      <div className="space-y-4">
+        {(Object.keys(TASK_CATEGORY_META) as TaskCategory[])
+          .filter((catKey) => categoryFilter === 'all' || categoryFilter === catKey)
+          .map((catKey) => {
+            const catMeta = TASK_CATEGORY_META[catKey];
+            const allCatTasks = trip.tasks.filter((t) => t.category === catKey);
+            const catTasks = filteredTasks.filter((t) => t.category === catKey);
+            const catDone = allCatTasks.filter((t) => t.completed).length;
+            const catTotal = allCatTasks.length;
+            const catPct = catTotal > 0 ? Math.round((catDone / catTotal) * 100) : 0;
+            const isCollapsed = !!collapsedCategories[catKey];
+            const isEquipment = catKey === 'shared_equipment';
 
-          return (
-            <div
-              key={task.id}
-              className={`rounded-[22px] p-4 border transition-all flex items-center justify-between gap-4 ${
-                task.completed
-                  ? 'bg-[#EFECE6]/40 border-black/5 opacity-70'
-                  : 'bg-[#EFECE6]/90 hover:bg-[#EFECE6] border-black/5 shadow-2xs'
-              }`}
-            >
-              <div className="flex items-start gap-3.5 min-w-0 flex-1">
+            if (catTotal === 0 && categoryFilter === 'all') return null;
+
+            return (
+              <div
+                key={catKey}
+                className="bg-white/60 backdrop-blur-md rounded-[26px] border border-black/5 overflow-hidden shadow-2xs"
+              >
+                {/* Collapsible Category Header with Progress Bar */}
                 <button
                   type="button"
-                  onClick={() => toggleTaskCompleted(task.id)}
-                  className="mt-0.5 text-[#141416] hover:scale-110 transition-transform shrink-0"
-                  title={
-                    task.completed
-                      ? 'Als offen markieren'
-                      : 'Als erledigt abhaken'
-                  }
+                  onClick={() => toggleCategoryCollapse(catKey)}
+                  className="w-full px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-white/80 transition-colors text-left"
                 >
-                  {task.completed ? (
-                    <CheckCircle2 className="w-5 h-5 text-emerald-700 fill-[#A9B882]" />
-                  ) : (
-                    <Square className="w-5 h-5 text-neutral-500" />
-                  )}
-                </button>
-
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span
-                      className={`text-sm font-extrabold ${
-                        task.completed
-                          ? 'line-through text-neutral-500'
-                          : 'text-[#141416]'
-                      }`}
-                    >
-                      {task.title}
-                    </span>
-
-                    <span
-                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${catMeta.bg} text-[#141416]`}
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-9 h-9 rounded-2xl ${catMeta.bg} flex items-center justify-center shrink-0`}
                     >
                       {catMeta.icon}
-                      <span>{catMeta.shortLabel}</span>
-                    </span>
-
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${prioMeta.badgeClass}`}
-                    >
-                      {prioMeta.label}
-                    </span>
-
-                    {assignee && (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-white text-[#141416]">
-                        <span
-                          style={{ backgroundColor: assignee.color }}
-                          className="w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center"
-                        >
-                          {assignee.initials}
-                        </span>
-                        <span>{assignee.name}</span>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-sm font-extrabold text-[#141416]">
+                          {catMeta.label}
+                        </h3>
+                        {isEquipment && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#F7C59F]/60 text-[#141416]">
+                            Wer bringt es mit?
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[11px] font-semibold text-neutral-500">
+                        {catDone} / {catTotal} {isEquipment ? 'eingepackt' : 'erledigt'}
                       </span>
-                    )}
+                    </div>
                   </div>
 
-                  {task.description && (
-                    <p className="text-xs text-neutral-600 mt-1">
-                      {task.description}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => toggleTaskVote(task.id)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
-                    hasVoted
-                      ? 'bg-[#141416] text-white'
-                      : 'bg-white hover:bg-[#F4DF7B] text-[#141416]'
-                  }`}
-                  title="Wichtigkeit betonen"
-                >
-                  <ThumbsUp className="w-3.5 h-3.5" />
-                  <span>{task.votes.length}</span>
+                  <div className="flex items-center gap-3 sm:min-w-[200px]">
+                    <div className="flex-1 h-2 rounded-full bg-[#EFECE6] overflow-hidden">
+                      <div
+                        style={{ width: `${catPct}%` }}
+                        className="h-full bg-[#141416] rounded-full transition-all duration-300"
+                      />
+                    </div>
+                    <span className="text-[11px] font-bold text-[#141416] w-9 text-right">
+                      {catPct}%
+                    </span>
+                    {isCollapsed ? (
+                      <ChevronDown className="w-4 h-4 text-neutral-600 shrink-0" />
+                    ) : (
+                      <ChevronUp className="w-4 h-4 text-neutral-600 shrink-0" />
+                    )}
+                  </div>
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => deleteTask(task.id)}
-                  className="w-8 h-8 rounded-full hover:bg-red-100 text-neutral-400 hover:text-red-600 flex items-center justify-center transition-colors"
-                  title="Aufgabe löschen"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                {/* Category Tasks List */}
+                {!isCollapsed && (
+                  <div className="px-4 pb-4 space-y-2.5">
+                    {catTasks.length === 0 ? (
+                      <div className="rounded-2xl bg-[#EFECE6]/50 p-4 text-center text-xs text-neutral-500">
+                        Keine Aufgaben in diesem Filterstatus.
+                      </div>
+                    ) : (
+                      catTasks.map((task) => {
+                        const prioMeta = PRIORITY_META[task.priority];
+                        const assignee = task.assignedTo ? getTraveler(task.assignedTo) : null;
+                        const hasVoted = task.votes.includes(currentUser.id);
+                        const isConfirmingDelete = confirmDeleteTaskId === task.id;
+                        const isEditing = editingTaskId === task.id;
+
+                        if (isEditing) {
+                          return (
+                            <form
+                              key={task.id}
+                              onSubmit={(e) => handleSaveEditTask(e, task.id)}
+                              className="rounded-[22px] p-4 bg-white border border-[#141416]/20 shadow-xs space-y-2.5"
+                            >
+                              <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
+                                <input
+                                  type="text"
+                                  required
+                                  value={editTitle}
+                                  onChange={(e) => setEditTitle(e.target.value)}
+                                  className="md:col-span-2 bg-[#F9F6F0] rounded-xl px-3 py-2 text-xs font-bold border border-black/10"
+                                  placeholder="Titel *"
+                                />
+                                <select
+                                  value={editCategory}
+                                  onChange={(e) => setEditCategory(e.target.value as TaskCategory)}
+                                  className="bg-[#F9F6F0] rounded-xl px-2.5 py-2 text-xs font-semibold border border-black/10"
+                                >
+                                  <option value="before_trip">Vor der Reise</option>
+                                  <option value="shared_equipment">Gemeinschafts-Equipment</option>
+                                  <option value="packing">Packliste</option>
+                                  <option value="shopping">Einkauf vor Ort</option>
+                                  <option value="documents">Dokumente</option>
+                                </select>
+                                <select
+                                  value={editPriority}
+                                  onChange={(e) => setEditPriority(e.target.value as TaskPriority)}
+                                  className="bg-[#F9F6F0] rounded-xl px-2.5 py-2 text-xs font-semibold border border-black/10"
+                                >
+                                  <option value="normal">Normal</option>
+                                  <option value="important">Wichtig</option>
+                                  <option value="critical">Dringend!</option>
+                                </select>
+                                <select
+                                  value={editAssignedTo}
+                                  onChange={(e) => setEditAssignedTo(e.target.value)}
+                                  className="bg-[#F9F6F0] rounded-xl px-2.5 py-2 text-xs font-semibold border border-black/10"
+                                >
+                                  <option value="">Offen / Alle</option>
+                                  {trip.travelers.map((t) => (
+                                    <option key={t.id} value={t.id}>
+                                      {t.name}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                <input
+                                  type="text"
+                                  value={editDescription}
+                                  onChange={(e) => setEditDescription(e.target.value)}
+                                  className="flex-1 bg-[#F9F6F0] rounded-xl px-3 py-2 text-xs border border-black/10"
+                                  placeholder="Optionale Notiz..."
+                                />
+                                <div className="flex items-center justify-end gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => setEditingTaskId(null)}
+                                    className="px-3 py-1.5 rounded-full text-xs font-bold bg-[#EFECE6] text-neutral-700"
+                                  >
+                                    Abbrechen
+                                  </button>
+                                  <button
+                                    type="submit"
+                                    className="px-4 py-1.5 rounded-full text-xs font-bold bg-[#141416] text-white"
+                                  >
+                                    Speichern
+                                  </button>
+                                </div>
+                              </div>
+                            </form>
+                          );
+                        }
+
+                        return (
+                          <div
+                            key={task.id}
+                            className={`rounded-[22px] p-4 border transition-all flex items-center justify-between gap-4 ${
+                              task.completed
+                                ? 'bg-[#EFECE6]/40 border-black/5 opacity-75'
+                                : 'bg-[#EFECE6]/90 hover:bg-[#EFECE6] border-black/5 shadow-2xs'
+                            }`}
+                          >
+                            <div className="flex items-start gap-3.5 min-w-0 flex-1">
+                              <button
+                                type="button"
+                                onClick={() => toggleTaskCompleted(task.id)}
+                                className="mt-0.5 text-[#141416] hover:scale-110 transition-transform shrink-0"
+                                title={
+                                  task.completed
+                                    ? 'Als offen markieren'
+                                    : isEquipment
+                                    ? 'Als eingepackt markieren'
+                                    : 'Als erledigt abhaken'
+                                }
+                              >
+                                {task.completed ? (
+                                  <CheckCircle2 className="w-5 h-5 text-emerald-700 fill-[#A9B882]" />
+                                ) : (
+                                  <Square className="w-5 h-5 text-neutral-500" />
+                                )}
+                              </button>
+
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span
+                                    className={`text-sm font-extrabold ${
+                                      task.completed
+                                        ? 'line-through text-neutral-500'
+                                        : 'text-[#141416]'
+                                    }`}
+                                  >
+                                    {task.title}
+                                  </span>
+
+                                  <span
+                                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${prioMeta.badgeClass}`}
+                                  >
+                                    {prioMeta.label}
+                                  </span>
+
+                                  {isEquipment && task.completed && (
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#A9B882] text-[#141416]">
+                                      <CheckCircle2 className="w-3 h-3" /> Eingepackt
+                                    </span>
+                                  )}
+
+                                  {isEquipment ? (
+                                    assignee ? (
+                                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white text-[#141416] border border-black/5">
+                                        <span
+                                          style={{ backgroundColor: assignee.color }}
+                                          className="w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center"
+                                        >
+                                          {assignee.initials}
+                                        </span>
+                                        <span>Bringt mit: {assignee.name}</span>
+                                      </span>
+                                    ) : (
+                                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-300/60">
+                                        Wer bringt es mit?
+                                      </span>
+                                    )
+                                  ) : (
+                                    assignee && (
+                                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-white text-[#141416]">
+                                        <span
+                                          style={{ backgroundColor: assignee.color }}
+                                          className="w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center"
+                                        >
+                                          {assignee.initials}
+                                        </span>
+                                        <span>{assignee.name}</span>
+                                      </span>
+                                    )
+                                  )}
+                                </div>
+
+                                {task.description && (
+                                  <p className="text-xs text-neutral-600 mt-1">
+                                    {task.description}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => toggleTaskVote(task.id)}
+                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
+                                  hasVoted
+                                    ? 'bg-[#141416] text-white'
+                                    : 'bg-white hover:bg-[#F4DF7B] text-[#141416]'
+                                }`}
+                                title="Wichtigkeit betonen"
+                              >
+                                <ThumbsUp className="w-3.5 h-3.5" />
+                                <span>{task.votes.length}</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleStartEditTask(task)}
+                                className="w-8 h-8 rounded-full hover:bg-black/10 text-neutral-500 hover:text-[#141416] flex items-center justify-center transition-colors"
+                                title="Aufgabe bearbeiten"
+                              >
+                                <Pencil className="w-3.5 h-3.5" />
+                              </button>
+
+                              {isConfirmingDelete ? (
+                                <div className="inline-flex items-center gap-1 bg-red-50 border border-red-200 rounded-full px-2 py-1 text-[10px] font-bold">
+                                  <span className="text-red-700">Löschen?</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      deleteTask(task.id);
+                                      setConfirmDeleteTaskId(null);
+                                    }}
+                                    className="px-1.5 py-0.5 rounded-full bg-red-600 text-white hover:bg-red-700"
+                                  >
+                                    Ja
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setConfirmDeleteTaskId(null)}
+                                    className="px-1.5 py-0.5 rounded-full bg-white text-neutral-700 hover:bg-neutral-100"
+                                  >
+                                    Nein
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => setConfirmDeleteTaskId(task.id)}
+                                  className="w-8 h-8 rounded-full hover:bg-red-100 text-neutral-400 hover:text-red-600 flex items-center justify-center transition-colors"
+                                  title="Aufgabe löschen"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                )}
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
     </div>
   );

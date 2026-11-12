@@ -12,6 +12,7 @@ import {
   Calendar,
   Users,
   KeyRound,
+  Trash2,
 } from 'lucide-react';
 import { useVacation } from '../context/VacationContext';
 
@@ -31,6 +32,7 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
     switchTrip,
     switchToDemoTrip,
     setIsNewTripModalOpen,
+    deleteTrip,
   } = useVacation();
 
   const [passwordInput, setPasswordInput] = useState('');
@@ -40,6 +42,7 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
     'select-trip'
   );
   const [newUserName, setNewUserName] = useState('');
+  const [confirmDeleteTripId, setConfirmDeleteTripId] = useState<string | null>(null);
 
   // Custom trips vs Demo trip
   const customTrips = savedTrips.filter((t) => !t.isDemo);
@@ -222,24 +225,72 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
                     </p>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      {customTrips.map((t) => (
-                        <button
-                          key={t.id}
-                          type="button"
-                          onClick={() => handleSelectExistingTrip(t.id)}
-                          className="bg-white hover:bg-[#C5D1F5]/50 text-left p-4 rounded-2xl border border-black/5 transition-all flex items-center justify-between group cursor-pointer"
-                        >
-                          <div className="min-w-0 pr-2">
-                            <p className="font-extrabold text-sm text-[#141416] truncate">
-                              {t.title}
-                            </p>
-                            <p className="text-xs text-[#141416]/60 truncate mt-0.5">
-                              {t.destination} · {t.totalDays} Tage
-                            </p>
+                      {customTrips.map((t) => {
+                        const isConfirmingDelete = confirmDeleteTripId === t.id;
+                        return (
+                          <div
+                            key={t.id}
+                            onClick={() => {
+                              if (!isConfirmingDelete) {
+                                handleSelectExistingTrip(t.id);
+                              }
+                            }}
+                            className="bg-white hover:bg-[#C5D1F5]/50 text-left p-4 rounded-2xl border border-black/5 transition-all flex items-center justify-between gap-2 group cursor-pointer"
+                          >
+                            <div className="min-w-0 flex-1 pr-1">
+                              <p className="font-extrabold text-sm text-[#141416] truncate">
+                                {t.title}
+                              </p>
+                              <p className="text-xs text-[#141416]/60 truncate mt-0.5">
+                                {t.destination} · {t.totalDays} Tage
+                              </p>
+                            </div>
+
+                            {isConfirmingDelete ? (
+                              <div
+                                className="flex items-center gap-1 shrink-0"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <span className="text-[10px] font-bold text-red-700 mr-0.5">
+                                  Wirklich?
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    deleteTrip(t.id);
+                                    setConfirmDeleteTripId(null);
+                                  }}
+                                  className="px-2 py-1 rounded-full bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold transition-colors cursor-pointer"
+                                >
+                                  Löschen
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setConfirmDeleteTripId(null)}
+                                  className="px-2 py-1 rounded-full bg-black/10 hover:bg-black/15 text-[#141416] text-[10px] font-bold transition-colors cursor-pointer"
+                                >
+                                  Abbrechen
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setConfirmDeleteTripId(t.id);
+                                  }}
+                                  title="Urlaub löschen"
+                                  className="w-7 h-7 rounded-full hover:bg-red-50 text-[#141416]/35 hover:text-red-600 flex items-center justify-center transition-colors cursor-pointer"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                                <ArrowRight className="w-4 h-4 text-[#141416]/40 group-hover:text-[#141416] group-hover:translate-x-0.5 transition-all" />
+                              </div>
+                            )}
                           </div>
-                          <ArrowRight className="w-4 h-4 text-[#141416]/40 group-hover:text-[#141416] group-hover:translate-x-0.5 transition-all shrink-0" />
-                        </button>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>

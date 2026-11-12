@@ -19,6 +19,10 @@ import {
   CalendarCheck,
   X,
   Utensils,
+  Pencil,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
 } from 'lucide-react';
 import { useVacation } from '../context/VacationContext';
 import {
@@ -453,6 +457,7 @@ export const ScheduleView: React.FC = () => {
     selectedDay,
     setSelectedDay,
     addActivity,
+    updateActivity,
     toggleActivityVote,
     updateActivityStatus,
     deleteActivity,
@@ -462,6 +467,9 @@ export const ScheduleView: React.FC = () => {
   const [sortBy, setSortBy] = useState<'time' | 'votes'>('time');
   const [categoryFilter, setCategoryFilter] = useState<ActivityCategory | 'all'>('all');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingActivityId, setEditingActivityId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [collapsedDays, setCollapsedDays] = useState<Record<number, boolean>>({});
 
   // New Activity Form State
   const [title, setTitle] = useState('');
@@ -512,11 +520,38 @@ export const ScheduleView: React.FC = () => {
       color: '#E8C2E8',
     };
 
+  const resetForm = () => {
+    setTitle('');
+    setFormDay(selectedDay);
+    setTimeSlot('10:00');
+    setEndTime('12:30');
+    setCategory('activity');
+    setLocation('');
+    setDescription('');
+    setEstimatedCost('20');
+    setStatus('idea');
+    setEditingActivityId(null);
+  };
+
+  const handleStartEdit = (act: DayActivity) => {
+    setEditingActivityId(act.id);
+    setTitle(act.title);
+    setFormDay(act.dayNumber);
+    setTimeSlot(act.timeSlot);
+    setEndTime(act.endTime || '');
+    setCategory(act.category);
+    setLocation(act.location);
+    setDescription(act.description);
+    setEstimatedCost(String(act.estimatedCost));
+    setStatus(act.status);
+    setShowAddForm(true);
+  };
+
   const handleCreateActivity = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
 
-    addActivity({
+    const payload = {
       dayNumber: formDay,
       timeSlot,
       endTime: endTime || undefined,
@@ -526,12 +561,20 @@ export const ScheduleView: React.FC = () => {
       description: description.trim() || 'Gemeinsamer Vorschlag für den Tagesplan.',
       estimatedCost: Math.max(0, Number(estimatedCost) || 0),
       status,
-    });
+    };
 
-    setTitle('');
-    setLocation('');
-    setDescription('');
+    if (editingActivityId) {
+      updateActivity(editingActivityId, payload);
+    } else {
+      addActivity(payload);
+    }
+
+    resetForm();
     setShowAddForm(false);
+  };
+
+  const toggleDayCollapse = (dayNum: number) => {
+    setCollapsedDays((prev) => ({ ...prev, [dayNum]: !prev[dayNum] }));
   };
 
   return (
@@ -554,7 +597,15 @@ export const ScheduleView: React.FC = () => {
 
         <button
           type="button"
-          onClick={() => setShowAddForm((prev) => !prev)}
+          onClick={() => {
+            if (showAddForm) {
+              resetForm();
+              setShowAddForm(false);
+            } else {
+              resetForm();
+              setShowAddForm(true);
+            }
+          }}
           className="bg-[#141416] hover:bg-neutral-800 text-white rounded-full px-5 py-3 text-xs font-bold flex items-center gap-2 self-start md:self-auto shadow-sm transition-all shrink-0"
         >
           <Plus className="w-4 h-4" />
@@ -625,15 +676,22 @@ export const ScheduleView: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-base font-bold text-[#141416]">
-                Neue Aktivität / Ausflug vorschlagen
+                {editingActivityId
+                  ? 'Aktivität bearbeiten'
+                  : 'Neue Aktivität / Ausflug vorschlagen'}
               </h3>
               <p className="text-xs text-neutral-600">
-                Vorgeschlagen von <strong>{currentUser.name}</strong> – andere Reisende können sofort abstimmen.
+                {editingActivityId
+                  ? 'Änderungen speichern – alle bisherigen Votes bleiben erhalten.'
+                  : <>Vorgeschlagen von <strong>{currentUser.name}</strong> – andere Reisende können sofort abstimmen.</>}
               </p>
             </div>
             <button
               type="button"
-              onClick={() => setShowAddForm(false)}
+              onClick={() => {
+                resetForm();
+                setShowAddForm(false);
+              }}
               className="w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center"
             >
               <X className="w-4 h-4" />
@@ -774,7 +832,10 @@ export const ScheduleView: React.FC = () => {
           <div className="flex justify-end gap-2">
             <button
               type="button"
-              onClick={() => setShowAddForm(false)}
+              onClick={() => {
+                resetForm();
+                setShowAddForm(false);
+              }}
               className="px-4 py-2 rounded-full text-xs font-bold bg-white/80 text-neutral-700"
             >
               Abbrechen
@@ -783,7 +844,7 @@ export const ScheduleView: React.FC = () => {
               type="submit"
               className="px-5 py-2.5 rounded-full text-xs font-bold bg-[#141416] text-white hover:bg-neutral-800"
             >
-              Aktivität speichern
+              {editingActivityId ? 'Änderungen speichern' : 'Aktivität speichern'}
             </button>
           </div>
         </form>
@@ -842,152 +903,254 @@ export const ScheduleView: React.FC = () => {
           </p>
           <button
             type="button"
-            onClick={() => setShowAddForm(true)}
+            onClick={() => {
+              resetForm();
+              setShowAddForm(true);
+            }}
             className="bg-[#141416] text-white rounded-full px-5 py-2.5 text-xs font-bold"
           >
             + Jetzt Vorschlag erstellen
           </button>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredActivities.map((act) => {
-            const catMeta = CATEGORY_META[act.category];
-            const proposer = getTraveler(act.createdBy);
-            const hasVoted = act.votes.includes(currentUser.id);
+      ) : (() => {
+        const renderActivityCard = (act: DayActivity) => {
+          const catMeta = CATEGORY_META[act.category];
+          const proposer = getTraveler(act.createdBy);
+          const hasVoted = act.votes.includes(currentUser.id);
+          const isConfirmingDelete = confirmDeleteId === act.id;
 
-            return (
-              <div
-                key={act.id}
-                className="bg-[#EFECE6]/80 hover:bg-[#EFECE6] rounded-[26px] p-5 border border-black/5 flex flex-col justify-between gap-4 transition-all shadow-xs"
-              >
-                <div>
-                  {/* Top Meta Row */}
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {viewAllDays && (
-                        <span className="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-[#141416] text-white">
-                          Tag {act.dayNumber}
-                        </span>
-                      )}
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-white text-[#141416]">
-                        <Clock className="w-3 h-3 text-neutral-500" />
-                        {act.timeSlot}
-                        {act.endTime ? ` – ${act.endTime}` : ''}
+          return (
+            <div
+              key={act.id}
+              className="bg-[#EFECE6]/80 hover:bg-[#EFECE6] rounded-[26px] p-5 border border-black/5 flex flex-col justify-between gap-4 transition-all shadow-xs"
+            >
+              <div>
+                {/* Top Meta Row */}
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {viewAllDays && (
+                      <span className="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-[#141416] text-white">
+                        Tag {act.dayNumber}
                       </span>
-                      <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${catMeta.badgeBg}`}
-                      >
-                        {catMeta.icon}
-                        <span>{catMeta.label}</span>
-                      </span>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => deleteActivity(act.id)}
-                      className="w-7 h-7 rounded-full hover:bg-red-100 text-neutral-400 hover:text-red-600 flex items-center justify-center transition-colors"
-                      title="Vorschlag löschen"
+                    )}
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-white text-[#141416]">
+                      <Clock className="w-3 h-3 text-neutral-500" />
+                      {act.timeSlot}
+                      {act.endTime ? ` – ${act.endTime}` : ''}
+                    </span>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${catMeta.badgeBg}`}
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                      {catMeta.icon}
+                      <span>{catMeta.label}</span>
+                    </span>
                   </div>
 
-                  {/* Title & Description */}
-                  <h3 className="text-base font-extrabold text-[#141416] leading-snug">
-                    {act.title}
-                  </h3>
-                  <p className="text-xs text-neutral-600 mt-1.5 leading-relaxed">
-                    {act.description}
-                  </p>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => handleStartEdit(act)}
+                      className="w-7 h-7 rounded-full hover:bg-black/10 text-neutral-500 hover:text-[#141416] flex items-center justify-center transition-colors"
+                      title="Aktivität bearbeiten"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
 
-                  {/* Location, Cost & Proposer Badges */}
-                  <div className="flex flex-wrap items-center gap-2 mt-3.5">
-                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-neutral-700 bg-white/80 px-2.5 py-1 rounded-full">
-                      <MapPin className="w-3 h-3 text-neutral-500" />
-                      {act.location}
-                    </span>
-
-                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#141416] bg-[#F4DF7B]/70 px-2.5 py-1 rounded-full">
-                      {act.estimatedCost > 0
-                        ? `ca. ${act.estimatedCost} € p.P.`
-                        : 'Kostenlos'}
-                    </span>
-
-                    <span className="inline-flex items-center gap-1.5 text-[11px] text-neutral-600 bg-white/60 px-2.5 py-1 rounded-full">
-                      <span
-                        style={{ backgroundColor: proposer.color }}
-                        className="w-4 h-4 rounded-full text-[9px] font-bold text-[#141416] flex items-center justify-center"
+                    {isConfirmingDelete ? (
+                      <div className="inline-flex items-center gap-1 bg-red-50 border border-red-200 rounded-full px-2 py-0.5 text-[11px] font-bold">
+                        <span className="text-red-700">Löschen?</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            deleteActivity(act.id);
+                            setConfirmDeleteId(null);
+                          }}
+                          className="px-1.5 py-0.5 rounded-full bg-red-600 text-white hover:bg-red-700"
+                        >
+                          Ja
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setConfirmDeleteId(null)}
+                          className="px-1.5 py-0.5 rounded-full bg-white text-neutral-700 hover:bg-neutral-100"
+                        >
+                          Nein
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setConfirmDeleteId(act.id)}
+                        className="w-7 h-7 rounded-full hover:bg-red-100 text-neutral-400 hover:text-red-600 flex items-center justify-center transition-colors"
+                        title="Vorschlag löschen"
                       >
-                        {proposer.initials}
-                      </span>
-                      Idee von {proposer.name}
-                    </span>
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
                 </div>
 
-                {/* Footer: Status Switcher & Interactive Voting */}
-                <div className="pt-3.5 border-t border-black/5 flex flex-wrap items-center justify-between gap-3">
-                  {/* Status Switcher */}
-                  <div className="flex items-center gap-1 bg-white/70 p-1 rounded-full">
-                    {STATUS_OPTIONS.map((st) => {
-                      const active = act.status === st.value;
+                {/* Title & Description */}
+                <h3 className="text-base font-extrabold text-[#141416] leading-snug">
+                  {act.title}
+                </h3>
+                <p className="text-xs text-neutral-600 mt-1.5 leading-relaxed">
+                  {act.description}
+                </p>
+
+                {/* Location, Maps Link, Cost & Proposer Badges */}
+                <div className="flex flex-wrap items-center gap-2 mt-3.5">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-neutral-700 bg-white/80 px-2.5 py-1 rounded-full">
+                    <MapPin className="w-3 h-3 text-neutral-500" />
+                    {act.location}
+                  </span>
+
+                  {act.location && (
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(act.location)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-[#141416] bg-white/90 hover:bg-[#C5D1F5]/70 px-2.5 py-1 rounded-full border border-black/5 transition-colors"
+                      title={`In Google Maps öffnen: ${act.location}`}
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      <span>Maps</span>
+                    </a>
+                  )}
+
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#141416] bg-[#F4DF7B]/70 px-2.5 py-1 rounded-full">
+                    {act.estimatedCost > 0
+                      ? `ca. ${act.estimatedCost} € p.P.`
+                      : 'Kostenlos'}
+                  </span>
+
+                  <span className="inline-flex items-center gap-1.5 text-[11px] text-neutral-600 bg-white/60 px-2.5 py-1 rounded-full">
+                    <span
+                      style={{ backgroundColor: proposer.color }}
+                      className="w-4 h-4 rounded-full text-[9px] font-bold text-[#141416] flex items-center justify-center"
+                    >
+                      {proposer.initials}
+                    </span>
+                    Idee von {proposer.name}
+                  </span>
+                </div>
+              </div>
+
+              {/* Footer: Status Switcher & Interactive Voting */}
+              <div className="pt-3.5 border-t border-black/5 flex flex-wrap items-center justify-between gap-3">
+                {/* Status Switcher */}
+                <div className="flex items-center gap-1 bg-white/70 p-1 rounded-full">
+                  {STATUS_OPTIONS.map((st) => {
+                    const active = act.status === st.value;
+                    return (
+                      <button
+                        key={st.value}
+                        type="button"
+                        onClick={() => updateActivityStatus(act.id, st.value)}
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all ${
+                          active
+                            ? `${st.pillClass} shadow-2xs`
+                            : 'text-neutral-500 hover:text-[#141416]'
+                        }`}
+                      >
+                        {st.icon}
+                        <span>{st.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Voters & Vote Button */}
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center -space-x-1.5">
+                    {act.votes.map((voterId) => {
+                      const voter = getTraveler(voterId);
                       return (
-                        <button
-                          key={st.value}
-                          type="button"
-                          onClick={() => updateActivityStatus(act.id, st.value)}
-                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all ${
-                            active
-                              ? `${st.pillClass} shadow-2xs`
-                              : 'text-neutral-500 hover:text-[#141416]'
-                          }`}
+                        <span
+                          key={voterId}
+                          style={{ backgroundColor: voter.color }}
+                          className="w-6 h-6 rounded-full text-[10px] font-bold text-[#141416] flex items-center justify-center ring-2 ring-[#EFECE6]"
+                          title={`${voter.name} stimmt dafür`}
                         >
-                          {st.icon}
-                          <span>{st.label}</span>
-                        </button>
+                          {voter.initials}
+                        </span>
                       );
                     })}
                   </div>
 
-                  {/* Voters & Vote Button */}
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center -space-x-1.5">
-                      {act.votes.map((voterId) => {
-                        const voter = getTraveler(voterId);
-                        return (
-                          <span
-                            key={voterId}
-                            style={{ backgroundColor: voter.color }}
-                            className="w-6 h-6 rounded-full text-[10px] font-bold text-[#141416] flex items-center justify-center ring-2 ring-[#EFECE6]"
-                            title={`${voter.name} stimmt dafür`}
-                          >
-                            {voter.initials}
-                          </span>
-                        );
-                      })}
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => toggleActivityVote(act.id)}
-                      className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-                        hasVoted
-                          ? 'bg-[#141416] text-white shadow-xs'
-                          : 'bg-white hover:bg-[#E8C2E8] text-[#141416]'
-                      }`}
-                    >
-                      <ThumbsUp className="w-3.5 h-3.5" />
-                      <span>
-                        {hasVoted ? 'Abgestimmt' : 'Vote'} ({act.votes.length})
-                      </span>
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => toggleActivityVote(act.id)}
+                    className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
+                      hasVoted
+                        ? 'bg-[#141416] text-white shadow-xs'
+                        : 'bg-white hover:bg-[#E8C2E8] text-[#141416]'
+                    }`}
+                  >
+                    <ThumbsUp className="w-3.5 h-3.5" />
+                    <span>
+                      {hasVoted ? 'Abgestimmt' : 'Vote'} ({act.votes.length})
+                    </span>
+                  </button>
                 </div>
               </div>
-            );
-          })}
-        </div>
-      )}
+            </div>
+          );
+        };
+
+        if (viewAllDays) {
+          const dayNumbers = Array.from({ length: trip.totalDays }, (_, i) => i + 1);
+          return (
+            <div className="space-y-4">
+              {dayNumbers.map((dayNum) => {
+                const dayActs = filteredActivities.filter((a) => a.dayNumber === dayNum);
+                if (dayActs.length === 0) return null;
+                const isCollapsed = !!collapsedDays[dayNum];
+                const dayCost = dayActs.reduce((sum, a) => sum + a.estimatedCost, 0);
+
+                return (
+                  <div key={dayNum} className="space-y-3">
+                    <button
+                      type="button"
+                      onClick={() => toggleDayCollapse(dayNum)}
+                      className="w-full flex items-center justify-between bg-white/75 hover:bg-white/90 backdrop-blur-md border border-black/5 rounded-[20px] px-5 py-3.5 transition-all shadow-2xs text-left"
+                    >
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        <span className="px-2.5 py-1 rounded-full text-xs font-extrabold bg-[#141416] text-white">
+                          Tag {dayNum}
+                        </span>
+                        <span className="text-xs font-bold text-neutral-600">
+                          {getDayDateLabel(dayNum)}
+                        </span>
+                        <span className="text-xs font-bold text-[#141416]">
+                          · {dayActs.length} {dayActs.length === 1 ? 'Aktivität' : 'Aktivitäten'} · ~{dayCost} € p.P.
+                        </span>
+                      </div>
+                      {isCollapsed ? (
+                        <ChevronDown className="w-4 h-4 text-neutral-600 shrink-0" />
+                      ) : (
+                        <ChevronUp className="w-4 h-4 text-neutral-600 shrink-0" />
+                      )}
+                    </button>
+
+                    {!isCollapsed && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {dayActs.map(renderActivityCard)}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        }
+
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {filteredActivities.map(renderActivityCard)}
+          </div>
+        );
+      })()}
     </div>
   );
 };
