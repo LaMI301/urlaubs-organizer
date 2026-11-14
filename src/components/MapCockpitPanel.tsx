@@ -450,7 +450,7 @@ export const MapCockpitPanel: React.FC = () => {
     };
   }, []);
 
-  // Manage tile layer & automatic fallback (Carto Voyager -> OSM -> Offline Spatial)
+  // Manage tile layer & automatic fallback (Esri Street -> OSM -> Offline Spatial)
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
@@ -469,17 +469,17 @@ export const MapCockpitPanel: React.FC = () => {
 
     const url =
       tileMode === 'carto'
-        ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+        ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
         : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
     const attribution =
       tileMode === 'carto'
-        ? '&copy; OpenStreetMap &copy; CARTO'
+        ? 'Tiles &copy; Esri'
         : '&copy; OpenStreetMap';
 
     const layer = L.tileLayer(url, {
       attribution,
-      subdomains: tileMode === 'carto' ? 'abcd' : 'abc',
+      subdomains: 'abc',
       maxZoom: 19,
     });
 
