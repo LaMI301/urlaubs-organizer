@@ -56,39 +56,39 @@ const CATEGORY_META: Record<
 > = {
   beach: {
     label: 'Strand & Meer',
-    iconBg: 'bg-cyan-400/15 border border-cyan-400/30 text-cyan-300',
-    badgeClass: 'bg-cyan-400/15 text-cyan-300 border border-cyan-400/30',
-    icon: <Sun className="w-3.5 h-3.5 text-cyan-300" />,
+    iconBg: 'bg-[#D9822B]/14 border border-[#D9822B]/30 text-[#9E5A14]',
+    badgeClass: 'bg-[#D9822B]/14 text-[#9E5A14] border border-[#D9822B]/30',
+    icon: <Sun className="w-3.5 h-3.5 text-[#D9822B]" />,
   },
   activity: {
     label: 'Ausflug & Action',
-    iconBg: 'bg-emerald-400/15 border border-emerald-400/30 text-emerald-300',
-    badgeClass: 'bg-emerald-400/15 text-emerald-300 border border-emerald-400/30',
-    icon: <Compass className="w-3.5 h-3.5 text-emerald-300" />,
+    iconBg: 'bg-[#6E7F5E]/14 border border-[#6E7F5E]/30 text-[#4B593E]',
+    badgeClass: 'bg-[#6E7F5E]/14 text-[#4B593E] border border-[#6E7F5E]/30',
+    icon: <Compass className="w-3.5 h-3.5 text-[#6E7F5E]" />,
   },
   culture: {
     label: 'Kultur & Sightseeing',
-    iconBg: 'bg-violet-400/15 border border-violet-400/30 text-violet-300',
-    badgeClass: 'bg-violet-400/15 text-violet-300 border border-violet-400/30',
-    icon: <Landmark className="w-3.5 h-3.5 text-violet-300" />,
+    iconBg: 'bg-[#2A7B88]/12 border border-[#2A7B88]/30 text-[#1F5E68]',
+    badgeClass: 'bg-[#2A7B88]/12 text-[#1F5E68] border border-[#2A7B88]/30',
+    icon: <Landmark className="w-3.5 h-3.5 text-[#2A7B88]" />,
   },
   transport: {
     label: 'Transfer & Route',
-    iconBg: 'bg-sky-400/15 border border-sky-400/30 text-sky-300',
-    badgeClass: 'bg-sky-400/15 text-sky-300 border border-sky-400/30',
-    icon: <Car className="w-3.5 h-3.5 text-sky-300" />,
+    iconBg: 'bg-[#F3ECE1]/80 border border-[#E6DDD1] text-[#6B6259]',
+    badgeClass: 'bg-[#F3ECE1]/80 text-[#6B6259] border border-[#E6DDD1]',
+    icon: <Car className="w-3.5 h-3.5 text-[#6B6259]" />,
   },
   nightlife: {
     label: 'Abend & Nightlife',
-    iconBg: 'bg-amber-400/15 border border-amber-400/30 text-amber-300',
-    badgeClass: 'bg-amber-400/15 text-amber-300 border border-amber-400/30',
-    icon: <Music className="w-3.5 h-3.5 text-amber-300" />,
+    iconBg: 'bg-[#C85A38]/12 border border-[#C85A38]/30 text-[#A34224]',
+    badgeClass: 'bg-[#C85A38]/12 text-[#A34224] border border-[#C85A38]/30',
+    icon: <Music className="w-3.5 h-3.5 text-[#C85A38]" />,
   },
   other: {
     label: 'Sonstiges',
-    iconBg: 'bg-slate-400/15 border border-slate-400/30 text-slate-300',
-    badgeClass: 'bg-slate-400/15 text-slate-300 border border-slate-400/30',
-    icon: <Sparkles className="w-3.5 h-3.5 text-slate-300" />,
+    iconBg: 'bg-[#FAF7F2] border border-[#E6DDD1] text-[#6B6259]',
+    badgeClass: 'bg-[#FAF7F2] text-[#6B6259] border border-[#E6DDD1]',
+    icon: <Sparkles className="w-3.5 h-3.5 text-[#6B6259]" />,
   },
 };
 
@@ -101,19 +101,19 @@ const STATUS_OPTIONS: Array<{
   {
     value: 'idea',
     label: 'Idee',
-    pillClass: 'bg-amber-400/20 text-amber-200 border border-amber-400/40',
+    pillClass: 'bg-[#D9822B]/14 text-[#9E5A14] border border-[#D9822B]/30',
     icon: <Lightbulb className="w-3.5 h-3.5" />,
   },
   {
     value: 'planned',
     label: 'Geplant',
-    pillClass: 'bg-cyan-400/20 text-cyan-200 border border-cyan-400/40',
+    pillClass: 'bg-[#2A7B88]/12 text-[#1F5E68] border border-[#2A7B88]/30',
     icon: <CalendarCheck className="w-3.5 h-3.5" />,
   },
   {
     value: 'confirmed',
     label: 'Bestätigt',
-    pillClass: 'bg-emerald-400/20 text-emerald-200 border border-emerald-400/40',
+    pillClass: 'bg-[#6E7F5E]/14 text-[#4B593E] border border-[#6E7F5E]/30',
     icon: <CheckCircle2 className="w-3.5 h-3.5" />,
   },
 ];
@@ -247,7 +247,7 @@ export const QuickAddModal: React.FC = () => {
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in"
+      className="fixed inset-0 z-50 bg-[#1F1B18]/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
       onClick={handleClose}
     >
       <div
@@ -255,11 +255,11 @@ export const QuickAddModal: React.FC = () => {
         aria-modal="true"
         aria-labelledby="quick-add-modal-title"
         onClick={(e) => e.stopPropagation()}
-        className="aurora-glass-elevated rounded-[28px] max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 space-y-4"
+        className="surface-glass-elevated rounded-[28px] max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 space-y-4"
       >
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-cyan-400/15 border border-cyan-400/30 text-cyan-300 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-2xl bg-[#C85A38]/12 border border-[#C85A38]/30 text-[#A34224] flex items-center justify-center shrink-0">
               {mode === 'activity' ? (
                 <Sparkles className="w-5 h-5" />
               ) : (
@@ -269,13 +269,13 @@ export const QuickAddModal: React.FC = () => {
             <div>
               <h3
                 id="quick-add-modal-title"
-                className="text-lg font-black text-slate-100"
+                className="text-lg font-black text-[#1F1B18]"
               >
                 Neuen Vorschlag einreichen
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-[#6B6259]">
                 Du schlägst gerade vor als{' '}
-                <strong className="text-slate-200">{currentUser.name}</strong>
+                <strong className="text-[#1F1B18]">{currentUser.name}</strong>
               </p>
             </div>
           </div>
@@ -284,14 +284,14 @@ export const QuickAddModal: React.FC = () => {
             type="button"
             onClick={handleClose}
             aria-label="Dialog schließen"
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-200 flex items-center justify-center cursor-pointer"
+            className="w-8 h-8 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] border border-[#E6DDD1] text-[#6B6259] flex items-center justify-center cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Mode Switch */}
-        <div className="grid grid-cols-2 gap-1.5 bg-white/5 border border-white/10 p-1 rounded-full text-xs font-bold">
+        <div className="grid grid-cols-2 gap-1.5 bg-[#FAF7F2] border border-[#E6DDD1] p-1 rounded-full text-xs font-bold">
           <button
             type="button"
             onClick={() => {
@@ -300,8 +300,8 @@ export const QuickAddModal: React.FC = () => {
             }}
             className={`py-2 rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               mode === 'activity'
-                ? 'bg-cyan-400 text-slate-950 shadow-sm'
-                : 'text-slate-300 hover:text-white'
+                ? 'bg-[#C85A38] text-white shadow-sm'
+                : 'text-[#6B6259] hover:text-[#1F1B18]'
             }`}
           >
             <Compass className="w-3.5 h-3.5" />
@@ -315,8 +315,8 @@ export const QuickAddModal: React.FC = () => {
             }}
             className={`py-2 rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               mode === 'meal'
-                ? 'bg-cyan-400 text-slate-950 shadow-sm'
-                : 'text-slate-300 hover:text-white'
+                ? 'bg-[#C85A38] text-white shadow-sm'
+                : 'text-[#6B6259] hover:text-[#1F1B18]'
             }`}
           >
             <Utensils className="w-3.5 h-3.5" />
@@ -325,8 +325,8 @@ export const QuickAddModal: React.FC = () => {
         </div>
 
         {timeError && (
-          <div className="rounded-2xl bg-rose-500/15 border border-rose-400/40 px-3.5 py-2.5 text-xs font-semibold text-rose-200 flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-rose-300 shrink-0" />
+          <div className="rounded-2xl bg-rose-600/12 border border-rose-500/30 px-3.5 py-2.5 text-xs font-semibold text-rose-800 flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-rose-700 shrink-0" />
             <span>{timeError}</span>
           </div>
         )}
@@ -335,7 +335,7 @@ export const QuickAddModal: React.FC = () => {
           <div>
             <label
               htmlFor="quickadd-title"
-              className="text-xs font-bold text-slate-300 block mb-1.5"
+              className="text-xs font-bold text-[#1F1B18] block mb-1.5"
             >
               Titel des Vorschlags *
             </label>
@@ -351,7 +351,7 @@ export const QuickAddModal: React.FC = () => {
               }
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full aurora-input rounded-2xl px-3.5 py-2.5 text-sm font-semibold placeholder:text-slate-500"
+              className="w-full surface-input rounded-2xl px-3.5 py-2.5 text-sm font-semibold placeholder:text-[#8C8277]"
             />
           </div>
 
@@ -359,7 +359,7 @@ export const QuickAddModal: React.FC = () => {
             <div>
               <label
                 htmlFor="quickadd-day"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Reisetag
               </label>
@@ -367,10 +367,10 @@ export const QuickAddModal: React.FC = () => {
                 id="quickadd-day"
                 value={dayNumber}
                 onChange={(e) => setDayNumber(Number(e.target.value))}
-                className="w-full aurora-input rounded-2xl px-3 py-2 text-xs font-bold [color-scheme:dark]"
+                className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-bold [color-scheme:light]"
               >
                 {Array.from({ length: safeTotalDays }, (_, i) => i + 1).map((d) => (
-                  <option key={d} value={d} className="bg-[#131823] text-slate-100">
+                  <option key={d} value={d} className="bg-white text-[#1F1B18]">
                     Tag {d}
                   </option>
                 ))}
@@ -380,7 +380,7 @@ export const QuickAddModal: React.FC = () => {
             <div>
               <label
                 htmlFor="quickadd-start"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Startzeit
               </label>
@@ -392,7 +392,7 @@ export const QuickAddModal: React.FC = () => {
                   setTimeSlot(e.target.value);
                   if (timeError) setTimeError(null);
                 }}
-                className="w-full aurora-input rounded-2xl px-3 py-2 text-xs font-mono tabular-nums font-bold [color-scheme:dark]"
+                className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-mono tabular-nums font-bold [color-scheme:light]"
               />
             </div>
 
@@ -400,7 +400,7 @@ export const QuickAddModal: React.FC = () => {
               <div>
                 <label
                   htmlFor="quickadd-end"
-                  className="text-xs font-bold text-slate-300 block mb-1.5"
+                  className="text-xs font-bold text-[#1F1B18] block mb-1.5"
                 >
                   Endzeit
                 </label>
@@ -412,14 +412,14 @@ export const QuickAddModal: React.FC = () => {
                     setEndTime(e.target.value);
                     if (timeError) setTimeError(null);
                   }}
-                  className="w-full aurora-input rounded-2xl px-3 py-2 text-xs font-mono tabular-nums font-bold [color-scheme:dark]"
+                  className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-mono tabular-nums font-bold [color-scheme:light]"
                 />
               </div>
             ) : (
               <div>
                 <label
                   htmlFor="quickadd-meal-type"
-                  className="text-xs font-bold text-slate-300 block mb-1.5"
+                  className="text-xs font-bold text-[#1F1B18] block mb-1.5"
                 >
                   Mahlzeit
                 </label>
@@ -427,18 +427,18 @@ export const QuickAddModal: React.FC = () => {
                   id="quickadd-meal-type"
                   value={mealType}
                   onChange={(e) => setMealType(e.target.value as MealType)}
-                  className="w-full aurora-input rounded-2xl px-3 py-2 text-xs font-bold [color-scheme:dark]"
+                  className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-bold [color-scheme:light]"
                 >
-                  <option value="breakfast" className="bg-[#131823] text-slate-100">
+                  <option value="breakfast" className="bg-white text-[#1F1B18]">
                     Frühstück
                   </option>
-                  <option value="lunch" className="bg-[#131823] text-slate-100">
+                  <option value="lunch" className="bg-white text-[#1F1B18]">
                     Mittagessen
                   </option>
-                  <option value="dinner" className="bg-[#131823] text-slate-100">
+                  <option value="dinner" className="bg-white text-[#1F1B18]">
                     Abendessen
                   </option>
-                  <option value="snack" className="bg-[#131823] text-slate-100">
+                  <option value="snack" className="bg-white text-[#1F1B18]">
                     Snacks & Drinks
                   </option>
                 </select>
@@ -451,7 +451,7 @@ export const QuickAddModal: React.FC = () => {
               <div>
                 <label
                   htmlFor="quickadd-cat"
-                  className="text-xs font-bold text-slate-300 block mb-1.5"
+                  className="text-xs font-bold text-[#1F1B18] block mb-1.5"
                 >
                   Kategorie
                 </label>
@@ -459,24 +459,24 @@ export const QuickAddModal: React.FC = () => {
                   id="quickadd-cat"
                   value={category}
                   onChange={(e) => setCategory(e.target.value as ActivityCategory)}
-                  className="w-full aurora-input rounded-2xl px-3 py-2 text-xs font-bold [color-scheme:dark]"
+                  className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-bold [color-scheme:light]"
                 >
-                  <option value="beach" className="bg-[#131823] text-slate-100">
+                  <option value="beach" className="bg-white text-[#1F1B18]">
                     Strand & Meer
                   </option>
-                  <option value="activity" className="bg-[#131823] text-slate-100">
+                  <option value="activity" className="bg-white text-[#1F1B18]">
                     Ausflug & Action
                   </option>
-                  <option value="culture" className="bg-[#131823] text-slate-100">
+                  <option value="culture" className="bg-white text-[#1F1B18]">
                     Kultur & Sightseeing
                   </option>
-                  <option value="transport" className="bg-[#131823] text-slate-100">
+                  <option value="transport" className="bg-white text-[#1F1B18]">
                     Transfer & Route
                   </option>
-                  <option value="nightlife" className="bg-[#131823] text-slate-100">
+                  <option value="nightlife" className="bg-white text-[#1F1B18]">
                     Abend & Nightlife
                   </option>
-                  <option value="other" className="bg-[#131823] text-slate-100">
+                  <option value="other" className="bg-white text-[#1F1B18]">
                     Sonstiges
                   </option>
                 </select>
@@ -484,7 +484,7 @@ export const QuickAddModal: React.FC = () => {
               <div>
                 <label
                   htmlFor="quickadd-status"
-                  className="text-xs font-bold text-slate-300 block mb-1.5"
+                  className="text-xs font-bold text-[#1F1B18] block mb-1.5"
                 >
                   Status
                 </label>
@@ -494,15 +494,15 @@ export const QuickAddModal: React.FC = () => {
                   onChange={(e) =>
                     setStatus(e.target.value as DayActivity['status'])
                   }
-                  className="w-full aurora-input rounded-2xl px-3 py-2 text-xs font-bold [color-scheme:dark]"
+                  className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-bold [color-scheme:light]"
                 >
-                  <option value="idea" className="bg-[#131823] text-slate-100">
+                  <option value="idea" className="bg-white text-[#1F1B18]">
                     Idee (zur Abstimmung)
                   </option>
-                  <option value="planned" className="bg-[#131823] text-slate-100">
+                  <option value="planned" className="bg-white text-[#1F1B18]">
                     Geplant
                   </option>
-                  <option value="confirmed" className="bg-[#131823] text-slate-100">
+                  <option value="confirmed" className="bg-white text-[#1F1B18]">
                     Bestätigt / Gebucht
                   </option>
                 </select>
@@ -512,7 +512,7 @@ export const QuickAddModal: React.FC = () => {
             <div>
               <label
                 htmlFor="quickadd-meal-style"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Art der Verpflegung
               </label>
@@ -520,18 +520,18 @@ export const QuickAddModal: React.FC = () => {
                 id="quickadd-meal-style"
                 value={mealStyle}
                 onChange={(e) => setMealStyle(e.target.value as MealStyle)}
-                className="w-full aurora-input rounded-2xl px-3 py-2 text-xs font-bold [color-scheme:dark]"
+                className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-bold [color-scheme:light]"
               >
-                <option value="cook" className="bg-[#131823] text-slate-100">
+                <option value="cook" className="bg-white text-[#1F1B18]">
                   Selbst kochen
                 </option>
-                <option value="restaurant" className="bg-[#131823] text-slate-100">
+                <option value="restaurant" className="bg-white text-[#1F1B18]">
                   Restaurant
                 </option>
-                <option value="bakery" className="bg-[#131823] text-slate-100">
+                <option value="bakery" className="bg-white text-[#1F1B18]">
                   Bäckerei / Café
                 </option>
-                <option value="delivery" className="bg-[#131823] text-slate-100">
+                <option value="delivery" className="bg-white text-[#1F1B18]">
                   Lieferservice
                 </option>
               </select>
@@ -542,7 +542,7 @@ export const QuickAddModal: React.FC = () => {
             <div className="col-span-2">
               <label
                 htmlFor="quickadd-loc"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 {mode === 'activity' ? 'Ort / Treffpunkt' : 'Restaurant / Rezept-Idee'}
               </label>
@@ -556,14 +556,14 @@ export const QuickAddModal: React.FC = () => {
                 }
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="w-full aurora-input rounded-2xl px-3.5 py-2 text-xs font-semibold placeholder:text-slate-500"
+                className="w-full surface-input rounded-2xl px-3.5 py-2 text-xs font-semibold placeholder:text-[#8C8277]"
               />
             </div>
 
             <div>
               <label
                 htmlFor="quickadd-cost"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Kosten p.P. ({currency})
               </label>
@@ -574,7 +574,7 @@ export const QuickAddModal: React.FC = () => {
                 step="0.01"
                 value={estimatedCost}
                 onChange={(e) => setEstimatedCost(e.target.value)}
-                className="w-full aurora-input rounded-2xl px-3 py-2 text-xs font-mono tabular-nums font-semibold"
+                className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-mono tabular-nums font-semibold"
               />
             </div>
           </div>
@@ -582,7 +582,7 @@ export const QuickAddModal: React.FC = () => {
           <div>
             <label
               htmlFor="quickadd-desc"
-              className="text-xs font-bold text-slate-300 block mb-1.5"
+              className="text-xs font-bold text-[#1F1B18] block mb-1.5"
             >
               Beschreibung & Details
             </label>
@@ -592,7 +592,7 @@ export const QuickAddModal: React.FC = () => {
               placeholder="Was müssen die anderen wissen? Tipps, Links oder Details..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full aurora-input rounded-2xl px-3.5 py-2 text-xs placeholder:text-slate-500 resize-none"
+              className="w-full surface-input rounded-2xl px-3.5 py-2 text-xs placeholder:text-[#8C8277] resize-none"
             />
           </div>
 
@@ -600,7 +600,7 @@ export const QuickAddModal: React.FC = () => {
             <div>
               <label
                 htmlFor="quickadd-notes"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Einkaufsnotizen (optional)
               </label>
@@ -610,7 +610,7 @@ export const QuickAddModal: React.FC = () => {
                 placeholder="z.B. Frischer Fisch vom Markt, Zitronen, Aioli..."
                 value={shoppingNotes}
                 onChange={(e) => setShoppingNotes(e.target.value)}
-                className="w-full aurora-input rounded-2xl px-3.5 py-2 text-xs placeholder:text-slate-500"
+                className="w-full surface-input rounded-2xl px-3.5 py-2 text-xs placeholder:text-[#8C8277]"
               />
             </div>
           )}
@@ -619,13 +619,13 @@ export const QuickAddModal: React.FC = () => {
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2.5 rounded-full text-xs font-bold bg-white/10 hover:bg-white/15 text-slate-200 cursor-pointer"
+              className="px-4 py-2.5 rounded-full text-xs font-bold bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#6B6259] border border-[#E6DDD1] cursor-pointer"
             >
               Abbrechen
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-full text-xs font-extrabold bg-cyan-400 hover:bg-cyan-300 text-slate-950 shadow-[0_0_20px_rgba(34,211,238,0.28)] cursor-pointer"
+              className="px-5 py-2.5 rounded-full text-xs font-extrabold bg-[#C85A38] hover:bg-[#B54B2B] text-white shadow-sm cursor-pointer"
             >
               Vorschlag speichern
             </button>
@@ -1037,28 +1037,28 @@ export const ScheduleView: React.FC = () => {
         }}
         className={`rounded-[24px] p-5 flex flex-col justify-between gap-4 transition-all cursor-grab active:cursor-grabbing ${
           isHighlighted
-            ? 'aurora-glass-elevated ring-2 ring-cyan-400 shadow-[0_0_28px_rgba(34,211,238,0.3)]'
+            ? 'surface-glass-elevated ring-2 ring-[#C85A38] shadow-md'
             : isDragging
-            ? 'aurora-glass opacity-60 scale-[0.98] border-cyan-400/50'
+            ? 'surface-glass opacity-60 scale-[0.98] border-[#C85A38]/50'
             : conflictLabels.length > 0
-            ? 'aurora-glass border-amber-400/45 shadow-[0_0_20px_rgba(251,191,36,0.12)]'
-            : 'aurora-glass hover:border-cyan-400/35'
+            ? 'surface-glass border-[#D9822B]/50 shadow-sm'
+            : 'surface-glass hover:border-[#C85A38]/35'
         }`}
       >
         <div>
           {/* Top Meta Row */}
           <div className="flex items-start justify-between gap-2 mb-3">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <GripVertical className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+              <GripVertical className="w-3.5 h-3.5 text-[#8C8277] shrink-0" />
               {(viewAllDays ||
                 act.dayNumber < 1 ||
                 act.dayNumber > safeTotalDays) && (
-                <span className="px-2.5 py-1 rounded-full text-[11px] font-mono tabular-nums font-extrabold bg-cyan-400/20 text-cyan-200 border border-cyan-400/40">
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-mono tabular-nums font-extrabold bg-[#C85A38]/12 text-[#A34224] border border-[#C85A38]/30">
                   Tag {act.dayNumber}
                 </span>
               )}
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono tabular-nums font-bold bg-white/10 text-slate-100 border border-white/10">
-                <Clock className="w-3 h-3 text-cyan-400" />
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono tabular-nums font-bold bg-[#FAF7F2] text-[#1F1B18] border border-[#E6DDD1]">
+                <Clock className="w-3 h-3 text-[#C85A38]" />
                 {act.timeSlot}
                 {act.endTime ? ` – ${act.endTime}` : ''}
               </span>
@@ -1078,8 +1078,8 @@ export const ScheduleView: React.FC = () => {
                 }
                 className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors cursor-pointer ${
                   isMoving
-                    ? 'bg-cyan-400 text-slate-950'
-                    : 'hover:bg-white/10 text-slate-400 hover:text-cyan-300'
+                    ? 'bg-[#C85A38] text-white'
+                    : 'hover:bg-[#F3ECE1] text-[#6B6259] hover:text-[#A34224]'
                 }`}
                 title="Auf anderen Tag verschieben"
               >
@@ -1089,29 +1089,29 @@ export const ScheduleView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handleStartEdit(act)}
-                className="w-7 h-7 rounded-full hover:bg-white/10 text-slate-400 hover:text-cyan-300 flex items-center justify-center transition-colors cursor-pointer"
+                className="w-7 h-7 rounded-full hover:bg-[#F3ECE1] text-[#6B6259] hover:text-[#A34224] flex items-center justify-center transition-colors cursor-pointer"
                 title="Aktivität bearbeiten"
               >
                 <Pencil className="w-3.5 h-3.5" />
               </button>
 
               {isConfirmingDelete ? (
-                <div className="inline-flex items-center gap-1 bg-rose-500/15 border border-rose-400/40 rounded-full px-2 py-0.5 text-[10px] font-bold">
-                  <span className="text-rose-200">Löschen?</span>
+                <div className="inline-flex items-center gap-1 bg-rose-600/12 border border-rose-500/30 rounded-full px-2 py-0.5 text-[10px] font-bold">
+                  <span className="text-rose-800">Löschen?</span>
                   <button
                     type="button"
                     onClick={() => {
                       deleteActivity(act.id);
                       setConfirmDeleteId(null);
                     }}
-                    className="px-1.5 py-0.5 rounded-full bg-rose-500 text-white hover:bg-rose-400 cursor-pointer"
+                    className="px-1.5 py-0.5 rounded-full bg-rose-600 text-white hover:bg-rose-500 cursor-pointer"
                   >
                     Ja
                   </button>
                   <button
                     type="button"
                     onClick={() => setConfirmDeleteId(null)}
-                    className="px-1.5 py-0.5 rounded-full bg-white/10 text-slate-200 hover:bg-white/20 cursor-pointer"
+                    className="px-1.5 py-0.5 rounded-full bg-white text-[#1F1B18] border border-[#E6DDD1] hover:bg-[#FAF7F2] cursor-pointer"
                   >
                     Nein
                   </button>
@@ -1120,7 +1120,7 @@ export const ScheduleView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setConfirmDeleteId(act.id)}
-                  className="w-7 h-7 rounded-full hover:bg-rose-500/15 text-slate-400 hover:text-rose-300 flex items-center justify-center transition-colors cursor-pointer"
+                  className="w-7 h-7 rounded-full hover:bg-rose-600/12 text-[#6B6259] hover:text-rose-700 flex items-center justify-center transition-colors cursor-pointer"
                   title="Vorschlag löschen"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -1131,13 +1131,13 @@ export const ScheduleView: React.FC = () => {
 
           {/* Touch-friendly Day Move Selector */}
           {isMoving && (
-            <div className="mb-3 p-2.5 rounded-2xl bg-cyan-500/10 border border-cyan-400/35 space-y-2 animate-fade-in">
-              <div className="flex items-center justify-between text-[11px] font-bold text-cyan-200">
+            <div className="mb-3 p-2.5 rounded-2xl bg-[#FAF7F2] border border-[#C85A38]/30 space-y-2 animate-fade-in">
+              <div className="flex items-center justify-between text-[11px] font-bold text-[#A34224]">
                 <span>Auf welchen Tag verschieben?</span>
                 <button
                   type="button"
                   onClick={() => setMovingActivityId(null)}
-                  className="text-slate-400 hover:text-white cursor-pointer"
+                  className="text-[#8C8277] hover:text-[#1F1B18] cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -1148,10 +1148,10 @@ export const ScheduleView: React.FC = () => {
                     key={d}
                     type="button"
                     onClick={() => handleMoveActivityToDay(act, d)}
-                    className={`px-2.5 py-1 rounded-lg text-[11px] font-mono tabular-nums font-bold transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-mono tabular-nums font-bold transition-all cursor-pointer border ${
                       act.dayNumber === d
-                        ? 'bg-cyan-400 text-slate-950'
-                        : 'bg-white/10 hover:bg-cyan-400/25 text-slate-200'
+                        ? 'bg-[#C85A38] text-white border-[#C85A38]'
+                        : 'bg-white hover:bg-[#C85A38]/12 text-[#1F1B18] border-[#E6DDD1]'
                     }`}
                   >
                     Tag {d}
@@ -1163,8 +1163,8 @@ export const ScheduleView: React.FC = () => {
 
           {/* Time Conflict Warning */}
           {conflictLabels.length > 0 && (
-            <div className="mb-3 rounded-2xl bg-amber-500/15 border border-amber-400/40 px-3 py-2 text-[11px] text-amber-200 flex items-start gap-2">
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-300 shrink-0 mt-0.5" />
+            <div className="mb-3 rounded-2xl bg-[#D9822B]/14 border border-[#D9822B]/35 px-3 py-2 text-[11px] text-[#9E5A14] flex items-start gap-2">
+              <AlertTriangle className="w-3.5 h-3.5 text-[#D9822B] shrink-0 mt-0.5" />
               <div>
                 <strong className="font-extrabold">Zeitkonflikt:</strong>{' '}
                 <span>Überschneidet sich mit {conflictLabels.join(', ')}</span>
@@ -1173,18 +1173,18 @@ export const ScheduleView: React.FC = () => {
           )}
 
           {/* Title & Description */}
-          <h3 className="text-base font-extrabold text-slate-100 leading-snug">
+          <h3 className="text-base font-extrabold text-[#1F1B18] leading-snug">
             {act.title}
           </h3>
-          <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
+          <p className="text-xs text-[#6B6259] mt-1.5 leading-relaxed">
             {act.description}
           </p>
 
           {/* Location, Map Focus, External Maps, Cost & Proposer Badges */}
           <div className="flex flex-wrap items-center gap-1.5 mt-3.5">
             {act.location && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-200 bg-white/5 border border-white/10 px-2.5 py-1 rounded-full max-w-full">
-                <MapPin className="w-3 h-3 text-cyan-400 shrink-0" />
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#1F1B18] bg-[#FAF7F2] border border-[#E6DDD1] px-2.5 py-1 rounded-full max-w-full">
+                <MapPin className="w-3 h-3 text-[#2A7B88] shrink-0" />
                 <span className="truncate">{act.location}</span>
               </span>
             )}
@@ -1204,8 +1204,8 @@ export const ScheduleView: React.FC = () => {
                     time: act.timeSlot,
                   })
                 }
-                className="inline-flex items-center gap-1 text-[11px] font-bold text-cyan-300 bg-cyan-500/15 hover:bg-cyan-500/25 px-2.5 py-1 rounded-full border border-cyan-400/30 transition-colors cursor-pointer"
-                title="Im Map-Cockpit anzeigen"
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-[#1F5E68] bg-[#2A7B88]/12 hover:bg-[#2A7B88]/20 px-2.5 py-1 rounded-full border border-[#2A7B88]/30 transition-colors cursor-pointer"
+                title="Auf Karte anzeigen"
               >
                 <MapIcon className="w-3 h-3" />
                 <span>Auf Karte</span>
@@ -1217,24 +1217,24 @@ export const ScheduleView: React.FC = () => {
                 href={mapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-200 bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-full border border-white/10 transition-colors"
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-[#1F1B18] bg-[#FAF7F2] hover:bg-[#F3ECE1] px-2.5 py-1 rounded-full border border-[#E6DDD1] transition-colors"
                 title={`In Google Maps öffnen: ${act.location}`}
               >
-                <ExternalLink className="w-3 h-3 text-slate-400" />
+                <ExternalLink className="w-3 h-3 text-[#6B6259]" />
                 <span>Maps</span>
               </a>
             )}
 
-            <span className="inline-flex items-center gap-1 text-[11px] font-mono tabular-nums font-bold text-amber-300 bg-amber-400/10 border border-amber-400/25 px-2.5 py-1 rounded-full">
+            <span className="inline-flex items-center gap-1 text-[11px] font-mono tabular-nums font-bold text-[#9E5A14] bg-[#D9822B]/14 border border-[#D9822B]/30 px-2.5 py-1 rounded-full">
               {act.estimatedCost > 0
                 ? `ca. ${formatCurrency(act.estimatedCost, currency)} p.P.`
                 : 'Kostenlos'}
             </span>
 
-            <span className="inline-flex items-center gap-1.5 text-[11px] text-slate-300 bg-white/5 border border-white/10 px-2.5 py-1 rounded-full">
+            <span className="inline-flex items-center gap-1.5 text-[11px] text-[#6B6259] bg-[#FAF7F2] border border-[#E6DDD1] px-2.5 py-1 rounded-full">
               <span
                 style={{ backgroundColor: proposer.color }}
-                className="w-4 h-4 rounded-full text-[9px] font-black text-slate-950 flex items-center justify-center shrink-0"
+                className="w-4 h-4 rounded-full text-[9px] font-black text-white flex items-center justify-center shrink-0"
               >
                 {proposer.initials}
               </span>
@@ -1244,8 +1244,8 @@ export const ScheduleView: React.FC = () => {
         </div>
 
         {/* Footer: Status Switcher & Interactive Voting */}
-        <div className="pt-3.5 border-t border-white/10 flex flex-wrap items-center justify-between gap-2.5">
-          <div className="flex items-center gap-1 bg-white/5 border border-white/10 p-1 rounded-full">
+        <div className="pt-3.5 border-t border-[#E6DDD1] flex flex-wrap items-center justify-between gap-2.5">
+          <div className="flex items-center gap-1 bg-[#FAF7F2] border border-[#E6DDD1] p-1 rounded-full">
             {STATUS_OPTIONS.map((st) => {
               const active = act.status === st.value;
               return (
@@ -1256,7 +1256,7 @@ export const ScheduleView: React.FC = () => {
                   className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
                     active
                       ? st.pillClass
-                      : 'text-slate-400 hover:text-slate-100'
+                      : 'text-[#6B6259] hover:text-[#1F1B18]'
                   }`}
                 >
                   {st.icon}
@@ -1275,7 +1275,7 @@ export const ScheduleView: React.FC = () => {
                   <span
                     key={voterId}
                     style={{ backgroundColor: voter.color }}
-                    className="w-6 h-6 rounded-full text-[10px] font-black text-slate-950 flex items-center justify-center ring-2 ring-[#131823]"
+                    className="w-6 h-6 rounded-full text-[10px] font-black text-white flex items-center justify-center ring-2 ring-[#FAF7F2]"
                     title={`${voter.name} stimmt dafür`}
                   >
                     {voter.initials}
@@ -1287,10 +1287,10 @@ export const ScheduleView: React.FC = () => {
             <button
               type="button"
               onClick={() => toggleActivityVote(act.id)}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-extrabold transition-all cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-extrabold transition-all cursor-pointer border ${
                 hasVoted
-                  ? 'bg-cyan-400 text-slate-950 shadow-[0_0_14px_rgba(34,211,238,0.28)]'
-                  : 'bg-white/10 hover:bg-white/15 text-slate-200 border border-white/10'
+                  ? 'bg-[#C85A38] text-white border-[#C85A38] shadow-sm'
+                  : 'bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#1F1B18] border-[#E6DDD1]'
               }`}
             >
               <ThumbsUp className="w-3.5 h-3.5" />
@@ -1307,20 +1307,19 @@ export const ScheduleView: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="aurora-glass-elevated rounded-[28px] p-6 relative overflow-hidden">
-        <div className="absolute -top-12 -right-12 w-52 h-52 bg-cyan-400/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="surface-glass-elevated rounded-[28px] p-6 relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-cyan-400/15 border border-cyan-400/30 text-cyan-300 mb-2">
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#C85A38]/12 border border-[#C85A38]/30 text-[#A34224] mb-2">
               <Calendar className="w-3.5 h-3.5" />
               Tagesplan & Aktivitäten
             </span>
-            <h1 className="text-2xl font-black text-slate-100">
+            <h1 className="text-2xl font-black text-[#1F1B18]">
               Was unternehmen wir wann?
             </h1>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-[#6B6259] mt-1">
               Sammelt Ideen, zieht Karten per Drag & Drop auf einen anderen Tag und plant als{' '}
-              <strong className="text-slate-200">{currentUser.name}</strong> euer Tagesprogramm.
+              <strong className="text-[#1F1B18]">{currentUser.name}</strong> euer Tagesprogramm.
             </p>
           </div>
 
@@ -1330,10 +1329,10 @@ export const ScheduleView: React.FC = () => {
                 href={selectedDayRouteUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-xs font-bold bg-emerald-400/15 hover:bg-emerald-400/25 text-emerald-200 border border-emerald-400/35 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-xs font-bold bg-[#6E7F5E]/14 hover:bg-[#6E7F5E]/22 text-[#4B593E] border border-[#6E7F5E]/30 transition-colors"
                 title={`Route für Tag ${selectedDay} in Google Maps öffnen`}
               >
-                <Route className="w-3.5 h-3.5 text-emerald-300" />
+                <Route className="w-3.5 h-3.5 text-[#6E7F5E]" />
                 <span>🗺️ Tagesroute in Google Maps</span>
               </a>
             )}
@@ -1350,7 +1349,7 @@ export const ScheduleView: React.FC = () => {
                   scrollToForm();
                 }
               }}
-              className="bg-cyan-400 hover:bg-cyan-300 text-slate-950 rounded-full px-5 py-2.5 text-xs font-extrabold flex items-center gap-2 shadow-[0_0_20px_rgba(34,211,238,0.28)] transition-all cursor-pointer shrink-0"
+              className="bg-[#C85A38] hover:bg-[#B54B2B] text-white rounded-full px-5 py-2.5 text-xs font-extrabold flex items-center gap-2 shadow-sm transition-all cursor-pointer shrink-0"
             >
               <Plus className="w-4 h-4" />
               <span>
@@ -1364,7 +1363,7 @@ export const ScheduleView: React.FC = () => {
       {/* Horizontal Day Selector Bar (Drop Targets for Activities & Ideas) */}
       <div className="space-y-2">
         {(draggingActivityId || draggingIdeaId) && (
-          <div className="text-xs font-bold text-cyan-300 flex items-center gap-2 px-1 animate-fade-in">
+          <div className="text-xs font-bold text-[#A34224] flex items-center gap-2 px-1 animate-fade-in">
             <Sparkles className="w-3.5 h-3.5" />
             <span>
               {draggingIdeaId
@@ -1380,14 +1379,14 @@ export const ScheduleView: React.FC = () => {
             onClick={() => setViewAllDays(true)}
             className={`px-4 py-3 rounded-[20px] text-left transition-all shrink-0 border cursor-pointer ${
               viewAllDays
-                ? 'bg-cyan-400 text-slate-950 border-cyan-300 shadow-[0_0_18px_rgba(34,211,238,0.3)]'
-                : 'aurora-glass text-slate-200 hover:bg-white/10'
+                ? 'bg-[#C85A38] text-white border-[#C85A38] shadow-sm'
+                : 'surface-glass text-[#1F1B18] hover:bg-white/90'
             }`}
           >
             <div className="text-xs font-extrabold">Alle Tage</div>
             <div
               className={`text-[11px] font-mono tabular-nums ${
-                viewAllDays ? 'text-slate-900 font-bold' : 'text-slate-400'
+                viewAllDays ? 'text-white/90 font-bold' : 'text-[#6B6259]'
               }`}
             >
               {trip.activities.length} Vorschläge
@@ -1420,10 +1419,10 @@ export const ScheduleView: React.FC = () => {
                 }}
                 className={`px-4 py-3 rounded-[20px] text-left transition-all shrink-0 border cursor-pointer ${
                   isDropTarget
-                    ? 'bg-emerald-400/25 text-emerald-100 border-emerald-400 scale-[1.03] shadow-[0_0_20px_rgba(52,211,153,0.35)]'
+                    ? 'bg-[#6E7F5E]/20 text-[#4B593E] border-[#6E7F5E] scale-[1.03] shadow-sm'
                     : isSelected
-                    ? 'bg-cyan-500/20 text-cyan-100 border-cyan-400/60 shadow-[0_0_18px_rgba(34,211,238,0.2)]'
-                    : 'aurora-glass text-slate-200 hover:bg-white/10'
+                    ? 'bg-[#C85A38]/12 text-[#A34224] border-[#C85A38]/45 shadow-sm'
+                    : 'surface-glass text-[#1F1B18] hover:bg-white/90'
                 }`}
               >
                 <div className="flex items-center justify-between gap-2.5">
@@ -1431,16 +1430,16 @@ export const ScheduleView: React.FC = () => {
                     Tag {dayNum}
                     {dayHasConflict && (
                       <AlertTriangle
-                        className="w-3 h-3 text-amber-400"
+                        className="w-3 h-3 text-[#D9822B]"
                         aria-label="Zeitkonflikt an diesem Tag"
                       />
                     )}
                   </span>
-                  <span className="text-[10px] font-semibold text-slate-400">
+                  <span className="text-[10px] font-semibold text-[#6B6259]">
                     {getDayDateLabel(dayNum)}
                   </span>
                 </div>
-                <div className="text-[11px] font-mono tabular-nums text-slate-400 mt-0.5 font-medium">
+                <div className="text-[11px] font-mono tabular-nums text-[#6B6259] mt-0.5 font-medium">
                   {actCount} Akt. • {mealCount} Essen
                 </div>
               </button>
@@ -1451,23 +1450,23 @@ export const ScheduleView: React.FC = () => {
 
       {/* Collapsible Unscheduled Ideas Tray (Drag & Drop directly onto Day Pills) */}
       {unscheduledIdeas.length > 0 && (
-        <div className="aurora-glass rounded-[22px] p-3.5">
+        <div className="surface-glass rounded-[22px] p-3.5">
           <button
             type="button"
             onClick={() => setShowIdeaTray((prev) => !prev)}
             className="w-full flex items-center justify-between gap-2 text-left cursor-pointer"
           >
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-200">
-              <Lightbulb className="w-4 h-4 text-amber-400" />
+            <div className="flex items-center gap-2 text-xs font-bold text-[#1F1B18]">
+              <Lightbulb className="w-4 h-4 text-[#D9822B]" />
               <span>
                 Ideen aus dem Ideen-Pool direkt einplanen (
-                <span className="font-mono tabular-nums text-amber-300">
+                <span className="font-mono tabular-nums text-[#9E5A14]">
                   {unscheduledIdeas.length}
                 </span>
                 )
               </span>
             </div>
-            <span className="inline-flex items-center gap-1 text-[11px] text-cyan-300 font-bold">
+            <span className="inline-flex items-center gap-1 text-[11px] text-[#A34224] font-bold">
               <span>{showIdeaTray ? 'Ausblenden' : 'Zum Reinziehen öffnen'}</span>
               {showIdeaTray ? (
                 <ChevronUp className="w-4 h-4" />
@@ -1478,7 +1477,7 @@ export const ScheduleView: React.FC = () => {
           </button>
 
           {showIdeaTray && (
-            <div className="mt-3 pt-3 border-t border-white/10 flex flex-wrap gap-2">
+            <div className="mt-3 pt-3 border-t border-[#E6DDD1] flex flex-wrap gap-2">
               {unscheduledIdeas.map((idea) => (
                 <div
                   key={idea.id}
@@ -1496,16 +1495,16 @@ export const ScheduleView: React.FC = () => {
                     setDraggingIdeaId(null);
                     setDragOverDay(null);
                   }}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-400/10 border border-amber-400/30 text-xs font-bold text-amber-100 cursor-grab active:cursor-grabbing hover:bg-amber-400/20 transition-colors"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#D9822B]/14 border border-[#D9822B]/30 text-xs font-bold text-[#9E5A14] cursor-grab active:cursor-grabbing hover:bg-[#D9822B]/20 transition-colors"
                   title="Auf einen Tag oben ziehen oder per Klick für aktuellen Tag einplanen"
                 >
-                  <GripVertical className="w-3 h-3 text-amber-300" />
+                  <GripVertical className="w-3 h-3 text-[#D9822B]" />
                   <span className="truncate max-w-[200px]">{idea.title}</span>
                   {!viewAllDays && (
                     <button
                       type="button"
                       onClick={() => scheduleIdeaToDay(idea.id, selectedDay, '10:00')}
-                      className="px-2 py-0.5 rounded-full bg-cyan-400 text-slate-950 text-[10px] font-extrabold hover:bg-cyan-300 cursor-pointer"
+                      className="px-2 py-0.5 rounded-full bg-[#C85A38] text-white text-[10px] font-extrabold hover:bg-[#B54B2B] cursor-pointer"
                     >
                       + Tag {selectedDay}
                     </button>
@@ -1522,22 +1521,22 @@ export const ScheduleView: React.FC = () => {
         <form
           ref={formRef}
           onSubmit={handleCreateActivity}
-          className="aurora-glass-elevated rounded-[26px] p-6 border-cyan-400/35 space-y-4 animate-fade-in"
+          className="surface-glass-elevated rounded-[26px] p-6 border-[#C85A38]/35 space-y-4 animate-fade-in"
         >
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h3 className="text-base font-extrabold text-slate-100">
+              <h3 className="text-base font-extrabold text-[#1F1B18]">
                 {editingActivityId
                   ? 'Aktivität bearbeiten'
                   : 'Neue Aktivität / Ausflug vorschlagen'}
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-[#6B6259]">
                 {editingActivityId ? (
                   'Änderungen speichern – alle bisherigen Votes bleiben erhalten.'
                 ) : (
                   <>
                     Vorgeschlagen von{' '}
-                    <strong className="text-slate-200">{currentUser.name}</strong> –
+                    <strong className="text-[#1F1B18]">{currentUser.name}</strong> –
                     andere Reisende können sofort abstimmen.
                   </>
                 )}
@@ -1549,15 +1548,15 @@ export const ScheduleView: React.FC = () => {
                 resetForm();
                 setShowAddForm(false);
               }}
-              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-200 flex items-center justify-center cursor-pointer"
+              className="w-8 h-8 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] border border-[#E6DDD1] text-[#6B6259] flex items-center justify-center cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
           {formError && (
-            <div className="rounded-2xl bg-rose-500/15 border border-rose-400/40 px-4 py-2.5 text-xs font-semibold text-rose-200 flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-rose-300 shrink-0" />
+            <div className="rounded-2xl bg-rose-600/12 border border-rose-500/30 px-4 py-2.5 text-xs font-semibold text-rose-800 flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-rose-700 shrink-0" />
               <span>{formError}</span>
             </div>
           )}
@@ -1566,7 +1565,7 @@ export const ScheduleView: React.FC = () => {
             <div className="md:col-span-2">
               <label
                 htmlFor="sched-title"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Titel der Aktivität *
               </label>
@@ -1580,14 +1579,14 @@ export const ScheduleView: React.FC = () => {
                   setTitle(e.target.value);
                   if (formError) setFormError(null);
                 }}
-                className="w-full aurora-input rounded-2xl px-3.5 py-2.5 text-xs font-semibold placeholder:text-slate-500"
+                className="w-full surface-input rounded-2xl px-3.5 py-2.5 text-xs font-semibold placeholder:text-[#8C8277]"
               />
             </div>
 
             <div>
               <label
                 htmlFor="sched-day"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Tag auswählen
               </label>
@@ -1595,10 +1594,10 @@ export const ScheduleView: React.FC = () => {
                 id="sched-day"
                 value={formDay}
                 onChange={(e) => setFormDay(Number(e.target.value))}
-                className="w-full aurora-input rounded-2xl px-3 py-2.5 text-xs font-bold [color-scheme:dark]"
+                className="w-full surface-input rounded-2xl px-3 py-2.5 text-xs font-bold [color-scheme:light]"
               >
                 {Array.from({ length: safeTotalDays }, (_, i) => i + 1).map((d) => (
-                  <option key={d} value={d} className="bg-[#131823] text-slate-100">
+                  <option key={d} value={d} className="bg-white text-[#1F1B18]">
                     Tag {d} ({getDayDateLabel(d)})
                   </option>
                 ))}
@@ -1608,7 +1607,7 @@ export const ScheduleView: React.FC = () => {
             <div>
               <label
                 htmlFor="sched-cat"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Kategorie
               </label>
@@ -1616,24 +1615,24 @@ export const ScheduleView: React.FC = () => {
                 id="sched-cat"
                 value={category}
                 onChange={(e) => setCategory(e.target.value as ActivityCategory)}
-                className="w-full aurora-input rounded-2xl px-3 py-2.5 text-xs font-bold [color-scheme:dark]"
+                className="w-full surface-input rounded-2xl px-3 py-2.5 text-xs font-bold [color-scheme:light]"
               >
-                <option value="beach" className="bg-[#131823] text-slate-100">
+                <option value="beach" className="bg-white text-[#1F1B18]">
                   Strand & Meer
                 </option>
-                <option value="activity" className="bg-[#131823] text-slate-100">
+                <option value="activity" className="bg-white text-[#1F1B18]">
                   Ausflug & Action
                 </option>
-                <option value="culture" className="bg-[#131823] text-slate-100">
+                <option value="culture" className="bg-white text-[#1F1B18]">
                   Kultur & Sightseeing
                 </option>
-                <option value="transport" className="bg-[#131823] text-slate-100">
+                <option value="transport" className="bg-white text-[#1F1B18]">
                   Transfer & Route
                 </option>
-                <option value="nightlife" className="bg-[#131823] text-slate-100">
+                <option value="nightlife" className="bg-white text-[#1F1B18]">
                   Abend & Nightlife
                 </option>
-                <option value="other" className="bg-[#131823] text-slate-100">
+                <option value="other" className="bg-white text-[#1F1B18]">
                   Sonstiges
                 </option>
               </select>
@@ -1644,7 +1643,7 @@ export const ScheduleView: React.FC = () => {
             <div>
               <label
                 htmlFor="sched-start"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Startzeit
               </label>
@@ -1656,14 +1655,14 @@ export const ScheduleView: React.FC = () => {
                   setTimeSlot(e.target.value);
                   if (formError) setFormError(null);
                 }}
-                className="w-full aurora-input rounded-2xl px-3 py-2 text-xs font-mono tabular-nums font-bold [color-scheme:dark]"
+                className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-mono tabular-nums font-bold [color-scheme:light]"
               />
             </div>
 
             <div>
               <label
                 htmlFor="sched-end"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Endzeit
               </label>
@@ -1675,14 +1674,14 @@ export const ScheduleView: React.FC = () => {
                   setEndTime(e.target.value);
                   if (formError) setFormError(null);
                 }}
-                className="w-full aurora-input rounded-2xl px-3 py-2 text-xs font-mono tabular-nums font-bold [color-scheme:dark]"
+                className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-mono tabular-nums font-bold [color-scheme:light]"
               />
             </div>
 
             <div className="col-span-2 md:col-span-1">
               <label
                 htmlFor="sched-loc"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Ort / Treffpunkt
               </label>
@@ -1692,14 +1691,14 @@ export const ScheduleView: React.FC = () => {
                 placeholder="z.B. Cala Llombards"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="w-full aurora-input rounded-2xl px-3 py-2 text-xs font-semibold placeholder:text-slate-500"
+                className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-semibold placeholder:text-[#8C8277]"
               />
             </div>
 
             <div>
               <label
                 htmlFor="sched-cost"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Kosten p.P. ({currency})
               </label>
@@ -1710,14 +1709,14 @@ export const ScheduleView: React.FC = () => {
                 step="0.01"
                 value={estimatedCost}
                 onChange={(e) => setEstimatedCost(e.target.value)}
-                className="w-full aurora-input rounded-2xl px-3 py-2 text-xs font-mono tabular-nums font-semibold"
+                className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-mono tabular-nums font-semibold"
               />
             </div>
 
             <div>
               <label
                 htmlFor="sched-status"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Status
               </label>
@@ -1725,15 +1724,15 @@ export const ScheduleView: React.FC = () => {
                 id="sched-status"
                 value={status}
                 onChange={(e) => setStatus(e.target.value as DayActivity['status'])}
-                className="w-full aurora-input rounded-2xl px-3 py-2 text-xs font-bold [color-scheme:dark]"
+                className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-bold [color-scheme:light]"
               >
-                <option value="idea" className="bg-[#131823] text-slate-100">
+                <option value="idea" className="bg-white text-[#1F1B18]">
                   Idee
                 </option>
-                <option value="planned" className="bg-[#131823] text-slate-100">
+                <option value="planned" className="bg-white text-[#1F1B18]">
                   Geplant
                 </option>
-                <option value="confirmed" className="bg-[#131823] text-slate-100">
+                <option value="confirmed" className="bg-white text-[#1F1B18]">
                   Bestätigt
                 </option>
               </select>
@@ -1743,7 +1742,7 @@ export const ScheduleView: React.FC = () => {
           <div>
             <label
               htmlFor="sched-desc"
-              className="text-xs font-bold text-slate-300 block mb-1.5"
+              className="text-xs font-bold text-[#1F1B18] block mb-1.5"
             >
               Beschreibung & Infos für die Gruppe
             </label>
@@ -1753,7 +1752,7 @@ export const ScheduleView: React.FC = () => {
               placeholder="Was macht diesen Vorschlag besonders? Müssen wir vorab reservieren oder Tickets buchen?"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full aurora-input rounded-2xl px-3.5 py-2 text-xs placeholder:text-slate-500 resize-none"
+              className="w-full surface-input rounded-2xl px-3.5 py-2 text-xs placeholder:text-[#8C8277] resize-none"
             />
           </div>
 
@@ -1764,13 +1763,13 @@ export const ScheduleView: React.FC = () => {
                 resetForm();
                 setShowAddForm(false);
               }}
-              className="px-4 py-2 rounded-full text-xs font-bold bg-white/10 hover:bg-white/15 text-slate-200 cursor-pointer"
+              className="px-4 py-2 rounded-full text-xs font-bold bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#6B6259] border border-[#E6DDD1] cursor-pointer"
             >
               Abbrechen
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-full text-xs font-extrabold bg-cyan-400 hover:bg-cyan-300 text-slate-950 shadow-[0_0_18px_rgba(34,211,238,0.28)] cursor-pointer"
+              className="px-5 py-2.5 rounded-full text-xs font-extrabold bg-[#C85A38] hover:bg-[#B54B2B] text-white shadow-sm cursor-pointer"
             >
               {editingActivityId ? 'Änderungen speichern' : 'Aktivität speichern'}
             </button>
@@ -1781,8 +1780,8 @@ export const ScheduleView: React.FC = () => {
       {/* Filter & Sort Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-xs font-bold text-slate-400 flex items-center gap-1 mr-1">
-            <Filter className="w-3.5 h-3.5 text-cyan-400" /> Filter:
+          <span className="text-xs font-bold text-[#6B6259] flex items-center gap-1 mr-1">
+            <Filter className="w-3.5 h-3.5 text-[#C85A38]" /> Filter:
           </span>
           {(
             [
@@ -1801,8 +1800,8 @@ export const ScheduleView: React.FC = () => {
               onClick={() => setCategoryFilter(cat.id)}
               className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                 categoryFilter === cat.id
-                  ? 'bg-cyan-400 text-slate-950 shadow-sm'
-                  : 'aurora-glass text-slate-300 hover:bg-white/10'
+                  ? 'bg-[#C85A38] text-white shadow-sm'
+                  : 'surface-glass text-[#6B6259] hover:text-[#1F1B18]'
               }`}
             >
               {cat.label}
@@ -1813,12 +1812,12 @@ export const ScheduleView: React.FC = () => {
         <button
           type="button"
           onClick={() => setSortBy((prev) => (prev === 'time' ? 'votes' : 'time'))}
-          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold aurora-glass hover:bg-white/10 text-slate-200 transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold surface-glass hover:bg-white/90 text-[#1F1B18] transition-colors cursor-pointer"
         >
-          <ArrowUpDown className="w-3.5 h-3.5 text-cyan-400" />
+          <ArrowUpDown className="w-3.5 h-3.5 text-[#C85A38]" />
           <span>
             Sortiert nach:{' '}
-            <strong className="text-cyan-300">
+            <strong className="text-[#A34224]">
               {sortBy === 'time' ? 'Uhrzeit' : 'Beliebtheit (Votes)'}
             </strong>
           </span>
@@ -1827,12 +1826,12 @@ export const ScheduleView: React.FC = () => {
 
       {/* Activity Cards Grid */}
       {inRangeFilteredActivities.length === 0 ? (
-        <div className="aurora-glass rounded-[28px] p-10 text-center border-dashed border-white/15">
-          <Sparkles className="w-8 h-8 text-cyan-400 mx-auto mb-2.5 opacity-80" />
-          <h3 className="text-base font-extrabold text-slate-100">
+        <div className="surface-glass rounded-[28px] p-10 text-center border-dashed border-[#E6DDD1]">
+          <Sparkles className="w-8 h-8 text-[#C85A38] mx-auto mb-2.5 opacity-80" />
+          <h3 className="text-base font-extrabold text-[#1F1B18]">
             Keine Aktivitäten für diese Auswahl gefunden
           </h3>
-          <p className="text-xs text-slate-400 mt-1 mb-4">
+          <p className="text-xs text-[#6B6259] mt-1 mb-4">
             Füge oben den ersten Vorschlag für diesen Tag hinzu oder ändere den Filter.
           </p>
           <button
@@ -1842,7 +1841,7 @@ export const ScheduleView: React.FC = () => {
               setShowAddForm(true);
               scrollToForm();
             }}
-            className="bg-cyan-400 hover:bg-cyan-300 text-slate-950 rounded-full px-5 py-2.5 text-xs font-extrabold cursor-pointer shadow-[0_0_18px_rgba(34,211,238,0.25)]"
+            className="bg-[#C85A38] hover:bg-[#B54B2B] text-white rounded-full px-5 py-2.5 text-xs font-extrabold cursor-pointer shadow-sm"
           >
             + Jetzt Vorschlag erstellen
           </button>
@@ -1867,29 +1866,29 @@ export const ScheduleView: React.FC = () => {
 
             return (
               <div key={dayNum} className="space-y-3">
-                <div className="flex items-center justify-between gap-2 aurora-glass rounded-[20px] px-4 py-3">
+                <div className="flex items-center justify-between gap-2 surface-glass rounded-[20px] px-4 py-3">
                   <button
                     type="button"
                     onClick={() => toggleDayCollapse(dayNum)}
                     className="flex-1 flex items-center justify-between gap-3 text-left cursor-pointer min-w-0"
                   >
                     <div className="flex items-center gap-2.5 flex-wrap min-w-0">
-                      <span className="px-2.5 py-1 rounded-full text-xs font-mono tabular-nums font-extrabold bg-cyan-400 text-slate-950">
+                      <span className="px-2.5 py-1 rounded-full text-xs font-mono tabular-nums font-extrabold bg-[#C85A38] text-white">
                         Tag {dayNum}
                       </span>
-                      <span className="text-xs font-bold text-slate-400">
+                      <span className="text-xs font-bold text-[#6B6259]">
                         {getDayDateLabel(dayNum)}
                       </span>
-                      <span className="text-xs font-bold text-slate-200 font-mono tabular-nums">
+                      <span className="text-xs font-bold text-[#1F1B18] font-mono tabular-nums">
                         · {dayActs.length}{' '}
                         {dayActs.length === 1 ? 'Aktivität' : 'Aktivitäten'} · ~
                         {formatCurrency(dayCost, currency)} p.P.
                       </span>
                     </div>
                     {isCollapsed ? (
-                      <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+                      <ChevronDown className="w-4 h-4 text-[#6B6259] shrink-0" />
                     ) : (
-                      <ChevronUp className="w-4 h-4 text-slate-400 shrink-0" />
+                      <ChevronUp className="w-4 h-4 text-[#6B6259] shrink-0" />
                     )}
                   </button>
 
@@ -1898,7 +1897,7 @@ export const ScheduleView: React.FC = () => {
                       href={dayRouteUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-bold bg-emerald-400/15 hover:bg-emerald-400/25 text-emerald-200 border border-emerald-400/30 shrink-0 transition-colors"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-bold bg-[#6E7F5E]/14 hover:bg-[#6E7F5E]/22 text-[#4B593E] border border-[#6E7F5E]/30 shrink-0 transition-colors"
                       title={`Route Tag ${dayNum} in Google Maps`}
                     >
                       <Route className="w-3 h-3" />
@@ -1924,31 +1923,31 @@ export const ScheduleView: React.FC = () => {
 
       {/* Collapsible Out-of-Range Section (Tag < 1 or Tag > totalDays) */}
       {outOfRangeActivities.length > 0 && (
-        <div className="aurora-glass rounded-[24px] border-amber-400/35 overflow-hidden">
+        <div className="surface-glass rounded-[24px] border-[#D9822B]/35 overflow-hidden">
           <button
             type="button"
             onClick={() => setShowOutOfRange((prev) => !prev)}
-            className="w-full px-5 py-3.5 flex items-center justify-between gap-3 text-left hover:bg-white/[0.04] transition-colors cursor-pointer"
+            className="w-full px-5 py-3.5 flex items-center justify-between gap-3 text-left hover:bg-[#FAF7F2] transition-colors cursor-pointer"
           >
             <div className="flex items-center gap-2.5 flex-wrap">
-              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-              <span className="text-xs font-extrabold text-amber-200">
+              <AlertTriangle className="w-4 h-4 text-[#D9822B] shrink-0" />
+              <span className="text-xs font-extrabold text-[#9E5A14]">
                 Außerhalb Reisedauer (Tag &lt; 1 oder Tag &gt; {safeTotalDays})
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono tabular-nums font-bold bg-amber-400/20 text-amber-200">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono tabular-nums font-bold bg-[#D9822B]/14 text-[#9E5A14]">
                 {outOfRangeActivities.length}
               </span>
             </div>
             {showOutOfRange ? (
-              <ChevronUp className="w-4 h-4 text-slate-400 shrink-0" />
+              <ChevronUp className="w-4 h-4 text-[#6B6259] shrink-0" />
             ) : (
-              <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+              <ChevronDown className="w-4 h-4 text-[#6B6259] shrink-0" />
             )}
           </button>
 
           {showOutOfRange && (
             <div className="p-4 pt-1 space-y-3">
-              <p className="text-xs text-slate-400 px-1">
+              <p className="text-xs text-[#6B6259] px-1">
                 Diese Einträge liegen außerhalb der aktuell eingestellten {safeTotalDays} Reisetage
                 und können hier auf einen gültigen Tag verschoben oder gelöscht werden.
               </p>

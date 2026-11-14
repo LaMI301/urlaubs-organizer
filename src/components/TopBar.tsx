@@ -273,11 +273,11 @@ export const TopBar: React.FC<TopBarProps> = ({
           <div
             className={`flex items-center gap-2.5 rounded-full px-4 py-2 border transition-all ${
               isSearchOpen
-                ? 'bg-[#131823]/[0.98] border-cyan-400/50 shadow-[0_0_24px_rgba(34,211,238,0.18)]'
-                : 'bg-[#131823]/80 hover:bg-[#1B2232]/90 border-white/12 shadow-sm'
+                ? 'bg-white border-[#C85A38]/55 shadow-md ring-2 ring-[#C85A38]/15'
+                : 'bg-[#FAF7F2]/90 hover:bg-white border-[#DDD2C3] shadow-sm'
             } backdrop-blur-xl`}
           >
-            <Search className="w-4 h-4 text-cyan-300 shrink-0" />
+            <Search className="w-4 h-4 text-[#C85A38] shrink-0" />
             <input
               ref={searchInputRef}
               type="text"
@@ -295,7 +295,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               }}
               placeholder="Spotlight-Suche: Orte, Essen, Ideen, Abstimmungen..."
               aria-label="Spotlight-Suche im Urlaub"
-              className="bg-transparent text-xs sm:text-sm text-slate-100 placeholder-slate-400 focus:outline-none flex-1 min-w-0"
+              className="bg-transparent text-xs sm:text-sm text-[#1F1B18] placeholder-[#8C8277] focus:outline-none flex-1 min-w-0"
             />
             {searchQuery ? (
               <button
@@ -305,42 +305,42 @@ export const TopBar: React.FC<TopBarProps> = ({
                   searchInputRef.current?.focus();
                 }}
                 aria-label="Suchtext löschen"
-                className="p-1 rounded-full hover:bg-white/10 text-slate-400 hover:text-slate-100 cursor-pointer shrink-0"
+                className="p-1 rounded-full hover:bg-[#F3ECE1] text-[#6B6259] hover:text-[#1F1B18] cursor-pointer shrink-0"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
             ) : (
-              <kbd className="hidden sm:inline-flex items-center gap-0.5 font-mono tabular-nums text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/[0.07] border border-white/10 text-slate-300 shrink-0">
+              <kbd className="hidden sm:inline-flex items-center gap-0.5 font-mono tabular-nums text-[10px] font-bold px-2 py-0.5 rounded-md bg-[#F3ECE1] border border-[#DDD2C3] text-[#6B6259] shrink-0">
                 ⌘K
               </kbd>
             )}
           </div>
 
-          {/* Opaque Midnight Aurora Search Dropdown */}
+          {/* Opaque Light Search Dropdown */}
           {showDropdown && (
             <div
               role="listbox"
               aria-label="Suchergebnisse"
-              className="absolute left-0 right-0 top-full mt-2 bg-[#131823]/[0.98] backdrop-blur-2xl rounded-3xl shadow-[0_28px_70px_rgba(0,0,0,0.85)] border border-white/15 p-3.5 z-50 max-h-[65vh] overflow-y-auto"
+              className="absolute left-0 right-0 top-full mt-2 bg-white/[0.98] backdrop-blur-2xl rounded-3xl shadow-2xl border border-[#DDD2C3] p-3.5 z-50 max-h-[65vh] overflow-y-auto text-[#1F1B18]"
             >
-              <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/10 px-1">
-                <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
+              <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#E6DDD1] px-1">
+                <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#6B6259]">
                   Treffer{' '}
-                  <span className="font-mono tabular-nums text-cyan-300">
+                  <span className="font-mono tabular-nums text-[#C85A38]">
                     ({totalMatches})
                   </span>
                 </span>
                 <button
                   type="button"
                   onClick={closeSearch}
-                  className="text-[11px] font-bold text-slate-400 hover:text-slate-100 cursor-pointer"
+                  className="text-[11px] font-bold text-[#6B6259] hover:text-[#1F1B18] cursor-pointer"
                 >
                   ESC schließen
                 </button>
               </div>
 
               {totalMatches === 0 ? (
-                <p className="text-xs text-slate-400 py-5 text-center">
+                <p className="text-xs text-[#6B6259] py-5 text-center">
                   Keine Einträge für „{searchQuery}“ gefunden.
                 </p>
               ) : (
@@ -362,20 +362,20 @@ export const TopBar: React.FC<TopBarProps> = ({
                         setActiveTab('schedule');
                         closeSearch();
                       }}
-                      className="w-full flex items-center justify-between gap-2 p-2.5 rounded-2xl hover:bg-white/[0.08] text-left transition-colors cursor-pointer"
+                      className="w-full flex items-center justify-between gap-2 p-2.5 rounded-2xl hover:bg-[#FAF7F2] text-left transition-colors cursor-pointer"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-bold text-slate-100 truncate">
+                        <p className="text-xs font-bold text-[#1F1B18] truncate">
                           {act.title}
                         </p>
-                        <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                          <span className="font-mono tabular-nums text-cyan-300">
+                        <p className="text-[11px] text-[#6B6259] truncate mt-0.5">
+                          <span className="font-mono tabular-nums text-[#C85A38] font-semibold">
                             Tag {act.dayNumber} · {act.timeSlot}
                           </span>
                           {act.location ? ` · ${act.location}` : ''}
                         </p>
                       </div>
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-cyan-400/15 border border-cyan-400/30 text-cyan-300 shrink-0">
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#C85A38]/12 border border-[#C85A38]/30 text-[#9E3F22] shrink-0">
                         Tagesplan
                       </span>
                     </button>
@@ -397,20 +397,20 @@ export const TopBar: React.FC<TopBarProps> = ({
                         setActiveTab('meals');
                         closeSearch();
                       }}
-                      className="w-full flex items-center justify-between gap-2 p-2.5 rounded-2xl hover:bg-white/[0.08] text-left transition-colors cursor-pointer"
+                      className="w-full flex items-center justify-between gap-2 p-2.5 rounded-2xl hover:bg-[#FAF7F2] text-left transition-colors cursor-pointer"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-bold text-slate-100 truncate">
+                        <p className="text-xs font-bold text-[#1F1B18] truncate">
                           {meal.title}
                         </p>
-                        <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                          <span className="font-mono tabular-nums text-emerald-300">
+                        <p className="text-[11px] text-[#6B6259] truncate mt-0.5">
+                          <span className="font-mono tabular-nums text-[#4E5F40] font-semibold">
                             Tag {meal.dayNumber} · {meal.time}
                           </span>
                           {meal.locationOrRecipe ? ` · ${meal.locationOrRecipe}` : ''}
                         </p>
                       </div>
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-400/15 border border-emerald-400/30 text-emerald-300 shrink-0">
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#6E7F5E]/14 border border-[#6E7F5E]/30 text-[#4E5F40] shrink-0">
                         Essen
                       </span>
                     </button>
@@ -429,17 +429,17 @@ export const TopBar: React.FC<TopBarProps> = ({
                         setActiveTab('ideas');
                         closeSearch();
                       }}
-                      className="w-full flex items-center justify-between gap-2 p-2.5 rounded-2xl hover:bg-white/[0.08] text-left transition-colors cursor-pointer"
+                      className="w-full flex items-center justify-between gap-2 p-2.5 rounded-2xl hover:bg-[#FAF7F2] text-left transition-colors cursor-pointer"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-bold text-slate-100 truncate">
+                        <p className="text-xs font-bold text-[#1F1B18] truncate">
                           {idea.title}
                         </p>
-                        <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                        <p className="text-[11px] text-[#6B6259] truncate mt-0.5">
                           {idea.location || idea.description}
                         </p>
                       </div>
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-violet-400/15 border border-violet-400/30 text-violet-300 shrink-0">
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#D9822B]/14 border border-[#D9822B]/30 text-[#9E5A14] shrink-0">
                         Idee
                       </span>
                     </button>
@@ -459,21 +459,21 @@ export const TopBar: React.FC<TopBarProps> = ({
                         setActiveTab('polls');
                         closeSearch();
                       }}
-                      className="w-full flex items-center justify-between gap-2 p-2.5 rounded-2xl hover:bg-white/[0.08] text-left transition-colors cursor-pointer"
+                      className="w-full flex items-center justify-between gap-2 p-2.5 rounded-2xl hover:bg-[#FAF7F2] text-left transition-colors cursor-pointer"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-bold text-slate-100 truncate">
+                        <p className="text-xs font-bold text-[#1F1B18] truncate">
                           {poll.question}
                         </p>
                         {(matchedOptionText || poll.isClosed) && (
-                          <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                          <p className="text-[11px] text-[#6B6259] truncate mt-0.5">
                             {matchedOptionText
                               ? `Option: ${matchedOptionText}`
                               : 'Abgeschlossene Abstimmung'}
                           </p>
                         )}
                       </div>
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-300 shrink-0">
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#D9822B]/14 border border-[#D9822B]/30 text-[#9E5A14] shrink-0">
                         Umfrage
                       </span>
                     </button>
@@ -492,19 +492,19 @@ export const TopBar: React.FC<TopBarProps> = ({
                         setActiveTab('tasks');
                         closeSearch();
                       }}
-                      className="w-full flex items-center justify-between gap-2 p-2.5 rounded-2xl hover:bg-white/[0.08] text-left transition-colors cursor-pointer"
+                      className="w-full flex items-center justify-between gap-2 p-2.5 rounded-2xl hover:bg-[#FAF7F2] text-left transition-colors cursor-pointer"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-bold text-slate-100 truncate">
+                        <p className="text-xs font-bold text-[#1F1B18] truncate">
                           {task.title}
                         </p>
                         {task.description && (
-                          <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                          <p className="text-[11px] text-[#6B6259] truncate mt-0.5">
                             {task.description}
                           </p>
                         )}
                       </div>
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-sky-400/15 border border-sky-400/30 text-sky-300 shrink-0">
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#2A7B88]/12 border border-[#2A7B88]/30 text-[#1F5E68] shrink-0">
                         Aufgabe
                       </span>
                     </button>
@@ -524,17 +524,17 @@ export const TopBar: React.FC<TopBarProps> = ({
                         setActiveTab('budget');
                         closeSearch();
                       }}
-                      className="w-full flex items-center justify-between gap-2 p-2.5 rounded-2xl hover:bg-white/[0.08] text-left transition-colors cursor-pointer"
+                      className="w-full flex items-center justify-between gap-2 p-2.5 rounded-2xl hover:bg-[#FAF7F2] text-left transition-colors cursor-pointer"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-bold text-slate-100 truncate">
+                        <p className="text-xs font-bold text-[#1F1B18] truncate">
                           {exp.title}
                         </p>
-                        <p className="font-mono tabular-nums text-[11px] text-slate-400 truncate mt-0.5">
+                        <p className="font-mono tabular-nums text-[11px] text-[#6B6259] truncate mt-0.5">
                           {formatCurrency(exp.amount, trip.currency)}
                         </p>
                       </div>
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-400/15 border border-emerald-400/30 text-emerald-300 shrink-0">
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#6E7F5E]/14 border border-[#6E7F5E]/30 text-[#4E5F40] shrink-0">
                         Ausgabe
                       </span>
                     </button>
@@ -556,21 +556,21 @@ export const TopBar: React.FC<TopBarProps> = ({
                 ? 'Lokaler Browser-Modus aktiv'
                 : 'Cloud-Sync aktiv'
             }
-            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white/[0.05] border border-white/10 text-[11px] font-semibold text-slate-300"
+            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-[#FAF7F2] border border-[#E6DDD1] text-[11px] font-semibold text-[#6B6259]"
           >
             {isSyncing ? (
               <>
-                <Cloud className="w-3.5 h-3.5 text-cyan-300 animate-pulse" />
-                <span className="text-cyan-200">Speichert…</span>
+                <Cloud className="w-3.5 h-3.5 text-[#2A7B88] animate-pulse" />
+                <span className="text-[#1F5E68]">Speichert…</span>
               </>
             ) : isLocalMode ? (
               <>
-                <HardDrive className="w-3.5 h-3.5 text-slate-400" />
+                <HardDrive className="w-3.5 h-3.5 text-[#6B6259]" />
                 <span>Lokal</span>
               </>
             ) : (
               <>
-                <Cloud className="w-3.5 h-3.5 text-emerald-400" />
+                <Cloud className="w-3.5 h-3.5 text-[#4E5F40]" />
                 <span>Synced</span>
               </>
             )}
@@ -583,8 +583,8 @@ export const TopBar: React.FC<TopBarProps> = ({
             aria-pressed={mapOpen}
             className={`hidden lg:inline-flex items-center gap-1.5 text-xs font-extrabold px-3.5 py-2 rounded-full border transition-all cursor-pointer ${
               mapOpen
-                ? 'bg-cyan-400 text-[#0B0E14] border-cyan-300 shadow-[0_0_20px_rgba(34,211,238,0.35)]'
-                : 'bg-white/[0.07] hover:bg-white/[0.14] text-cyan-200 border-cyan-400/30'
+                ? 'bg-[#2A7B88] text-white border-[#2A7B88] shadow-sm'
+                : 'bg-[#2A7B88]/10 hover:bg-[#2A7B88]/18 text-[#1F5E68] border-[#2A7B88]/30'
             }`}
           >
             <MapIcon className="w-3.5 h-3.5" />
@@ -596,16 +596,16 @@ export const TopBar: React.FC<TopBarProps> = ({
             type="button"
             onClick={handleCopyPrivateLink}
             title="Privaten Direktlink inkl. Zugangsschlüssel (#access) kopieren"
-            className="inline-flex items-center gap-1.5 bg-white/[0.07] hover:bg-white/[0.14] border border-white/12 text-slate-100 text-xs font-bold px-3 py-2 rounded-full transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 bg-[#FAF7F2] hover:bg-[#F3ECE1] border border-[#DDD2C3] text-[#1F1B18] text-xs font-bold px-3 py-2 rounded-full transition-colors cursor-pointer"
           >
             {copiedLink ? (
               <>
-                <Check className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-emerald-300">Link kopiert!</span>
+                <Check className="w-3.5 h-3.5 text-[#4E5F40]" />
+                <span className="text-[#4E5F40]">Link kopiert!</span>
               </>
             ) : (
               <>
-                <Link2 className="w-3.5 h-3.5 text-cyan-300" />
+                <Link2 className="w-3.5 h-3.5 text-[#2A7B88]" />
                 <span className="hidden sm:inline">Privater Link</span>
               </>
             )}
@@ -621,8 +621,8 @@ export const TopBar: React.FC<TopBarProps> = ({
               title="Passwort ändern oder App sperren"
               className={`w-9 h-9 rounded-full border flex items-center justify-center transition-colors cursor-pointer ${
                 isSecurityOpen
-                  ? 'bg-amber-400/20 border-amber-400/45 text-amber-200'
-                  : 'bg-white/[0.07] hover:bg-white/[0.14] border-white/12 text-slate-300 hover:text-amber-200'
+                  ? 'bg-[#D9822B]/18 border-[#D9822B]/45 text-[#9E5A14]'
+                  : 'bg-[#FAF7F2] hover:bg-[#F3ECE1] border-[#DDD2C3] text-[#6B6259] hover:text-[#1F1B18]'
               }`}
             >
               <Shield className="w-4 h-4" />
@@ -632,29 +632,29 @@ export const TopBar: React.FC<TopBarProps> = ({
               <div
                 role="dialog"
                 aria-label="Sicherheitseinstellungen"
-                className="absolute right-0 top-full mt-2 w-72 bg-[#131823]/[0.98] backdrop-blur-2xl rounded-3xl border border-white/15 shadow-[0_24px_60px_rgba(0,0,0,0.85)] p-4 z-50 space-y-3.5"
+                className="absolute right-0 top-full mt-2 w-72 bg-white/[0.98] backdrop-blur-2xl rounded-3xl border border-[#DDD2C3] shadow-2xl p-4 z-50 space-y-3.5 text-[#1F1B18]"
               >
-                <div className="flex items-center justify-between pb-2 border-b border-white/10">
-                  <span className="inline-flex items-center gap-1.5 text-xs font-extrabold text-slate-100">
-                    <KeyRound className="w-3.5 h-3.5 text-amber-300" />
+                <div className="flex items-center justify-between pb-2 border-b border-[#E6DDD1]">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#1F1B18]">
+                    <KeyRound className="w-3.5 h-3.5 text-[#D9822B]" />
                     Zugangsschutz
                   </span>
                   <button
                     type="button"
                     onClick={() => setIsSecurityOpen(false)}
                     aria-label="Schließen"
-                    className="text-slate-400 hover:text-slate-100 cursor-pointer"
+                    className="text-[#6B6259] hover:text-[#1F1B18] cursor-pointer"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
-                <div className="rounded-2xl bg-[#0B0E14]/80 border border-white/10 px-3 py-2 flex items-center justify-between gap-2">
+                <div className="rounded-2xl bg-[#FAF7F2] border border-[#E6DDD1] px-3 py-2 flex items-center justify-between gap-2">
                   <div className="min-w-0">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B6259] block">
                       Aktueller Code
                     </span>
-                    <span className="font-mono tabular-nums text-xs font-bold text-cyan-300 truncate block">
+                    <span className="font-mono tabular-nums text-xs font-bold text-[#C85A38] truncate block">
                       {showCurrentKey ? accessKey : '••••••••'}
                     </span>
                   </div>
@@ -664,7 +664,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     aria-label={
                       showCurrentKey ? 'Code verbergen' : 'Code anzeigen'
                     }
-                    className="p-1.5 rounded-full hover:bg-white/10 text-slate-400 hover:text-slate-100 cursor-pointer"
+                    className="p-1.5 rounded-full hover:bg-[#E6DDD1] text-[#6B6259] hover:text-[#1F1B18] cursor-pointer"
                   >
                     {showCurrentKey ? (
                       <EyeOff className="w-3.5 h-3.5" />
@@ -677,7 +677,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 <form onSubmit={handleUpdateAccessKey} className="space-y-2">
                   <label
                     htmlFor="topbar-new-access-key"
-                    className="block text-[11px] font-bold text-slate-300"
+                    className="block text-[11px] font-bold text-[#1F1B18]"
                   >
                     Passwort ändern
                   </label>
@@ -688,11 +688,11 @@ export const TopBar: React.FC<TopBarProps> = ({
                       value={newAccessKeyInput}
                       onChange={(e) => setNewAccessKeyInput(e.target.value)}
                       placeholder="Neuer Code..."
-                      className="aurora-input flex-1 min-w-0 rounded-xl px-3 py-2 text-xs font-semibold"
+                      className="surface-input flex-1 min-w-0 rounded-xl px-3 py-2 text-xs font-semibold"
                     />
                     <button
                       type="submit"
-                      className="px-3 py-2 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-[#0B0E14] text-xs font-extrabold transition-colors cursor-pointer shrink-0"
+                      className="px-3 py-2 rounded-xl bg-[#C85A38] hover:bg-[#B54B2B] text-white text-xs font-extrabold transition-colors cursor-pointer shrink-0"
                     >
                       Setzen
                     </button>
@@ -705,7 +705,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     setIsSecurityOpen(false);
                     lockApp();
                   }}
-                  className="w-full py-2 px-3 rounded-full bg-rose-500/15 hover:bg-rose-500/25 border border-rose-400/35 text-rose-200 text-xs font-extrabold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  className="w-full py-2 px-3 rounded-full bg-rose-500/10 hover:bg-rose-500/18 border border-rose-500/30 text-rose-700 text-xs font-extrabold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <Lock className="w-3.5 h-3.5" />
                   <span>App jetzt sperren</span>
@@ -718,9 +718,9 @@ export const TopBar: React.FC<TopBarProps> = ({
           <button
             type="button"
             onClick={() => setIsWelcomeOpen(true)}
-            className="inline-flex items-center gap-1.5 bg-white/[0.1] hover:bg-white/[0.16] border border-white/15 text-slate-100 text-xs font-bold px-3.5 py-2 rounded-full transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 bg-[#F3ECE1] hover:bg-[#E6DDD1] border border-[#DDD2C3] text-[#1F1B18] text-xs font-bold px-3.5 py-2 rounded-full transition-colors cursor-pointer"
           >
-            <ArrowLeftRight className="w-3.5 h-3.5 text-amber-300" />
+            <ArrowLeftRight className="w-3.5 h-3.5 text-[#D9822B]" />
             <span>Urlaub wechseln</span>
           </button>
         </div>
@@ -728,8 +728,8 @@ export const TopBar: React.FC<TopBarProps> = ({
 
       {/* Row 2: Responsive "Ich bin:" Traveler Pills (wrap/scroll cleanly on 390px) */}
       <div className="flex items-center gap-2 min-w-0 w-full">
-        <div className="flex items-center flex-wrap sm:flex-nowrap gap-1.5 bg-[#131823]/80 backdrop-blur-xl rounded-2xl sm:rounded-full p-1.5 border border-white/10 w-full sm:w-auto max-w-full overflow-x-auto no-scrollbar">
-          <span className="text-[11px] font-bold text-slate-400 pl-2 pr-1 shrink-0">
+        <div className="flex items-center flex-wrap sm:flex-nowrap gap-1.5 bg-[#FAF7F2]/90 backdrop-blur-xl rounded-2xl sm:rounded-full p-1.5 border border-[#E6DDD1] w-full sm:w-auto max-w-full overflow-x-auto no-scrollbar">
+          <span className="text-[11px] font-bold text-[#6B6259] pl-2 pr-1 shrink-0">
             Ich bin:
           </span>
 
@@ -743,12 +743,12 @@ export const TopBar: React.FC<TopBarProps> = ({
                 title={`Als ${traveler.name} planen & abstimmen`}
                 className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs transition-all cursor-pointer shrink-0 max-w-[140px] ${
                   isSelected
-                    ? 'bg-cyan-400 text-[#0B0E14] font-extrabold shadow-[0_0_14px_rgba(34,211,238,0.28)]'
-                    : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.1] hover:text-slate-100 font-medium'
+                    ? 'bg-[#C85A38] text-white font-extrabold shadow-sm'
+                    : 'bg-white text-[#6B6259] hover:bg-[#F3ECE1] hover:text-[#1F1B18] border border-[#E6DDD1] font-medium'
                 }`}
               >
                 <span
-                  className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black text-[#0B0E14] shrink-0"
+                  className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
                   style={{ backgroundColor: traveler.color }}
                 >
                   {traveler.initials}
@@ -764,14 +764,14 @@ export const TopBar: React.FC<TopBarProps> = ({
               onClick={() => setIsAddingTraveler(true)}
               title="Weiteren Namen hinzufügen"
               aria-label="Weiteren Namen hinzufügen"
-              className="w-7 h-7 rounded-full bg-white/[0.06] hover:bg-white/[0.14] text-slate-300 hover:text-cyan-300 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+              className="w-7 h-7 rounded-full bg-white hover:bg-[#F3ECE1] border border-[#DDD2C3] text-[#6B6259] hover:text-[#C85A38] flex items-center justify-center transition-colors cursor-pointer shrink-0"
             >
               <UserPlus className="w-3.5 h-3.5" />
             </button>
           ) : (
             <form
               onSubmit={handleAddTravelerSubmit}
-              className="inline-flex items-center gap-1 bg-[#0B0E14]/90 rounded-full pl-2.5 pr-1 py-0.5 border border-cyan-400/40 shrink-0"
+              className="inline-flex items-center gap-1 bg-white rounded-full pl-2.5 pr-1 py-0.5 border border-[#C85A38]/45 shrink-0"
             >
               <input
                 type="text"
@@ -785,12 +785,12 @@ export const TopBar: React.FC<TopBarProps> = ({
                 }}
                 placeholder="Name..."
                 autoFocus
-                className="text-xs text-slate-100 placeholder-slate-500 bg-transparent focus:outline-none w-24"
+                className="text-xs text-[#1F1B18] placeholder-[#8C8277] bg-transparent focus:outline-none w-24"
               />
               <button
                 type="submit"
                 aria-label="Name speichern"
-                className="w-5 h-5 rounded-full bg-cyan-400 text-[#0B0E14] flex items-center justify-center cursor-pointer"
+                className="w-5 h-5 rounded-full bg-[#C85A38] text-white flex items-center justify-center cursor-pointer"
               >
                 <Check className="w-3 h-3" />
               </button>
@@ -801,7 +801,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                   setIsAddingTraveler(false);
                   setNewTravelerName('');
                 }}
-                className="w-5 h-5 rounded-full bg-white/10 text-slate-300 flex items-center justify-center cursor-pointer"
+                className="w-5 h-5 rounded-full bg-[#F3ECE1] text-[#6B6259] flex items-center justify-center cursor-pointer"
               >
                 <X className="w-3 h-3" />
               </button>

@@ -69,24 +69,24 @@ const TOAST_STYLES: Record<
   { border: string; icon: React.FC<{ className?: string }>; iconColor: string }
 > = {
   success: {
-    border: 'border-emerald-400/40',
+    border: 'border-[#6E7F5E]/40',
     icon: CheckCircle2,
-    iconColor: 'text-emerald-300',
+    iconColor: 'text-[#4E5F40]',
   },
   info: {
-    border: 'border-cyan-400/40',
+    border: 'border-[#2A7B88]/40',
     icon: Info,
-    iconColor: 'text-cyan-300',
+    iconColor: 'text-[#2A7B88]',
   },
   warning: {
-    border: 'border-amber-400/40',
+    border: 'border-[#D9822B]/40',
     icon: AlertTriangle,
-    iconColor: 'text-amber-300',
+    iconColor: 'text-[#D9822B]',
   },
   error: {
-    border: 'border-rose-400/40',
+    border: 'border-rose-500/40',
     icon: AlertCircle,
-    iconColor: 'text-rose-300',
+    iconColor: 'text-rose-600',
   },
 };
 
@@ -256,28 +256,28 @@ const AppShell: React.FC = () => {
   return (
     <>
       <AccessAndWelcomeGate>
-        <div className="aurora-canvas relative min-h-screen w-full max-w-full overflow-x-clip p-2.5 sm:p-4 md:p-5 pb-24 lg:pb-5 text-slate-100 font-sans">
-          {/* Subtle Ambient Midnight Aurora Glow Blobs */}
+        <div className="surface-canvas relative min-h-screen w-full max-w-full overflow-x-clip p-2.5 sm:p-4 md:p-5 pb-24 lg:pb-5 text-[#1F1B18] font-sans">
+          {/* Subtle Ambient Warm Glow Blobs */}
           <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-            <div className="absolute -top-32 -left-32 w-96 h-96 bg-cyan-400/12 rounded-full blur-3xl" />
-            <div className="absolute top-1/4 -right-32 w-[28rem] h-[28rem] bg-violet-500/12 rounded-full blur-3xl" />
-            <div className="absolute -bottom-32 left-1/4 w-[28rem] h-[28rem] bg-emerald-400/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-amber-400/8 rounded-full blur-3xl" />
+            <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#C85A38]/8 rounded-full blur-3xl" />
+            <div className="absolute top-1/4 -right-32 w-[28rem] h-[28rem] bg-[#6E7F5E]/8 rounded-full blur-3xl" />
+            <div className="absolute -bottom-32 left-1/4 w-[28rem] h-[28rem] bg-[#2A7B88]/7 rounded-full blur-3xl" />
+            <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-[#D9822B]/8 rounded-full blur-3xl" />
           </div>
 
-          {/* Sleek Midnight Testmodus Banner */}
+          {/* Testmodus Banner */}
           {trip.isDemo && (
-            <div className="aurora-glass relative z-10 w-full max-w-[1680px] mx-auto mb-3 rounded-2xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 border border-amber-400/25">
+            <div className="surface-glass relative z-10 w-full max-w-[1680px] mx-auto mb-3 rounded-2xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 border border-[#D9822B]/30">
               <div className="flex flex-wrap items-center gap-2 text-xs md:text-sm min-w-0 w-full sm:w-auto">
-                <span className="inline-flex items-center gap-1.5 bg-amber-400/18 border border-amber-400/35 text-amber-300 font-bold px-2.5 py-0.5 rounded-full text-xs shrink-0">
+                <span className="inline-flex items-center gap-1.5 bg-[#D9822B]/15 border border-[#D9822B]/35 text-[#9E5A14] font-bold px-2.5 py-0.5 rounded-full text-xs shrink-0">
                   <Sparkles className="w-3.5 h-3.5" />
                   Testmodus
                 </span>
-                <span className="text-slate-200 font-medium truncate">
+                <span className="text-[#1F1B18] font-medium truncate">
                   <strong>{trip.title}</strong> (Beispielwerte zum Ausprobieren)
                 </span>
                 {isSyncing && (
-                  <span className="inline-flex items-center gap-1 text-[11px] text-cyan-300 ml-1 shrink-0">
+                  <span className="inline-flex items-center gap-1 text-[11px] text-[#2A7B88] ml-1 shrink-0">
                     <Cloud className="w-3 h-3 animate-pulse" /> Speichert…
                   </span>
                 )}
@@ -287,16 +287,16 @@ const AppShell: React.FC = () => {
                 <button
                   type="button"
                   onClick={resetDemoTrip}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold bg-white/[0.08] hover:bg-white/[0.16] border border-white/10 text-slate-200 px-3 py-1.5 rounded-full transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold bg-[#F3ECE1] hover:bg-[#E6DDD1] border border-[#DDD2C3] text-[#1F1B18] px-3 py-1.5 rounded-full transition-colors cursor-pointer"
                   title="Alle Beispielwerte von Mallorca 2026 auf Anfang zurücksetzen"
                 >
-                  <RotateCcw className="w-3.5 h-3.5 text-amber-300" />
+                  <RotateCcw className="w-3.5 h-3.5 text-[#D9822B]" />
                   <span>Reset Demo</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsNewTripModalOpen(true)}
-                  className="inline-flex items-center gap-1.5 text-xs font-extrabold bg-cyan-400 hover:bg-cyan-300 text-[#0B0E14] px-3.5 py-1.5 rounded-full transition-colors cursor-pointer shadow-[0_0_16px_rgba(34,211,238,0.25)]"
+                  className="inline-flex items-center gap-1.5 text-xs font-extrabold bg-[#C85A38] hover:bg-[#B54B2B] text-white px-3.5 py-1.5 rounded-full transition-colors cursor-pointer shadow-sm"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Eigenen Urlaub erstellen</span>
@@ -305,9 +305,9 @@ const AppShell: React.FC = () => {
             </div>
           )}
 
-          {/* Main Midnight Glass Dashboard Shell */}
+          {/* Main Dashboard Shell */}
           <div
-            className={`aurora-glass relative z-10 w-full max-w-[1680px] mx-auto rounded-[28px] md:rounded-[34px] p-2.5 sm:p-4 md:p-5 grid grid-cols-1 ${gridColumnsClass} gap-4 lg:gap-5 min-h-[calc(100vh-2.5rem)] transition-all duration-200`}
+            className={`surface-glass relative z-10 w-full max-w-[1680px] mx-auto rounded-[28px] md:rounded-[34px] p-2.5 sm:p-4 md:p-5 grid grid-cols-1 ${gridColumnsClass} gap-4 lg:gap-5 min-h-[calc(100vh-2.5rem)] transition-all duration-200`}
           >
             {/* Left Navigation Column (Desktop Rail + Mobile Bars/Drawer) */}
             <Sidebar
@@ -332,7 +332,7 @@ const AppShell: React.FC = () => {
                     setMapOpen(false);
                   }
                 }}
-                className="fixed inset-0 z-50 bg-[#06080D]/80 backdrop-blur-md p-3 flex flex-col lg:static lg:inset-auto lg:z-auto lg:bg-transparent lg:backdrop-blur-none lg:p-0 lg:block min-w-0"
+                className="fixed inset-0 z-50 bg-[#1F1B18]/45 backdrop-blur-sm p-3 flex flex-col lg:static lg:inset-auto lg:z-auto lg:bg-transparent lg:backdrop-blur-none lg:p-0 lg:block min-w-0"
               >
                 <div className="h-full w-full lg:h-[calc(100vh-3.5rem)] lg:sticky lg:top-5">
                   <MapCockpitPanel />
@@ -356,7 +356,7 @@ const AppShell: React.FC = () => {
       {/* Rendered outside AccessAndWelcomeGate so Welcome Gate stays open if user cancels */}
       <NewTripModal />
 
-      {/* Global Midnight Aurora Toast & 5s Undo Viewport */}
+      {/* Global Toast & 5s Undo Viewport */}
       {toasts.length > 0 && (
         <div
           aria-live="polite"
@@ -369,11 +369,11 @@ const AppShell: React.FC = () => {
               <div
                 key={toast.id}
                 role="status"
-                className={`aurora-glass-elevated pointer-events-auto rounded-2xl px-3.5 py-3 border ${meta.border} flex items-center justify-between gap-2.5 animate-fade-in`}
+                className={`surface-glass-elevated pointer-events-auto rounded-2xl px-3.5 py-3 border ${meta.border} flex items-center justify-between gap-2.5 animate-fade-in`}
               >
                 <div className="flex items-center gap-2.5 min-w-0 flex-1">
                   <Icon className={`w-4 h-4 shrink-0 ${meta.iconColor}`} />
-                  <span className="text-xs font-semibold text-slate-100 leading-snug break-words">
+                  <span className="text-xs font-semibold text-[#1F1B18] leading-snug break-words">
                     {toast.message}
                   </span>
                 </div>
@@ -383,7 +383,7 @@ const AppShell: React.FC = () => {
                     <button
                       type="button"
                       onClick={undoLastDelete}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-cyan-400 hover:bg-cyan-300 text-[#0B0E14] text-[11px] font-extrabold transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-white text-[11px] font-extrabold transition-colors cursor-pointer"
                     >
                       <Undo2 className="w-3 h-3" />
                       <span>Rückgängig</span>
@@ -393,7 +393,7 @@ const AppShell: React.FC = () => {
                     type="button"
                     onClick={() => dismissToast(toast.id)}
                     aria-label="Hinweis schließen"
-                    className="w-6 h-6 rounded-full hover:bg-white/10 text-slate-400 hover:text-slate-100 flex items-center justify-center transition-colors cursor-pointer"
+                    className="w-6 h-6 rounded-full hover:bg-[#E6DDD1] text-[#6B6259] hover:text-[#1F1B18] flex items-center justify-center transition-colors cursor-pointer"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>

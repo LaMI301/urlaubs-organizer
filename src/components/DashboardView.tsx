@@ -64,38 +64,38 @@ const CATEGORY_META: Record<
   beach: {
     label: 'Strand & Meer',
     icon: Palmtree,
-    pillClass: 'border-amber-400/30 bg-amber-400/10 text-amber-300',
-    iconBgClass: 'bg-amber-400/15 text-amber-300 border border-amber-400/30',
+    pillClass: 'border-[#D9822B]/30 bg-[#D9822B]/14 text-[#9E5A14]',
+    iconBgClass: 'bg-[#D9822B]/14 text-[#9E5A14] border border-[#D9822B]/30',
   },
   activity: {
     label: 'Ausflug & Action',
     icon: Compass,
-    pillClass: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300',
-    iconBgClass: 'bg-emerald-400/15 text-emerald-300 border border-emerald-400/30',
+    pillClass: 'border-[#6E7F5E]/30 bg-[#6E7F5E]/14 text-[#4B593E]',
+    iconBgClass: 'bg-[#6E7F5E]/14 text-[#4B593E] border border-[#6E7F5E]/30',
   },
   culture: {
     label: 'Kultur & Sightseeing',
     icon: Landmark,
-    pillClass: 'border-cyan-400/30 bg-cyan-400/10 text-cyan-300',
-    iconBgClass: 'bg-cyan-400/15 text-cyan-300 border border-cyan-400/30',
+    pillClass: 'border-[#2A7B88]/30 bg-[#2A7B88]/12 text-[#1F5E68]',
+    iconBgClass: 'bg-[#2A7B88]/12 text-[#1F5E68] border border-[#2A7B88]/30',
   },
   transport: {
     label: 'Anreise & Roadtrip',
     icon: Car,
-    pillClass: 'border-slate-400/30 bg-slate-400/10 text-slate-300',
-    iconBgClass: 'bg-slate-400/15 text-slate-300 border border-slate-400/30',
+    pillClass: 'border-[#E6DDD1] bg-[#F3ECE1]/80 text-[#6B6259]',
+    iconBgClass: 'bg-[#F3ECE1]/80 text-[#6B6259] border border-[#E6DDD1]',
   },
   nightlife: {
     label: 'Abend & Sunset',
     icon: Music,
-    pillClass: 'border-violet-400/30 bg-violet-400/10 text-violet-300',
-    iconBgClass: 'bg-violet-400/15 text-violet-300 border border-violet-400/30',
+    pillClass: 'border-[#C85A38]/30 bg-[#C85A38]/12 text-[#A34224]',
+    iconBgClass: 'bg-[#C85A38]/12 text-[#A34224] border border-[#C85A38]/30',
   },
   other: {
     label: 'Sonstiges',
     icon: Sparkles,
-    pillClass: 'border-white/15 bg-white/5 text-slate-300',
-    iconBgClass: 'bg-white/10 text-slate-200 border border-white/15',
+    pillClass: 'border-[#E6DDD1] bg-[#FAF7F2] text-[#6B6259]',
+    iconBgClass: 'bg-[#FAF7F2] text-[#6B6259] border border-[#E6DDD1]',
   },
 };
 
@@ -105,18 +105,18 @@ const STATUS_LABELS: Record<
 > = {
   confirmed: {
     label: 'Bestätigt',
-    badgeClass: 'bg-emerald-400/15 text-emerald-300 border border-emerald-400/35',
-    dotClass: 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.75)]',
+    badgeClass: 'bg-[#6E7F5E]/14 text-[#4B593E] border border-[#6E7F5E]/30',
+    dotClass: 'bg-[#6E7F5E] shadow-[0_0_0_3px_rgba(110,127,94,0.18)]',
   },
   planned: {
     label: 'Geplant',
-    badgeClass: 'bg-cyan-400/15 text-cyan-300 border border-cyan-400/35',
-    dotClass: 'bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.75)]',
+    badgeClass: 'bg-[#2A7B88]/12 text-[#1F5E68] border border-[#2A7B88]/30',
+    dotClass: 'bg-[#2A7B88] shadow-[0_0_0_3px_rgba(42,123,136,0.18)]',
   },
   idea: {
     label: 'Idee',
-    badgeClass: 'bg-amber-400/15 text-amber-300 border border-amber-400/35',
-    dotClass: 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.7)]',
+    badgeClass: 'bg-[#D9822B]/14 text-[#9E5A14] border border-[#D9822B]/30',
+    dotClass: 'bg-[#D9822B] shadow-[0_0_0_3px_rgba(217,130,43,0.18)]',
   },
 };
 
@@ -153,17 +153,17 @@ function renderWeatherIcon(code: number, className = 'w-4 h-4') {
   const { kind } = describeWeatherCode(code);
   switch (kind) {
     case 'sun':
-      return <Sun className={`${className} text-amber-300`} />;
+      return <Sun className={`${className} text-[#D9822B]`} />;
     case 'partly':
-      return <CloudSun className={`${className} text-amber-200`} />;
+      return <CloudSun className={`${className} text-[#D9822B]`} />;
     case 'rain':
-      return <CloudRain className={`${className} text-cyan-300`} />;
+      return <CloudRain className={`${className} text-[#2A7B88]`} />;
     case 'storm':
-      return <CloudLightning className={`${className} text-violet-300`} />;
+      return <CloudLightning className={`${className} text-[#C85A38]`} />;
     case 'snow':
-      return <Snowflake className={`${className} text-cyan-200`} />;
+      return <Snowflake className={`${className} text-[#2A7B88]`} />;
     default:
-      return <Cloud className={`${className} text-slate-300`} />;
+      return <Cloud className={`${className} text-[#6B6259]`} />;
   }
 }
 
@@ -718,24 +718,24 @@ export const DashboardView: React.FC = () => {
 
   return (
     <div className="space-y-5 min-w-0">
-      {/* Midnight Aurora Cockpit Header */}
+      {/* Reise-Übersicht Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div className="min-w-0">
-          <div className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-cyan-300/90 mb-1.5">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
-            <span>Midnight Aurora Cockpit</span>
+          <div className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#A34224] mb-1.5">
+            <span className="w-2 h-2 rounded-full bg-[#C85A38]" />
+            <span>Reise-Übersicht</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-100 truncate">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#1F1B18] truncate">
             Hallo, {currentUser.name}
           </h1>
-          <p className="text-xs sm:text-sm font-medium text-slate-400 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span className="font-mono tabular-nums text-cyan-300 font-semibold">
+          <p className="text-xs sm:text-sm font-medium text-[#6B6259] mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="font-mono tabular-nums text-[#A34224] font-semibold">
               Tag {selectedDay} von {safeTotalDays || 1}
             </span>
-            <span className="text-slate-600">•</span>
+            <span className="text-[#8C8277]">•</span>
             <span>{formatTripDayDate(trip.startDate, selectedDay)}</span>
-            <span className="text-slate-600">•</span>
-            <span className="text-slate-300 truncate">{trip.destination}</span>
+            <span className="text-[#8C8277]">•</span>
+            <span className="text-[#1F1B18] font-semibold truncate">{trip.destination}</span>
           </p>
         </div>
 
@@ -743,7 +743,7 @@ export const DashboardView: React.FC = () => {
           <button
             type="button"
             onClick={toggleBentoCards}
-            className="w-9 h-9 rounded-full aurora-glass hover:border-cyan-400/40 flex items-center justify-center text-slate-300 hover:text-cyan-300 transition-all cursor-pointer"
+            className="w-9 h-9 rounded-full surface-glass hover:border-[#C85A38]/40 flex items-center justify-center text-[#6B6259] hover:text-[#A34224] transition-all cursor-pointer"
             title={showBentoCards ? 'Live-Ribbon einklappen' : 'Live-Ribbon ausklappen'}
             aria-label={showBentoCards ? 'Live-Ribbon einklappen' : 'Live-Ribbon ausklappen'}
             aria-expanded={showBentoCards}
@@ -760,18 +760,18 @@ export const DashboardView: React.FC = () => {
             onClick={() => setMapOpen(!mapOpen)}
             className={`inline-flex items-center gap-2 text-xs font-bold px-4 py-2.5 rounded-full transition-all cursor-pointer border ${
               mapOpen
-                ? 'bg-cyan-400/20 text-cyan-200 border-cyan-400/50 shadow-[0_0_20px_rgba(34,211,238,0.2)]'
-                : 'aurora-glass text-slate-200 hover:text-cyan-200 hover:border-cyan-400/40'
+                ? 'bg-[#2A7B88]/12 text-[#1F5E68] border-[#2A7B88]/40 shadow-sm'
+                : 'surface-glass text-[#1F1B18] hover:text-[#1F5E68] hover:border-[#2A7B88]/40'
             }`}
           >
-            <MapIcon className="w-4 h-4 text-cyan-400" />
-            <span>{mapOpen ? 'Map-Cockpit aktiv' : 'Map-Cockpit'}</span>
+            <MapIcon className="w-4 h-4 text-[#2A7B88]" />
+            <span>{mapOpen ? 'Karte aktiv' : 'Karte'}</span>
           </button>
 
           <button
             type="button"
             onClick={() => setIsQuickAddOpen(true)}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-cyan-400 to-emerald-400 text-[#0B0E14] text-xs font-extrabold px-5 py-2.5 rounded-full hover:brightness-110 active:scale-95 transition-all shadow-[0_6px_24px_rgba(34,211,238,0.28)] cursor-pointer"
+            className="inline-flex items-center gap-2 bg-[#C85A38] hover:bg-[#B54B2B] text-white text-xs font-extrabold px-5 py-2.5 rounded-full active:scale-95 transition-all shadow-sm cursor-pointer"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
             <span>Neuer Vorschlag</span>
@@ -784,49 +784,49 @@ export const DashboardView: React.FC = () => {
         <div className="space-y-4 animate-fade-in">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* 1. Reise-Countdown & Live-Wetter-Chip */}
-            <div className="aurora-glass rounded-[26px] p-5 flex flex-col justify-between gap-4 border-t-2 border-t-cyan-400/50 min-w-0 relative overflow-hidden">
+            <div className="surface-glass rounded-[26px] p-5 flex flex-col justify-between gap-4 border-t-2 border-t-[#2A7B88]/60 min-w-0 relative overflow-hidden">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-cyan-300/90 flex items-center gap-1.5">
-                    <CalendarClock className="w-3.5 h-3.5" />
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#1F5E68] flex items-center gap-1.5">
+                    <CalendarClock className="w-3.5 h-3.5 text-[#2A7B88]" />
                     <span>Reise-Countdown</span>
                   </span>
-                  <div className="text-xl sm:text-2xl font-black tracking-tight text-slate-100 mt-1.5 font-mono tabular-nums break-words">
+                  <div className="text-xl sm:text-2xl font-black tracking-tight text-[#1F1B18] mt-1.5 font-mono tabular-nums break-words">
                     {tripTiming.badgeText}
                   </div>
-                  <p className="text-xs text-slate-400 mt-1 truncate">
+                  <p className="text-xs text-[#6B6259] mt-1 truncate">
                     {tripTiming.subText}
                   </p>
                 </div>
 
                 {/* Live Weather Chip with calm offline fallback */}
-                <div className="shrink-0 rounded-2xl bg-[#0B0E14]/75 border border-white/10 px-3.5 py-2.5 text-right min-w-[116px]">
+                <div className="shrink-0 rounded-2xl bg-[#FAF7F2] border border-[#E6DDD1] px-3.5 py-2.5 text-right min-w-[116px]">
                   {weatherStatus === 'ready' && weather ? (
                     <>
                       <div className="flex items-center justify-end gap-1.5">
                         {renderWeatherIcon(weather.code, 'w-4 h-4')}
-                        <span className="text-lg font-black text-slate-100 font-mono tabular-nums">
+                        <span className="text-lg font-black text-[#1F1B18] font-mono tabular-nums">
                           {weather.temp}°C
                         </span>
                       </div>
-                      <p className="text-[11px] font-semibold text-slate-300 mt-0.5 truncate max-w-[130px]">
+                      <p className="text-[11px] font-semibold text-[#6B6259] mt-0.5 truncate max-w-[130px]">
                         {weather.label}
                       </p>
                       {weather.tempMin !== undefined && weather.tempMax !== undefined && (
-                        <p className="text-[10px] text-slate-400 font-mono tabular-nums mt-0.5">
+                        <p className="text-[10px] text-[#8C8277] font-mono tabular-nums mt-0.5">
                           {weather.tempMin}° / {weather.tempMax}°
                         </p>
                       )}
                     </>
                   ) : (
                     <>
-                      <div className="flex items-center justify-end gap-1.5 text-slate-300">
-                        <Cloud className="w-4 h-4 text-cyan-400/75" />
+                      <div className="flex items-center justify-end gap-1.5 text-[#1F1B18]">
+                        <Cloud className="w-4 h-4 text-[#2A7B88]" />
                         <span className="text-xs font-bold font-mono">
                           {weatherStatus === 'loading' ? 'Lädt…' : 'Wetter bereit'}
                         </span>
                       </div>
-                      <p className="text-[10px] text-slate-400 mt-0.5 truncate max-w-[130px]">
+                      <p className="text-[10px] text-[#8C8277] mt-0.5 truncate max-w-[130px]">
                         {weatherStatus === 'loading'
                           ? 'Open-Meteo'
                           : 'Offline-Modus aktiv'}
@@ -836,10 +836,10 @@ export const DashboardView: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/10 text-xs">
-                <span className="inline-flex items-center gap-1.5 text-slate-300 font-semibold">
-                  <Users className="w-3.5 h-3.5 text-cyan-400" />
-                  <span className="font-mono tabular-nums">{trip.travelers.length}</span>{' '}
+              <div className="flex items-center justify-between gap-2 pt-2 border-t border-[#E6DDD1] text-xs">
+                <span className="inline-flex items-center gap-1.5 text-[#6B6259] font-semibold">
+                  <Users className="w-3.5 h-3.5 text-[#2A7B88]" />
+                  <span className="font-mono tabular-nums text-[#1F1B18]">{trip.travelers.length}</span>{' '}
                   Mitreisende
                 </span>
                 <div className="flex items-center -space-x-1.5">
@@ -847,7 +847,7 @@ export const DashboardView: React.FC = () => {
                     <span
                       key={t.id}
                       title={`${t.name}${t.role ? ` (${t.role})` : ''}`}
-                      className="w-6 h-6 rounded-full border border-[#0B0E14] text-[10px] font-extrabold text-[#0B0E14] flex items-center justify-center shrink-0"
+                      className="w-6 h-6 rounded-full border-2 border-[#FAF7F2] text-[10px] font-extrabold text-white flex items-center justify-center shrink-0"
                       style={{ backgroundColor: t.color }}
                     >
                       {t.initials}
@@ -861,20 +861,20 @@ export const DashboardView: React.FC = () => {
             <button
               type="button"
               onClick={() => setActiveTab('budget')}
-              className="aurora-glass rounded-[26px] p-5 flex flex-col justify-between gap-3.5 border-t-2 border-t-emerald-400/50 hover:border-emerald-400/40 hover:-translate-y-0.5 transition-all text-left cursor-pointer min-w-0 group"
+              className="surface-glass rounded-[26px] p-5 flex flex-col justify-between gap-3.5 border-t-2 border-t-[#6E7F5E]/60 hover:border-[#6E7F5E]/50 hover:-translate-y-0.5 transition-all text-left cursor-pointer min-w-0 group"
             >
               <div className="flex items-start justify-between gap-3 w-full">
                 <div className="min-w-0">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300/90 flex items-center gap-1.5">
-                    <Euro className="w-3.5 h-3.5" />
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#4B593E] flex items-center gap-1.5">
+                    <Euro className="w-3.5 h-3.5 text-[#6E7F5E]" />
                     <span>Budget-Ribbon (p.P.)</span>
                   </span>
                   <div className="flex items-baseline gap-2 mt-1.5 flex-wrap">
-                    <span className="text-2xl sm:text-3xl font-black text-slate-100 font-mono tabular-nums">
+                    <span className="text-2xl sm:text-3xl font-black text-[#1F1B18] font-mono tabular-nums">
                       {formatCurrency(budgetSummary.plannedPerPerson, trip.currency)}
                     </span>
                     {budgetSummary.target > 0 && (
-                      <span className="text-xs font-semibold text-slate-400 font-mono tabular-nums">
+                      <span className="text-xs font-semibold text-[#6B6259] font-mono tabular-nums">
                         / {formatCurrency(budgetSummary.target, trip.currency)} Ziel
                       </span>
                     )}
@@ -882,12 +882,12 @@ export const DashboardView: React.FC = () => {
                 </div>
 
                 <span
-                  className={`shrink-0 text-[11px] font-extrabold px-2.5 py-1 rounded-full font-mono tabular-nums ${
+                  className={`shrink-0 text-[11px] font-extrabold px-2.5 py-1 rounded-full font-mono tabular-nums border ${
                     budgetSummary.isOver
-                      ? 'bg-rose-500/20 text-rose-300 border border-rose-400/40'
+                      ? 'bg-rose-600/12 text-rose-800 border-rose-500/30'
                       : budgetSummary.isWarning
-                      ? 'bg-amber-400/20 text-amber-300 border border-amber-400/40'
-                      : 'bg-emerald-400/15 text-emerald-300 border border-emerald-400/35'
+                      ? 'bg-[#D9822B]/14 text-[#9E5A14] border-[#D9822B]/30'
+                      : 'bg-[#6E7F5E]/14 text-[#4B593E] border-[#6E7F5E]/30'
                   }`}
                 >
                   {budgetSummary.target > 0 ? `${budgetSummary.pct}%` : 'Flexibel'}
@@ -896,14 +896,14 @@ export const DashboardView: React.FC = () => {
 
               {/* Progress Bar */}
               <div className="w-full space-y-2">
-                <div className="w-full h-2.5 rounded-full bg-[#0B0E14]/80 border border-white/5 overflow-hidden">
+                <div className="w-full h-2.5 rounded-full bg-[#EFE7DB] border border-[#E6DDD1] overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-500 ${
                       budgetSummary.isOver
-                        ? 'bg-gradient-to-r from-amber-400 to-rose-500'
+                        ? 'bg-gradient-to-r from-[#D9822B] to-rose-600'
                         : budgetSummary.isWarning
-                        ? 'bg-gradient-to-r from-emerald-400 to-amber-400'
-                        : 'bg-gradient-to-r from-cyan-400 to-emerald-400'
+                        ? 'bg-gradient-to-r from-[#6E7F5E] to-[#D9822B]'
+                        : 'bg-gradient-to-r from-[#2A7B88] to-[#6E7F5E]'
                     }`}
                     style={{
                       width: `${
@@ -912,14 +912,14 @@ export const DashboardView: React.FC = () => {
                     }}
                   />
                 </div>
-                <div className="flex items-center justify-between gap-2 text-[11px] text-slate-400">
+                <div className="flex items-center justify-between gap-2 text-[11px] text-[#6B6259]">
                   <span className="font-mono tabular-nums">
                     Inkl. Ideen:{' '}
-                    <strong className="text-slate-200">
+                    <strong className="text-[#1F1B18]">
                       {formatCurrency(budgetSummary.withIdeasPerPerson, trip.currency)}
                     </strong>
                   </span>
-                  <span className="inline-flex items-center gap-1 text-emerald-300 font-bold group-hover:translate-x-0.5 transition-transform">
+                  <span className="inline-flex items-center gap-1 text-[#4B593E] font-bold group-hover:translate-x-0.5 transition-transform">
                     {budgetSummary.expensesCount > 0 ? (
                       <span className="font-mono tabular-nums">
                         {budgetSummary.expensesCount} Ausgaben
@@ -934,22 +934,22 @@ export const DashboardView: React.FC = () => {
             </button>
 
             {/* 3. Offene Abstimmungen & Ideen-Pool (Cleanly separated <button> elements!) */}
-            <div className="aurora-glass rounded-[26px] p-5 flex flex-col justify-between gap-3.5 border-t-2 border-t-amber-400/50 min-w-0">
+            <div className="surface-glass rounded-[26px] p-5 flex flex-col justify-between gap-3.5 border-t-2 border-t-[#D9822B]/60 min-w-0">
               <div className="flex items-start justify-between gap-3">
                 <button
                   type="button"
                   onClick={() => setActiveTab('polls')}
-                  className="text-left group cursor-pointer flex-1 min-w-0 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+                  className="text-left group cursor-pointer flex-1 min-w-0 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C85A38]"
                 >
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-amber-300/90 flex items-center gap-1.5">
-                    <Vote className="w-3.5 h-3.5" />
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#9E5A14] flex items-center gap-1.5">
+                    <Vote className="w-3.5 h-3.5 text-[#D9822B]" />
                     <span>Offene Abstimmungen</span>
                   </span>
                   <div className="flex items-baseline gap-2.5 mt-1.5">
-                    <span className="text-2xl sm:text-3xl font-black text-slate-100 font-mono tabular-nums">
+                    <span className="text-2xl sm:text-3xl font-black text-[#1F1B18] font-mono tabular-nums">
                       {openPollsCount}
                     </span>
-                    <span className="text-xs text-slate-400 font-medium font-mono tabular-nums">
+                    <span className="text-xs text-[#6B6259] font-medium font-mono tabular-nums">
                       aktiv · {totalPollVotes} Stimmen
                     </span>
                   </div>
@@ -958,7 +958,7 @@ export const DashboardView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setActiveTab('polls')}
-                  className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-amber-400/15 hover:bg-amber-400/25 text-amber-200 border border-amber-400/35 text-[11px] font-bold transition-colors cursor-pointer"
+                  className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#D9822B]/14 hover:bg-[#D9822B]/22 text-[#9E5A14] border border-[#D9822B]/30 text-[11px] font-bold transition-colors cursor-pointer"
                 >
                   <span>Abstimmen</span>
                   <ArrowRight className="w-3 h-3" />
@@ -969,18 +969,18 @@ export const DashboardView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setActiveTab('ideas')}
-                  className="rounded-2xl bg-[#0B0E14]/70 hover:bg-amber-400/10 border border-white/10 hover:border-amber-400/35 px-3.5 py-2.5 text-left transition-all cursor-pointer group min-w-0"
+                  className="rounded-2xl bg-[#FAF7F2] hover:bg-[#D9822B]/10 border border-[#E6DDD1] hover:border-[#D9822B]/40 px-3.5 py-2.5 text-left transition-all cursor-pointer group min-w-0"
                 >
                   <div className="flex items-center justify-between gap-1">
-                    <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-300">
-                      <Lightbulb className="w-3.5 h-3.5" />
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#9E5A14]">
+                      <Lightbulb className="w-3.5 h-3.5 text-[#D9822B]" />
                       <span className="truncate">Ideen-Pool</span>
                     </span>
-                    <span className="text-sm font-black text-slate-100 font-mono tabular-nums">
+                    <span className="text-sm font-black text-[#1F1B18] font-mono tabular-nums">
                       {ideasCount}
                     </span>
                   </div>
-                  <p className="text-[10px] text-slate-400 mt-0.5 truncate font-mono tabular-nums">
+                  <p className="text-[10px] text-[#8C8277] mt-0.5 truncate font-mono tabular-nums">
                     {unscheduledIdeasCount} noch frei
                   </p>
                 </button>
@@ -988,18 +988,18 @@ export const DashboardView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setActiveTab('tasks')}
-                  className="rounded-2xl bg-[#0B0E14]/70 hover:bg-emerald-400/10 border border-white/10 hover:border-emerald-400/35 px-3.5 py-2.5 text-left transition-all cursor-pointer group min-w-0"
+                  className="rounded-2xl bg-[#FAF7F2] hover:bg-[#6E7F5E]/10 border border-[#E6DDD1] hover:border-[#6E7F5E]/40 px-3.5 py-2.5 text-left transition-all cursor-pointer group min-w-0"
                 >
                   <div className="flex items-center justify-between gap-1">
-                    <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-300">
-                      <ListChecks className="w-3.5 h-3.5" />
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#4B593E]">
+                      <ListChecks className="w-3.5 h-3.5 text-[#6E7F5E]" />
                       <span className="truncate">Aufgaben</span>
                     </span>
-                    <span className="text-sm font-black text-slate-100 font-mono tabular-nums">
+                    <span className="text-sm font-black text-[#1F1B18] font-mono tabular-nums">
                       {openTasksCount}
                     </span>
                   </div>
-                  <p className="text-[10px] text-slate-400 mt-0.5 truncate font-mono tabular-nums">
+                  <p className="text-[10px] text-[#8C8277] mt-0.5 truncate font-mono tabular-nums">
                     {completedTasksCount} erledigt
                   </p>
                 </button>
@@ -1007,14 +1007,14 @@ export const DashboardView: React.FC = () => {
             </div>
 
             {/* 4. „Als Nächstes steht an“-Highlight-Karte */}
-            <div className="aurora-glass-elevated rounded-[26px] p-5 flex flex-col justify-between gap-3.5 border-t-2 border-t-violet-400/60 min-w-0">
+            <div className="surface-glass-elevated rounded-[26px] p-5 flex flex-col justify-between gap-3.5 border-t-2 border-t-[#C85A38]/70 min-w-0">
               <div className="flex items-start justify-between gap-3">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-violet-300 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#A34224] flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-[#C85A38]" />
                   <span>Als Nächstes steht an</span>
                 </span>
                 {nextHighlightItem && (
-                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-cyan-400/15 text-cyan-200 border border-cyan-400/30 font-mono tabular-nums shrink-0">
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#C85A38]/12 text-[#A34224] border border-[#C85A38]/30 font-mono tabular-nums shrink-0">
                     Tag {nextHighlightItem.dayNumber} · {nextHighlightItem.time}
                   </span>
                 )}
@@ -1038,13 +1038,13 @@ export const DashboardView: React.FC = () => {
                         });
                       }
                     }}
-                    className="text-left group cursor-pointer min-w-0 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+                    className="text-left group cursor-pointer min-w-0 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C85A38]"
                   >
-                    <h3 className="text-base sm:text-lg font-extrabold text-slate-100 group-hover:text-cyan-200 transition-colors line-clamp-1">
+                    <h3 className="text-base sm:text-lg font-extrabold text-[#1F1B18] group-hover:text-[#A34224] transition-colors line-clamp-1">
                       {nextHighlightItem.title}
                     </h3>
-                    <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1.5 truncate">
-                      <MapPin className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                    <p className="text-xs text-[#6B6259] mt-0.5 flex items-center gap-1.5 truncate">
+                      <MapPin className="w-3.5 h-3.5 text-[#2A7B88] shrink-0" />
                       <span className="truncate">
                         {nextHighlightItem.location || trip.destination}
                       </span>
@@ -1066,7 +1066,7 @@ export const DashboardView: React.FC = () => {
                           time: nextHighlightItem.time,
                         })
                       }
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-200 border border-cyan-400/40 text-xs font-bold transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#2A7B88]/12 hover:bg-[#2A7B88]/20 text-[#1F5E68] border border-[#2A7B88]/30 text-xs font-bold transition-colors cursor-pointer"
                     >
                       <Navigation className="w-3.5 h-3.5" />
                       <span>Auf Karte</span>
@@ -1077,23 +1077,23 @@ export const DashboardView: React.FC = () => {
                         href={nextMapsUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/15 text-slate-200 border border-white/15 text-xs font-bold transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#1F1B18] border border-[#E6DDD1] text-xs font-bold transition-colors"
                       >
                         <span>Maps</span>
-                        <ExternalLink className="w-3 h-3 text-slate-400" />
+                        <ExternalLink className="w-3 h-3 text-[#6B6259]" />
                       </a>
                     )}
                   </div>
                 </>
               ) : (
                 <div className="flex items-center justify-between gap-3 py-2">
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-[#6B6259]">
                     Noch keine festen Programmpunkte eingetragen.
                   </p>
                   <button
                     type="button"
                     onClick={() => setIsQuickAddOpen(true)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-cyan-400/20 text-cyan-200 border border-cyan-400/40 text-xs font-bold cursor-pointer shrink-0"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-white text-xs font-bold cursor-pointer shrink-0"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Planen</span>
@@ -1105,17 +1105,17 @@ export const DashboardView: React.FC = () => {
 
           {/* Dynamic Multi-Day Activity & Cost Pulse (supports > 7/8 days cleanly!) */}
           {dayStats.length > 0 && (
-            <div className="aurora-glass rounded-[26px] p-4 sm:p-5 min-w-0">
+            <div className="surface-glass rounded-[26px] p-4 sm:p-5 min-w-0">
               <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                 <div className="flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-cyan-400" />
-                  <h2 className="text-xs sm:text-sm font-extrabold text-slate-200">
+                  <Activity className="w-4 h-4 text-[#C85A38]" />
+                  <h2 className="text-xs sm:text-sm font-extrabold text-[#1F1B18]">
                     Tages-Puls & Kostenverlauf (Tag 1–{dayStats.length})
                   </h2>
                 </div>
-                <span className="text-[11px] text-slate-400 font-mono tabular-nums">
+                <span className="text-[11px] text-[#6B6259] font-mono tabular-nums">
                   Tag {selectedDay}:{' '}
-                  <strong className="text-cyan-300">
+                  <strong className="text-[#A34224]">
                     {formatCurrency(
                       dayStats[selectedDay - 1]?.plannedCost || 0,
                       trip.currency
@@ -1155,16 +1155,16 @@ export const DashboardView: React.FC = () => {
                             style={{ height: `${heightPct}%` }}
                             className={`w-full max-w-[26px] rounded-full transition-all ${
                               isSelected
-                                ? 'bg-gradient-to-t from-cyan-400 to-emerald-400 shadow-[0_0_12px_rgba(34,211,238,0.5)]'
+                                ? 'bg-gradient-to-t from-[#C85A38] to-[#D9822B] shadow-sm'
                                 : d.activitiesCount > 0
-                                ? 'bg-white/20 group-hover:bg-cyan-400/50'
-                                : 'bg-white/10 group-hover:bg-white/25'
+                                ? 'bg-[#D8CFC2] group-hover:bg-[#C85A38]/55'
+                                : 'bg-[#EDE6DA] group-hover:bg-[#D8CFC2]'
                             }`}
                           />
                         </div>
                         <span
                           className={`text-[10px] mt-1 font-mono tabular-nums font-bold ${
-                            isSelected ? 'text-cyan-300' : 'text-slate-500 group-hover:text-slate-300'
+                            isSelected ? 'text-[#A34224]' : 'text-[#8C8277] group-hover:text-[#1F1B18]'
                           }`}
                         >
                           T{d.day}
@@ -1181,19 +1181,19 @@ export const DashboardView: React.FC = () => {
                     className="w-full h-16 overflow-visible min-w-[240px]"
                   >
                     <defs>
-                      <linearGradient id="auroraCostWave" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#22D3EE" stopOpacity="0.32" />
-                        <stop offset="100%" stopColor="#22D3EE" stopOpacity="0" />
+                      <linearGradient id="costWaveGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#C85A38" stopOpacity="0.28" />
+                        <stop offset="100%" stopColor="#C85A38" stopOpacity="0" />
                       </linearGradient>
                     </defs>
                     {wavePoints.area && (
-                      <path d={wavePoints.area} fill="url(#auroraCostWave)" />
+                      <path d={wavePoints.area} fill="url(#costWaveGradient)" />
                     )}
                     {wavePoints.path && (
                       <path
                         d={wavePoints.path}
                         fill="none"
-                        stroke="#22D3EE"
+                        stroke="#C85A38"
                         strokeWidth="2.5"
                         strokeLinecap="round"
                       />
@@ -1204,8 +1204,8 @@ export const DashboardView: React.FC = () => {
                         cx={pt.x}
                         cy={pt.y}
                         r={pt.day === selectedDay ? 5.5 : 2.5}
-                        fill={pt.day === selectedDay ? '#34D399' : '#22D3EE'}
-                        stroke={pt.day === selectedDay ? '#0B0E14' : 'none'}
+                        fill={pt.day === selectedDay ? '#6E7F5E' : '#C85A38'}
+                        stroke={pt.day === selectedDay ? '#FAF7F2' : 'none'}
                         strokeWidth={pt.day === selectedDay ? 2 : 0}
                         className="cursor-pointer"
                         onClick={() => setSelectedDay(pt.day)}
@@ -1223,16 +1223,16 @@ export const DashboardView: React.FC = () => {
         </div>
       )}
 
-      {/* Collapsible Midnight Aurora Travel & Accommodation InfoBoardCard */}
+      {/* Collapsible Travel & Accommodation InfoBoardCard */}
       <InfoBoardCard />
 
       {/* Main Stage: Chronological Day Timeline (Left) & Detail Inspector + Activity Log (Right) */}
       <div className="grid grid-cols-1 xl:grid-cols-[1.05fr_0.95fr] gap-6 pt-1 min-w-0">
-        {/* Left: Glowing Chronological Timeline for selectedDay */}
+        {/* Left: Chronological Timeline for selectedDay */}
         <div className="flex flex-col min-w-0">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
             <div className="flex items-center gap-2">
-              <h2 className="text-base sm:text-lg font-extrabold text-slate-100">
+              <h2 className="text-base sm:text-lg font-extrabold text-[#1F1B18]">
                 Zeitstrahl · Tag {selectedDay}
               </h2>
               <div className="flex items-center gap-1">
@@ -1241,7 +1241,7 @@ export const DashboardView: React.FC = () => {
                   onClick={() => setSelectedDay(Math.max(1, selectedDay - 1))}
                   disabled={selectedDay <= 1}
                   aria-label="Vorheriger Tag"
-                  className="w-7 h-7 rounded-full aurora-glass hover:border-cyan-400/40 disabled:opacity-35 flex items-center justify-center text-slate-300 cursor-pointer"
+                  className="w-7 h-7 rounded-full surface-glass hover:border-[#C85A38]/40 disabled:opacity-35 flex items-center justify-center text-[#6B6259] cursor-pointer"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
                 </button>
@@ -1252,7 +1252,7 @@ export const DashboardView: React.FC = () => {
                   }
                   disabled={selectedDay >= Math.max(1, safeTotalDays)}
                   aria-label="Nächster Tag"
-                  className="w-7 h-7 rounded-full aurora-glass hover:border-cyan-400/40 disabled:opacity-35 flex items-center justify-center text-slate-300 cursor-pointer"
+                  className="w-7 h-7 rounded-full surface-glass hover:border-[#C85A38]/40 disabled:opacity-35 flex items-center justify-center text-[#6B6259] cursor-pointer"
                 >
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
@@ -1261,7 +1261,7 @@ export const DashboardView: React.FC = () => {
 
             <div className="flex flex-wrap items-center gap-2">
               {conflictItemIds.length > 0 && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-400/15 text-amber-300 border border-amber-400/35 text-[11px] font-bold">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#D9822B]/14 text-[#9E5A14] border border-[#D9822B]/30 text-[11px] font-bold">
                   <AlertTriangle className="w-3 h-3" />
                   <span className="font-mono tabular-nums">
                     {conflictItemIds.length} Konflikte
@@ -1274,9 +1274,9 @@ export const DashboardView: React.FC = () => {
                   href={dayRouteUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full aurora-glass hover:border-emerald-400/40 text-emerald-300 text-[11px] font-bold transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full surface-glass hover:border-[#6E7F5E]/40 text-[#4B593E] text-[11px] font-bold transition-colors"
                 >
-                  <Navigation className="w-3 h-3" />
+                  <Navigation className="w-3 h-3 text-[#6E7F5E]" />
                   <span>Tagesroute in Maps</span>
                 </a>
               )}
@@ -1284,7 +1284,7 @@ export const DashboardView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setMapOpen(true)}
-                className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-cyan-400/15 hover:bg-cyan-400/25 text-cyan-200 border border-cyan-400/30 text-[11px] font-bold transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#2A7B88]/12 hover:bg-[#2A7B88]/20 text-[#1F5E68] border border-[#2A7B88]/30 text-[11px] font-bold transition-colors cursor-pointer"
               >
                 <MapPin className="w-3 h-3" />
                 <span>Auf Karte</span>
@@ -1293,7 +1293,7 @@ export const DashboardView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveTab('schedule')}
-                className="text-xs font-bold text-slate-400 hover:text-cyan-300 transition-colors cursor-pointer"
+                className="text-xs font-bold text-[#6B6259] hover:text-[#A34224] transition-colors cursor-pointer"
               >
                 Alle Tage →
               </button>
@@ -1302,19 +1302,19 @@ export const DashboardView: React.FC = () => {
 
           <div className="space-y-3 relative">
             {dayActivities.length === 0 ? (
-              <div className="aurora-glass rounded-[24px] p-8 text-center border-dashed border-white/15">
-                <Clock className="w-7 h-7 text-cyan-400/60 mx-auto mb-2.5" />
-                <p className="text-sm font-bold text-slate-200">
+              <div className="surface-glass rounded-[24px] p-8 text-center border-dashed border-[#E6DDD1]">
+                <Clock className="w-7 h-7 text-[#C85A38]/70 mx-auto mb-2.5" />
+                <p className="text-sm font-bold text-[#1F1B18]">
                   Noch keine Programmpunkte an Tag {selectedDay}.
                 </p>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-[#6B6259] mt-1">
                   Füge direkt einen Vorschlag hinzu oder übernimm Highlights aus dem Ideen-Pool.
                 </p>
                 <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
                   <button
                     type="button"
                     onClick={() => setIsQuickAddOpen(true)}
-                    className="inline-flex items-center gap-1.5 bg-gradient-to-r from-cyan-400 to-emerald-400 text-[#0B0E14] text-xs font-extrabold px-4 py-2 rounded-full cursor-pointer"
+                    className="inline-flex items-center gap-1.5 bg-[#C85A38] hover:bg-[#B54B2B] text-white text-xs font-extrabold px-4 py-2 rounded-full cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Vorschlag hinzufügen</span>
@@ -1322,7 +1322,7 @@ export const DashboardView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setActiveTab('ideas')}
-                    className="inline-flex items-center gap-1.5 aurora-glass text-amber-300 text-xs font-bold px-4 py-2 rounded-full hover:border-amber-400/40 cursor-pointer"
+                    className="inline-flex items-center gap-1.5 surface-glass text-[#9E5A14] text-xs font-bold px-4 py-2 rounded-full hover:border-[#D9822B]/40 cursor-pointer"
                   >
                     <Lightbulb className="w-3.5 h-3.5" />
                     <span>Zum Ideen-Pool</span>
@@ -1331,8 +1331,8 @@ export const DashboardView: React.FC = () => {
               </div>
             ) : (
               <div className="relative pl-5 space-y-2.5">
-                {/* Glowing vertical timeline spine */}
-                <div className="absolute left-[9px] top-4 bottom-4 w-px bg-gradient-to-b from-cyan-400/60 via-emerald-400/40 to-violet-400/20 pointer-events-none" />
+                {/* Warm vertical timeline spine */}
+                <div className="absolute left-[9px] top-4 bottom-4 w-px bg-gradient-to-b from-[#C85A38]/60 via-[#6E7F5E]/40 to-[#2A7B88]/30 pointer-events-none" />
 
                 {dayActivities.map((act) => {
                   const isSelected = activeActivity?.id === act.id;
@@ -1347,11 +1347,11 @@ export const DashboardView: React.FC = () => {
                       key={act.id}
                       className={`relative flex items-center justify-between gap-2.5 p-3.5 rounded-[22px] transition-all border min-w-0 ${
                         isSelected
-                          ? 'aurora-glass-elevated border-cyan-400/50 shadow-[0_0_24px_rgba(34,211,238,0.14)]'
-                          : 'aurora-glass hover:border-white/20'
+                          ? 'surface-glass-elevated border-[#C85A38]/55 shadow-md'
+                          : 'surface-glass hover:border-[#D8CFC2]'
                       }`}
                     >
-                      {/* Glowing timeline node */}
+                      {/* Timeline node */}
                       <span
                         className={`absolute -left-[15px] w-2.5 h-2.5 rounded-full ${statusMeta.dotClass}`}
                       />
@@ -1360,7 +1360,7 @@ export const DashboardView: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setSelectedActivityId(act.id)}
-                        className="flex-1 flex items-center gap-3 min-w-0 text-left cursor-pointer rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+                        className="flex-1 flex items-center gap-3 min-w-0 text-left cursor-pointer rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C85A38]"
                       >
                         <div
                           className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${catMeta.iconBgClass}`}
@@ -1370,7 +1370,7 @@ export const DashboardView: React.FC = () => {
 
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-[11px] font-bold text-cyan-300 font-mono tabular-nums">
+                            <span className="text-[11px] font-bold text-[#A34224] font-mono tabular-nums">
                               {act.timeSlot}
                               {act.endTime ? `–${act.endTime}` : ''}
                             </span>
@@ -1382,7 +1382,7 @@ export const DashboardView: React.FC = () => {
                             {hasConflict && (
                               <span
                                 title="Zeitüberschneidung mit anderem Termin"
-                                className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/35"
+                                className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#D9822B]/14 text-[#9E5A14] border border-[#D9822B]/30"
                               >
                                 <AlertTriangle className="w-2.5 h-2.5" />
                                 Konflikt
@@ -1390,11 +1390,11 @@ export const DashboardView: React.FC = () => {
                             )}
                           </div>
 
-                          <p className="text-sm font-extrabold text-slate-100 truncate mt-0.5">
+                          <p className="text-sm font-extrabold text-[#1F1B18] truncate mt-0.5">
                             {act.title}
                           </p>
                           {act.location && (
-                            <p className="text-xs text-slate-400 truncate">
+                            <p className="text-xs text-[#6B6259] truncate">
                               {act.location}
                             </p>
                           )}
@@ -1419,7 +1419,7 @@ export const DashboardView: React.FC = () => {
                           }
                           title="Auf Karte zeigen"
                           aria-label={`${act.title} auf Karte zeigen`}
-                          className="w-8 h-8 rounded-full bg-white/5 hover:bg-cyan-400/20 text-slate-300 hover:text-cyan-200 border border-white/10 flex items-center justify-center transition-colors cursor-pointer"
+                          className="w-8 h-8 rounded-full bg-[#FAF7F2] hover:bg-[#2A7B88]/12 text-[#6B6259] hover:text-[#1F5E68] border border-[#E6DDD1] flex items-center justify-center transition-colors cursor-pointer"
                         >
                           <MapPin className="w-3.5 h-3.5" />
                         </button>
@@ -1431,8 +1431,8 @@ export const DashboardView: React.FC = () => {
                           aria-label={`Stimme für ${act.title} (${act.votes.length})`}
                           className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer font-mono tabular-nums border ${
                             hasVoted
-                              ? 'bg-cyan-400/20 text-cyan-200 border-cyan-400/50'
-                              : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
+                              ? 'bg-[#C85A38]/12 text-[#A34224] border-[#C85A38]/35'
+                              : 'bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#6B6259] border-[#E6DDD1]'
                           }`}
                         >
                           <ThumbsUp className="w-3.5 h-3.5" />
@@ -1447,16 +1447,16 @@ export const DashboardView: React.FC = () => {
 
             {/* Compact Day Meals Reference Strip */}
             {dayMeals.length > 0 && (
-              <div className="aurora-glass rounded-[20px] p-3.5 mt-3">
+              <div className="surface-glass rounded-[20px] p-3.5 mt-3">
                 <div className="flex items-center justify-between gap-2 mb-2">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-amber-300/90 flex items-center gap-1.5">
-                    <Utensils className="w-3.5 h-3.5" />
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#9E5A14] flex items-center gap-1.5">
+                    <Utensils className="w-3.5 h-3.5 text-[#D9822B]" />
                     <span>Mahlzeiten an Tag {selectedDay}</span>
                   </span>
                   <button
                     type="button"
                     onClick={() => setActiveTab('meals')}
-                    className="text-[11px] font-bold text-slate-400 hover:text-amber-300 cursor-pointer"
+                    className="text-[11px] font-bold text-[#6B6259] hover:text-[#9E5A14] cursor-pointer"
                   >
                     Essensplan →
                   </button>
@@ -1475,9 +1475,9 @@ export const DashboardView: React.FC = () => {
                           dayNumber: selectedDay,
                         });
                       }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0B0E14]/70 hover:bg-amber-400/15 border border-white/10 hover:border-amber-400/35 text-xs text-slate-200 transition-colors cursor-pointer max-w-full"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FAF7F2] hover:bg-[#D9822B]/14 border border-[#E6DDD1] hover:border-[#D9822B]/35 text-xs text-[#1F1B18] transition-colors cursor-pointer max-w-full"
                     >
-                      <span className="font-mono tabular-nums text-amber-300 font-bold">
+                      <span className="font-mono tabular-nums text-[#9E5A14] font-bold">
                         {meal.time}
                       </span>
                       <span className="truncate font-semibold">{meal.title}</span>
@@ -1494,7 +1494,7 @@ export const DashboardView: React.FC = () => {
           {/* Detail Inspector */}
           <div className="flex flex-col min-w-0">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-base sm:text-lg font-extrabold text-slate-100">
+              <h2 className="text-base sm:text-lg font-extrabold text-[#1F1B18]">
                 Detail-Inspector
               </h2>
               {activeActivity && (
@@ -1509,7 +1509,7 @@ export const DashboardView: React.FC = () => {
                       dayNumber: activeActivity.dayNumber,
                     });
                   }}
-                  className="text-xs font-bold text-cyan-300 hover:text-cyan-200 cursor-pointer"
+                  className="text-xs font-bold text-[#A34224] hover:text-[#C85A38] cursor-pointer"
                 >
                   Im Tagesplan bearbeiten →
                 </button>
@@ -1517,15 +1517,15 @@ export const DashboardView: React.FC = () => {
             </div>
 
             {activeActivity ? (
-              <div className="aurora-glass-elevated rounded-[26px] p-5 sm:p-6 flex flex-col justify-between space-y-5 min-w-0">
+              <div className="surface-glass-elevated rounded-[26px] p-5 sm:p-6 flex flex-col justify-between space-y-5 min-w-0">
                 <div className="space-y-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <span className="text-xs font-bold text-cyan-300 font-mono tabular-nums">
+                      <span className="text-xs font-bold text-[#A34224] font-mono tabular-nums">
                         Tag {activeActivity.dayNumber} · {activeActivity.timeSlot}
                         {activeActivity.endTime ? ` – ${activeActivity.endTime}` : ''} Uhr
                       </span>
-                      <h3 className="text-lg sm:text-xl font-black text-slate-100 mt-1 break-words">
+                      <h3 className="text-lg sm:text-xl font-black text-[#1F1B18] mt-1 break-words">
                         {activeActivity.title}
                       </h3>
                     </div>
@@ -1541,11 +1541,11 @@ export const DashboardView: React.FC = () => {
                   </div>
 
                   {activeConflicts.length > 0 && (
-                    <div className="rounded-2xl bg-amber-400/15 border border-amber-400/35 px-3.5 py-2.5 flex items-start gap-2 text-xs text-amber-200">
-                      <AlertTriangle className="w-4 h-4 text-amber-300 shrink-0 mt-0.5" />
+                    <div className="rounded-2xl bg-[#D9822B]/14 border border-[#D9822B]/30 px-3.5 py-2.5 flex items-start gap-2 text-xs text-[#9E5A14]">
+                      <AlertTriangle className="w-4 h-4 text-[#D9822B] shrink-0 mt-0.5" />
                       <div>
                         <p className="font-bold">Zeitkonflikt am selben Tag</p>
-                        <p className="text-amber-200/80 mt-0.5">
+                        <p className="text-[#9E5A14]/90 mt-0.5">
                           Überschneidet sich mit{' '}
                           <span className="font-mono tabular-nums">
                             {activeConflicts.length}
@@ -1558,8 +1558,8 @@ export const DashboardView: React.FC = () => {
 
                   {/* Location, Map Focus & Cost Pills */}
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white/10 text-slate-200 border border-white/10 max-w-full">
-                      <MapPin className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-[#FAF7F2] text-[#1F1B18] border border-[#E6DDD1] max-w-full">
+                      <MapPin className="w-3.5 h-3.5 text-[#2A7B88] shrink-0" />
                       <span className="truncate">
                         {activeActivity.location || trip.destination}
                       </span>
@@ -1579,7 +1579,7 @@ export const DashboardView: React.FC = () => {
                           time: activeActivity.timeSlot,
                         })
                       }
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-200 border border-cyan-400/40 transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-[#2A7B88]/12 hover:bg-[#2A7B88]/20 text-[#1F5E68] border border-[#2A7B88]/30 transition-colors cursor-pointer"
                     >
                       <Navigation className="w-3 h-3" />
                       <span>Auf Karte</span>
@@ -1590,14 +1590,14 @@ export const DashboardView: React.FC = () => {
                         href={activeActivityMapsUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white/5 hover:bg-white/15 text-slate-200 border border-white/10 transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#1F1B18] border border-[#E6DDD1] transition-colors"
                       >
                         <span>Maps</span>
-                        <ExternalLink className="w-3 h-3 text-slate-400" />
+                        <ExternalLink className="w-3 h-3 text-[#6B6259]" />
                       </a>
                     )}
 
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-400/15 text-emerald-200 border border-emerald-400/30 font-mono tabular-nums">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-[#6E7F5E]/14 text-[#4B593E] border border-[#6E7F5E]/30 font-mono tabular-nums">
                       <Euro className="w-3.5 h-3.5" />
                       {activeActivity.estimatedCost === 0
                         ? 'Kostenlos'
@@ -1607,18 +1607,18 @@ export const DashboardView: React.FC = () => {
 
                   {/* Description */}
                   {activeActivity.description && (
-                    <p className="text-sm text-slate-300 leading-relaxed bg-[#0B0E14]/65 border border-white/10 rounded-2xl p-4 break-words">
+                    <p className="text-sm text-[#1F1B18] leading-relaxed bg-[#FAF7F2] border border-[#E6DDD1] rounded-2xl p-4 break-words">
                       {activeActivity.description}
                     </p>
                   )}
 
                   {/* Voters (orphaned IDs NEVER mapped to travelers[0]) */}
                   <div className="flex items-center gap-2 flex-wrap pt-1">
-                    <span className="text-xs font-bold text-slate-400 font-mono tabular-nums">
+                    <span className="text-xs font-bold text-[#6B6259] font-mono tabular-nums">
                       Stimmen ({activeActivity.votes.length}):
                     </span>
                     {activeActivity.votes.length === 0 ? (
-                      <span className="text-xs text-slate-500">Noch keine Stimmen</span>
+                      <span className="text-xs text-[#8C8277]">Noch keine Stimmen</span>
                     ) : (
                       activeActivity.votes.map((voterId) => {
                         const voter = getTravelerExact(voterId);
@@ -1626,9 +1626,9 @@ export const DashboardView: React.FC = () => {
                           return (
                             <span
                               key={voterId}
-                              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-slate-400"
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F3ECE1] border border-[#E6DDD1] text-xs font-semibold text-[#6B6259]"
                             >
-                              <span className="w-4 h-4 rounded-full bg-slate-700 text-slate-300 text-[9px] flex items-center justify-center font-bold">
+                              <span className="w-4 h-4 rounded-full bg-[#D8CFC2] text-[#1F1B18] text-[9px] flex items-center justify-center font-bold">
                                 ?
                               </span>
                               Ehem. Mitglied
@@ -1638,10 +1638,10 @@ export const DashboardView: React.FC = () => {
                         return (
                           <span
                             key={voterId}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 border border-white/10 text-xs font-bold text-slate-200"
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FAF7F2] border border-[#E6DDD1] text-xs font-bold text-[#1F1B18]"
                           >
                             <span
-                              className="w-4 h-4 rounded-full text-[9px] text-[#0B0E14] flex items-center justify-center font-black"
+                              className="w-4 h-4 rounded-full text-[9px] text-white flex items-center justify-center font-black"
                               style={{ backgroundColor: voter.color }}
                             >
                               {voter.initials}
@@ -1655,7 +1655,7 @@ export const DashboardView: React.FC = () => {
                 </div>
 
                 {/* Footer Status & Vote Actions */}
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-white/10">
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[#E6DDD1]">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     {(['idea', 'planned', 'confirmed'] as const).map((st) => (
                       <button
@@ -1664,8 +1664,8 @@ export const DashboardView: React.FC = () => {
                         onClick={() => updateActivityStatus(activeActivity.id, st)}
                         className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
                           activeActivity.status === st
-                            ? 'bg-cyan-400 text-[#0B0E14] border-cyan-300 shadow-[0_0_16px_rgba(34,211,238,0.35)]'
-                            : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'
+                            ? 'bg-[#C85A38] text-white border-[#C85A38] shadow-sm'
+                            : 'bg-[#FAF7F2] text-[#6B6259] border-[#E6DDD1] hover:bg-[#F3ECE1]'
                         }`}
                       >
                         {STATUS_LABELS[st].label}
@@ -1676,13 +1676,13 @@ export const DashboardView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => toggleActivityVote(activeActivity.id)}
-                    className={`inline-flex items-center gap-2 text-xs font-extrabold px-5 py-2 rounded-full transition-all cursor-pointer ${
+                    className={`inline-flex items-center gap-2 text-xs font-extrabold px-5 py-2 rounded-full transition-all cursor-pointer border ${
                       activeActivity.votes.includes(currentUser.id)
-                        ? 'bg-emerald-400/20 text-emerald-200 border border-emerald-400/45'
-                        : 'bg-white/10 hover:bg-white/20 text-slate-100 border border-white/15'
+                        ? 'bg-[#6E7F5E]/14 text-[#4B593E] border-[#6E7F5E]/35'
+                        : 'bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#1F1B18] border-[#E6DDD1]'
                     }`}
                   >
-                    <ThumbsUp className="w-3.5 h-3.5 text-cyan-300" />
+                    <ThumbsUp className="w-3.5 h-3.5 text-[#C85A38]" />
                     <span>
                       {activeActivity.votes.includes(currentUser.id)
                         ? 'Stimme aktiv'
@@ -1692,12 +1692,12 @@ export const DashboardView: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="aurora-glass rounded-[26px] p-8 text-center flex flex-col items-center justify-center border-dashed border-white/15">
-                <Clock className="w-8 h-8 text-slate-500 mb-2.5" />
-                <p className="text-sm font-bold text-slate-200">
+              <div className="surface-glass rounded-[26px] p-8 text-center flex flex-col items-center justify-center border-dashed border-[#E6DDD1]">
+                <Clock className="w-8 h-8 text-[#8C8277] mb-2.5" />
+                <p className="text-sm font-bold text-[#1F1B18]">
                   Kein Programmpunkt für Tag {selectedDay} ausgewählt
                 </p>
-                <p className="text-xs text-slate-400 mt-1 max-w-xs">
+                <p className="text-xs text-[#6B6259] mt-1 max-w-xs">
                   Wähle einen Termin im Zeitstrahl oder lege einen neuen Vorschlag für diesen Tag an.
                 </p>
               </div>
@@ -1705,11 +1705,11 @@ export const DashboardView: React.FC = () => {
           </div>
 
           {/* Kleiner Gruppen-Aktivitätsfeed */}
-          <div className="aurora-glass rounded-[24px] p-4 sm:p-5 min-w-0">
+          <div className="surface-glass rounded-[24px] p-4 sm:p-5 min-w-0">
             <div className="flex items-center justify-between gap-2 mb-3">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-emerald-400" />
-                <h3 className="text-sm font-extrabold text-slate-100">
+                <Sparkles className="w-4 h-4 text-[#6E7F5E]" />
+                <h3 className="text-sm font-extrabold text-[#1F1B18]">
                   Gruppen-Aktivitätsfeed
                 </h3>
               </div>
@@ -1717,7 +1717,7 @@ export const DashboardView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowAllLogs((p) => !p)}
-                  className="text-[11px] font-bold text-cyan-300 hover:text-cyan-200 cursor-pointer"
+                  className="text-[11px] font-bold text-[#A34224] hover:text-[#C85A38] cursor-pointer"
                 >
                   {showAllLogs ? 'Weniger' : `Alle (${activityLogs.length})`}
                 </button>
@@ -1725,7 +1725,7 @@ export const DashboardView: React.FC = () => {
             </div>
 
             {visibleLogs.length === 0 ? (
-              <p className="text-xs text-slate-400 py-2">
+              <p className="text-xs text-[#6B6259] py-2">
                 Noch keine Aktivitäten im Gruppenverlauf erfasst.
               </p>
             ) : (
@@ -1735,30 +1735,30 @@ export const DashboardView: React.FC = () => {
                   return (
                     <div
                       key={entry.id}
-                      className="flex items-start justify-between gap-2.5 rounded-xl bg-[#0B0E14]/60 border border-white/5 px-3 py-2 text-xs min-w-0"
+                      className="flex items-start justify-between gap-2.5 rounded-xl bg-[#FAF7F2] border border-[#E6DDD1] px-3 py-2 text-xs min-w-0"
                     >
                       <div className="flex items-start gap-2.5 min-w-0">
                         <span
-                          className="w-6 h-6 rounded-full text-[10px] font-black flex items-center justify-center shrink-0 mt-0.5 text-[#0B0E14]"
-                          style={{ backgroundColor: actor?.color || '#64748B' }}
+                          className="w-6 h-6 rounded-full text-[10px] font-black flex items-center justify-center shrink-0 mt-0.5 text-white"
+                          style={{ backgroundColor: actor?.color || '#8C8277' }}
                         >
                           {actor?.initials || '?'}
                         </span>
                         <div className="min-w-0">
-                          <p className="text-slate-300 leading-snug break-words">
-                            <strong className="text-slate-100">
+                          <p className="text-[#6B6259] leading-snug break-words">
+                            <strong className="text-[#1F1B18]">
                               {actor?.name || 'Mitglied'}
                             </strong>{' '}
                             {entry.action}{' '}
                             {entry.targetLabel && (
-                              <span className="text-cyan-300 font-semibold">
+                              <span className="text-[#A34224] font-semibold">
                                 „{entry.targetLabel}“
                               </span>
                             )}
                           </p>
                         </div>
                       </div>
-                      <span className="text-[10px] text-slate-500 font-mono tabular-nums shrink-0 mt-0.5">
+                      <span className="text-[10px] text-[#8C8277] font-mono tabular-nums shrink-0 mt-0.5">
                         {formatRelativeTime(entry.createdAt)}
                       </span>
                     </div>

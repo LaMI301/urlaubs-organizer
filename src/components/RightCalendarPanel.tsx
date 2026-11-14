@@ -31,32 +31,32 @@ const CATEGORY_META: Record<
 > = {
   beach: {
     label: 'Strand & Meer',
-    badgeClass: 'bg-amber-400/15 text-amber-300 border border-amber-400/30',
+    badgeClass: 'bg-[#D9822B]/14 text-[#9E5A14] border border-[#D9822B]/30',
     icon: <Sun className="w-4 h-4" />,
   },
   activity: {
     label: 'Ausflug & Action',
-    badgeClass: 'bg-cyan-400/15 text-cyan-300 border border-cyan-400/30',
+    badgeClass: 'bg-[#6E7F5E]/14 text-[#4B593E] border border-[#6E7F5E]/30',
     icon: <Compass className="w-4 h-4" />,
   },
   culture: {
     label: 'Kultur & Sightseeing',
-    badgeClass: 'bg-violet-400/15 text-violet-300 border border-violet-400/30',
+    badgeClass: 'bg-[#2A7B88]/12 text-[#1F5E68] border border-[#2A7B88]/30',
     icon: <Landmark className="w-4 h-4" />,
   },
   transport: {
     label: 'Transfer & Route',
-    badgeClass: 'bg-emerald-400/15 text-emerald-300 border border-emerald-400/30',
+    badgeClass: 'bg-[#F3ECE1]/80 text-[#6B6259] border border-[#E6DDD1]',
     icon: <Car className="w-4 h-4" />,
   },
   nightlife: {
     label: 'Abend & Nightlife',
-    badgeClass: 'bg-rose-400/15 text-rose-300 border border-rose-400/30',
+    badgeClass: 'bg-[#C85A38]/12 text-[#A34224] border border-[#C85A38]/30',
     icon: <Music className="w-4 h-4" />,
   },
   other: {
     label: 'Sonstiges',
-    badgeClass: 'bg-white/10 text-slate-300 border border-white/15',
+    badgeClass: 'bg-[#FAF7F2] text-[#6B6259] border border-[#E6DDD1]',
     icon: <Sparkles className="w-4 h-4" />,
   },
 };
@@ -341,7 +341,7 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
 
   if (collapsed) {
     return (
-      <aside className="aurora-glass rounded-[26px] p-2.5 flex flex-row lg:flex-col items-center justify-between gap-2 w-full max-w-full min-w-0 lg:h-full select-none overflow-hidden">
+      <aside className="surface-glass rounded-[26px] p-2.5 flex flex-row lg:flex-col items-center justify-between gap-2 w-full max-w-full min-w-0 lg:h-full select-none overflow-hidden">
         <div className="flex flex-row lg:flex-col items-center gap-2 lg:gap-3 lg:pt-1">
           {onToggleCollapse && (
             <button
@@ -349,7 +349,7 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
               onClick={onToggleCollapse}
               title="Kalender ausklappen"
               aria-label="Kalender ausklappen"
-              className="w-8 h-8 rounded-full bg-white/10 hover:bg-cyan-400/20 text-slate-200 hover:text-cyan-200 border border-white/10 flex items-center justify-center transition-colors cursor-pointer"
+              className="w-8 h-8 rounded-full bg-[#FAF7F2] hover:bg-[#C85A38]/12 text-[#6B6259] hover:text-[#A34224] border border-[#E6DDD1] flex items-center justify-center transition-colors cursor-pointer"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -359,7 +359,7 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
             onClick={() => setActiveTab('week')}
             title="Wochenübersicht öffnen"
             aria-label="Wochenübersicht öffnen"
-            className="w-9 h-9 rounded-2xl bg-cyan-400/15 hover:bg-cyan-400/25 text-cyan-300 border border-cyan-400/35 flex items-center justify-center transition-all cursor-pointer"
+            className="w-9 h-9 rounded-2xl bg-[#2A7B88]/12 hover:bg-[#2A7B88]/20 text-[#1F5E68] border border-[#2A7B88]/30 flex items-center justify-center transition-all cursor-pointer"
           >
             <CalendarDays className="w-4 h-4" />
           </button>
@@ -369,7 +369,7 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
           type="button"
           onClick={onToggleCollapse}
           title={`Tag ${selectedDay} — Kalender öffnen`}
-          className="px-2.5 py-1.5 lg:py-2.5 rounded-2xl bg-[#0B0E14]/80 border border-white/10 text-[11px] font-extrabold text-cyan-300 font-mono tabular-nums cursor-pointer hover:border-cyan-400/40 transition-colors"
+          className="px-2.5 py-1.5 lg:py-2.5 rounded-2xl bg-[#FAF7F2] border border-[#E6DDD1] text-[11px] font-extrabold text-[#A34224] font-mono tabular-nums cursor-pointer hover:border-[#C85A38]/40 transition-colors"
         >
           T{selectedDay}
         </button>
@@ -379,7 +379,7 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
           onClick={() => setIsQuickAddOpen(true)}
           title="Neuer Termin"
           aria-label="Neuer Termin"
-          className="w-9 h-9 rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400 hover:brightness-110 text-[#0B0E14] flex items-center justify-center transition-all cursor-pointer shadow-[0_4px_16px_rgba(34,211,238,0.3)] lg:mb-1"
+          className="w-9 h-9 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-white flex items-center justify-center transition-all cursor-pointer shadow-sm lg:mb-1"
         >
           <Plus className="w-4 h-4 stroke-[2.5]" />
         </button>
@@ -388,24 +388,24 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
   }
 
   return (
-    <aside className="aurora-glass rounded-[28px] p-3.5 sm:p-4 lg:p-5 flex flex-col gap-4 w-full max-w-full min-w-0 lg:h-full overflow-hidden">
+    <aside className="surface-glass rounded-[28px] p-3.5 sm:p-4 lg:p-5 flex flex-col gap-4 w-full max-w-full min-w-0 lg:h-full overflow-hidden">
       {/* Calendar Header & Month Grid */}
-      <div className="aurora-glass-elevated rounded-[24px] p-3.5 sm:p-4 w-full min-w-0 overflow-hidden">
+      <div className="surface-glass-elevated rounded-[24px] p-3.5 sm:p-4 w-full min-w-0 overflow-hidden">
         <div className="flex items-start justify-between mb-3 gap-2 min-w-0">
           <button
             type="button"
             onClick={() => setActiveTab('week')}
             title="Zur Wochen- & Mehrtagesübersicht"
-            className="text-left group cursor-pointer rounded-xl px-1.5 py-1 -ml-1.5 hover:bg-white/5 transition-colors min-w-0 flex-1"
+            className="text-left group cursor-pointer rounded-xl px-1.5 py-1 -ml-1.5 hover:bg-[#FAF7F2] transition-colors min-w-0 flex-1"
           >
-            <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold flex items-center gap-1.5 flex-wrap">
+            <span className="text-[10px] uppercase tracking-wider text-[#6B6259] font-bold flex items-center gap-1.5 flex-wrap">
               <span>Reisezeitraum</span>
-              <span className="text-[10px] font-bold text-cyan-200 bg-cyan-400/15 border border-cyan-400/30 px-1.5 py-0.5 rounded-full">
+              <span className="text-[10px] font-bold text-[#1F5E68] bg-[#2A7B88]/12 border border-[#2A7B88]/30 px-1.5 py-0.5 rounded-full">
                 Wochenplan
               </span>
             </span>
-            <h2 className="text-sm sm:text-base font-extrabold text-slate-100 flex items-center gap-1.5 group-hover:text-cyan-300 transition-colors mt-1 truncate">
-              <CalendarIcon className="w-4 h-4 text-cyan-400 shrink-0" />
+            <h2 className="text-sm sm:text-base font-extrabold text-[#1F1B18] flex items-center gap-1.5 group-hover:text-[#A34224] transition-colors mt-1 truncate">
+              <CalendarIcon className="w-4 h-4 text-[#C85A38] shrink-0" />
               <span className="truncate">{calendarData.monthLabel}</span>
             </h2>
           </button>
@@ -416,7 +416,7 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
               onClick={() => setSelectedDay(Math.max(1, selectedDay - 1))}
               disabled={safeTotalDays <= 0 || selectedDay <= 1}
               aria-label="Vorheriger Tag"
-              className="w-7 h-7 rounded-full bg-white/5 hover:bg-cyan-400/20 border border-white/10 disabled:opacity-35 text-slate-200 flex items-center justify-center transition-colors cursor-pointer"
+              className="w-7 h-7 rounded-full bg-[#FAF7F2] hover:bg-[#C85A38]/12 border border-[#E6DDD1] disabled:opacity-35 text-[#1F1B18] flex items-center justify-center transition-colors cursor-pointer"
               title="Vorheriger Tag"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -428,7 +428,7 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
               }
               disabled={safeTotalDays <= 0 || selectedDay >= safeTotalDays}
               aria-label="Nächster Tag"
-              className="w-7 h-7 rounded-full bg-white/5 hover:bg-cyan-400/20 border border-white/10 disabled:opacity-35 text-slate-200 flex items-center justify-center transition-colors cursor-pointer"
+              className="w-7 h-7 rounded-full bg-[#FAF7F2] hover:bg-[#C85A38]/12 border border-[#E6DDD1] disabled:opacity-35 text-[#1F1B18] flex items-center justify-center transition-colors cursor-pointer"
               title="Nächster Tag"
             >
               <ChevronRight className="w-4 h-4" />
@@ -439,7 +439,7 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
                 onClick={onToggleCollapse}
                 title="Kalender einklappen"
                 aria-label="Kalender einklappen"
-                className="w-7 h-7 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer ml-0.5"
+                className="w-7 h-7 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] border border-[#E6DDD1] text-[#6B6259] hover:text-[#1F1B18] flex items-center justify-center transition-colors cursor-pointer ml-0.5"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -448,8 +448,8 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
         </div>
 
         {safeTotalDays <= 0 ? (
-          <div className="rounded-2xl bg-[#0B0E14]/60 border border-dashed border-white/10 p-5 text-center">
-            <p className="text-xs font-semibold text-slate-400">
+          <div className="rounded-2xl bg-[#FAF7F2] border border-dashed border-[#E6DDD1] p-5 text-center">
+            <p className="text-xs font-semibold text-[#6B6259]">
               Noch keine Reisetage festgelegt.
             </p>
           </div>
@@ -460,7 +460,7 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
               {WEEKDAYS.map((day) => (
                 <div
                   key={day}
-                  className="text-[10px] font-bold tracking-wider text-slate-500 py-1 font-mono"
+                  className="text-[10px] font-bold tracking-wider text-[#8C8277] py-1 font-mono"
                 >
                   {day}
                 </div>
@@ -491,12 +491,12 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
                     }}
                     className={`relative h-9 sm:h-10 rounded-xl flex flex-col items-center justify-center text-xs transition-all font-mono tabular-nums min-w-0 overflow-hidden ${
                       isSelected
-                        ? 'bg-gradient-to-br from-cyan-400 to-emerald-400 text-[#0B0E14] font-black shadow-[0_0_16px_rgba(34,211,238,0.45)]'
+                        ? 'bg-[#C85A38] text-white font-black shadow-sm'
                         : isTripDay
-                        ? 'bg-white/[0.07] hover:bg-cyan-400/20 text-slate-100 hover:text-cyan-200 border border-white/10 font-bold cursor-pointer'
+                        ? 'bg-[#FAF7F2] hover:bg-[#C85A38]/12 text-[#1F1B18] hover:text-[#A34224] border border-[#E6DDD1] font-bold cursor-pointer'
                         : cell.isStartMonth
-                        ? 'text-slate-500 cursor-default'
-                        : 'text-slate-600 cursor-default'
+                        ? 'text-[#8C8277]/70 cursor-default'
+                        : 'text-[#8C8277]/45 cursor-default'
                     }`}
                     title={
                       isTripDay
@@ -522,21 +522,21 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
                         {statusInfo.hasConfirmed && (
                           <span
                             className={`w-1 h-1 rounded-full ${
-                              isSelected ? 'bg-[#0B0E14]' : 'bg-emerald-400'
+                              isSelected ? 'bg-white' : 'bg-[#6E7F5E]'
                             }`}
                           />
                         )}
                         {(statusInfo.hasPlanned || statusInfo.hasIdea) && (
                           <span
                             className={`w-1 h-1 rounded-full ${
-                              isSelected ? 'bg-[#0B0E14]/75' : 'bg-cyan-400'
+                              isSelected ? 'bg-white/80' : 'bg-[#2A7B88]'
                             }`}
                           />
                         )}
                         {statusInfo.hasMeal && (
                           <span
                             className={`w-1 h-1 rounded-full ${
-                              isSelected ? 'bg-[#0B0E14]/60' : 'bg-amber-400'
+                              isSelected ? 'bg-white/65' : 'bg-[#D9822B]'
                             }`}
                           />
                         )}
@@ -550,7 +550,7 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
             {/* Tag 1 .. Tag N Scrollable Pill Selector with auto-scroll */}
             <div
               ref={dayPillsRef}
-              className="mt-3 pt-3 border-t border-white/10 flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar w-full max-w-full min-w-0"
+              className="mt-3 pt-3 border-t border-[#E6DDD1] flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar w-full max-w-full min-w-0"
             >
               {Array.from({ length: safeTotalDays }, (_, i) => i + 1).map(
                 (dayNum) => {
@@ -563,8 +563,8 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
                       onClick={() => setSelectedDay(dayNum)}
                       className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 font-mono tabular-nums ${
                         active
-                          ? 'bg-cyan-400 text-[#0B0E14] shadow-[0_0_12px_rgba(34,211,238,0.4)]'
-                          : 'bg-white/[0.07] text-slate-300 hover:bg-white/[0.14] border border-white/10'
+                          ? 'bg-[#C85A38] text-white shadow-sm'
+                          : 'bg-[#FAF7F2] text-[#6B6259] hover:bg-[#F3ECE1] border border-[#E6DDD1]'
                       }`}
                     >
                       Tag {dayNum}
@@ -581,7 +581,7 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
       <button
         type="button"
         onClick={() => setIsQuickAddOpen(true)}
-        className="w-full bg-gradient-to-r from-cyan-400 to-emerald-400 hover:brightness-110 text-[#0B0E14] rounded-full py-2.5 px-4 text-xs font-extrabold flex items-center justify-center gap-2 shadow-[0_6px_20px_rgba(34,211,238,0.22)] transition-all cursor-pointer shrink-0"
+        className="w-full bg-[#C85A38] hover:bg-[#B54B2B] text-white rounded-full py-2.5 px-4 text-xs font-extrabold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer shrink-0"
       >
         <Plus className="w-4 h-4 stroke-[2.5]" />
         <span>+ Vorschlag / Event</span>
@@ -591,14 +591,14 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
       <div className="flex-1 flex flex-col min-h-0 min-w-0">
         <div className="flex items-center justify-between mb-2.5 px-1 gap-2">
           <div className="min-w-0">
-            <h3 className="text-sm font-extrabold text-slate-100 truncate">
+            <h3 className="text-sm font-extrabold text-[#1F1B18] truncate">
               Tag {selectedDay} · Ablauf
             </h3>
-            <p className="text-[11px] text-slate-400 truncate">
+            <p className="text-[11px] text-[#6B6259] truncate">
               {selectedDateFormatted}
             </p>
           </div>
-          <span className="text-xs font-bold text-cyan-300 font-mono tabular-nums shrink-0">
+          <span className="text-xs font-bold text-[#A34224] font-mono tabular-nums shrink-0">
             {timelineItems.length}{' '}
             {timelineItems.length === 1 ? 'Eintrag' : 'Einträge'}
           </span>
@@ -606,9 +606,9 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
 
         <div className="space-y-2 overflow-y-auto pr-0.5 flex-1 min-w-0">
           {timelineItems.length === 0 ? (
-            <div className="bg-[#0B0E14]/55 rounded-[20px] p-6 text-center border border-dashed border-white/10">
-              <Clock className="w-5 h-5 text-slate-500 mx-auto mb-2" />
-              <p className="text-xs font-semibold text-slate-300">
+            <div className="bg-[#FAF7F2] rounded-[20px] p-6 text-center border border-dashed border-[#E6DDD1]">
+              <Clock className="w-5 h-5 text-[#8C8277] mx-auto mb-2" />
+              <p className="text-xs font-semibold text-[#6B6259]">
                 Noch keine Einträge für Tag {selectedDay}
               </p>
             </div>
@@ -624,7 +624,7 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
                   : {
                       label: MEAL_TYPE_LABELS[item.mealType],
                       badgeClass:
-                        'bg-amber-400/15 text-amber-300 border border-amber-400/30',
+                        'bg-[#D9822B]/14 text-[#9E5A14] border border-[#D9822B]/30',
                       icon: <Utensils className="w-4 h-4" />,
                     };
 
@@ -633,8 +633,8 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
                   key={`${item.kind}-${item.id}`}
                   className={`rounded-[20px] p-3 transition-all border flex items-center justify-between gap-2.5 min-w-0 ${
                     isSelectedCard
-                      ? 'aurora-glass-elevated border-cyan-400/50 shadow-[0_0_20px_rgba(34,211,238,0.16)]'
-                      : 'bg-[#0B0E14]/60 hover:bg-[#1B2232]/85 border-white/10'
+                      ? 'surface-glass-elevated border-[#C85A38]/55 shadow-md'
+                      : 'bg-[#FAF7F2] hover:bg-white border-[#E6DDD1]'
                   }`}
                 >
                   {/* Accessible main selection/navigation button */}
@@ -664,7 +664,7 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
                         });
                       }
                     }}
-                    className="flex-1 flex items-center gap-2.5 min-w-0 text-left cursor-pointer rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+                    className="flex-1 flex items-center gap-2.5 min-w-0 text-left cursor-pointer rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C85A38]"
                   >
                     <div
                       className={`w-9 h-9 rounded-xl ${catMeta.badgeClass} flex items-center justify-center shrink-0`}
@@ -674,21 +674,21 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[11px] font-bold text-cyan-300 font-mono tabular-nums">
+                        <span className="text-[11px] font-bold text-[#A34224] font-mono tabular-nums">
                           {item.time} Uhr
                         </span>
                         {hasConflict && (
                           <AlertTriangle
-                            className="w-3 h-3 text-amber-400 shrink-0"
+                            className="w-3 h-3 text-[#D9822B] shrink-0"
                             aria-label="Zeitkonflikt"
                           />
                         )}
                       </div>
-                      <h4 className="text-xs font-extrabold text-slate-100 truncate">
+                      <h4 className="text-xs font-extrabold text-[#1F1B18] truncate">
                         {item.title}
                       </h4>
                       {item.subtitle && (
-                        <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                        <p className="text-[11px] text-[#6B6259] truncate mt-0.5">
                           {item.subtitle}
                         </p>
                       )}
@@ -708,8 +708,8 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
                     aria-label={`Stimmen für ${item.title} (${item.votes.length})`}
                     className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[11px] font-bold shrink-0 transition-all cursor-pointer font-mono tabular-nums border ${
                       hasVoted
-                        ? 'bg-cyan-400/20 text-cyan-200 border-cyan-400/45'
-                        : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
+                        ? 'bg-[#C85A38]/12 text-[#A34224] border-[#C85A38]/35'
+                        : 'bg-white/90 hover:bg-[#F3ECE1] text-[#6B6259] border-[#E6DDD1]'
                     }`}
                   >
                     <ThumbsUp className="w-3 h-3" />

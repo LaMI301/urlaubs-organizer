@@ -74,30 +74,30 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     }
 
     return (
-      <div className="aurora-canvas min-h-screen w-full flex items-center justify-center p-4 sm:p-6 text-slate-100 relative overflow-hidden">
-        {/* Ambient Midnight Aurora Glows */}
+      <div className="surface-canvas min-h-screen w-full flex items-center justify-center p-4 sm:p-6 text-[#1F1B18] relative overflow-hidden">
+        {/* Ambient Warm Glows */}
         <div className="fixed inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute -top-28 -left-24 w-80 h-80 rounded-full bg-cyan-400/15 blur-3xl" />
-          <div className="absolute bottom-0 -right-24 w-96 h-96 rounded-full bg-violet-500/15 blur-3xl" />
+          <div className="absolute -top-28 -left-24 w-80 h-80 rounded-full bg-[#C85A38]/10 blur-3xl" />
+          <div className="absolute bottom-0 -right-24 w-96 h-96 rounded-full bg-[#6E7F5E]/10 blur-3xl" />
         </div>
 
         <div
           role="alert"
-          className="aurora-glass-elevated relative z-10 w-full max-w-lg rounded-[28px] p-6 sm:p-8 space-y-6"
+          className="surface-glass-elevated relative z-10 w-full max-w-lg rounded-[28px] p-6 sm:p-8 space-y-6"
         >
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-rose-500/15 border border-rose-400/30 text-rose-300 flex items-center justify-center shrink-0 shadow-[0_0_24px_rgba(244,63,94,0.2)]">
+            <div className="w-12 h-12 rounded-2xl bg-rose-500/12 border border-rose-500/30 text-rose-700 flex items-center justify-center shrink-0">
               <AlertTriangle className="w-6 h-6" />
             </div>
             <div className="min-w-0 flex-1">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-300 text-[11px] font-bold uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#D9822B]/14 border border-[#D9822B]/30 text-[#9E5A14] text-[11px] font-bold uppercase tracking-wider">
                 <ShieldAlert className="w-3 h-3" />
                 Schutzmodus aktiv
               </span>
-              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-100 mt-1.5">
+              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#1F1B18] mt-1.5">
                 Etwas ist schiefgelaufen
               </h1>
-              <p className="text-sm text-slate-400 mt-1 leading-relaxed">
+              <p className="text-sm text-[#6B6259] mt-1 leading-relaxed">
                 Die Ansicht konnte gerade nicht sauber dargestellt werden. Deine gespeicherten
                 Urlaubsdaten bleiben dabei geschützt.
               </p>
@@ -105,11 +105,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           </div>
 
           {this.state.errorMessage && (
-            <div className="rounded-2xl bg-[#0B0E14]/80 border border-white/10 p-3.5">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+            <div className="rounded-2xl bg-[#FAF7F2] border border-[#E6DDD1] p-3.5">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#6B6259] mb-1">
                 Fehlerdetails
               </p>
-              <p className="font-mono tabular-nums text-xs text-rose-300 break-words max-h-28 overflow-y-auto">
+              <p className="font-mono tabular-nums text-xs text-rose-700 break-words max-h-28 overflow-y-auto">
                 {this.state.errorMessage}
               </p>
             </div>
@@ -119,7 +119,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             <button
               type="button"
               onClick={this.handleReload}
-              className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-cyan-400 hover:bg-cyan-300 text-[#0B0E14] font-extrabold text-sm shadow-[0_0_20px_rgba(34,211,238,0.3)] transition-all cursor-pointer"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-white font-extrabold text-sm shadow-sm transition-all cursor-pointer"
             >
               <RefreshCw className="w-4 h-4" />
               <span>App neu laden</span>
@@ -128,31 +128,31 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             <button
               type="button"
               onClick={this.handleRetryRender}
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-white/[0.08] hover:bg-white/[0.14] border border-white/15 text-slate-100 font-bold text-sm transition-all cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-[#F3ECE1] hover:bg-[#E6DDD1] border border-[#DDD2C3] text-[#1F1B18] font-bold text-sm transition-all cursor-pointer"
             >
-              <RotateCcw className="w-4 h-4 text-cyan-300" />
+              <RotateCcw className="w-4 h-4 text-[#C85A38]" />
               <span>Erneut versuchen</span>
             </button>
           </div>
 
-          <div className="pt-4 border-t border-white/10">
+          <div className="pt-4 border-t border-[#E6DDD1]">
             {!this.state.confirmStorageReset ? (
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-[#6B6259]">
                   Tritt der Fehler dauerhaft wegen beschädigter lokaler Daten auf?
                 </span>
                 <button
                   type="button"
                   onClick={() => this.setState({ confirmStorageReset: true })}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-300 hover:text-amber-200 self-start sm:self-auto cursor-pointer"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#9E3F22] hover:text-[#C85A38] self-start sm:self-auto cursor-pointer"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>Lokalen Cache zurücksetzen</span>
                 </button>
               </div>
             ) : (
-              <div className="rounded-2xl bg-rose-500/10 border border-rose-400/25 p-3.5 space-y-3">
-                <p className="text-xs text-rose-200 leading-relaxed">
+              <div className="rounded-2xl bg-rose-500/10 border border-rose-500/25 p-3.5 space-y-3">
+                <p className="text-xs text-rose-800 leading-relaxed">
                   Achtung: Dabei werden lokal zwischengespeicherte Reisen und Einstellungen in diesem
                   Browser entfernt und die App frisch geladen.
                 </p>
@@ -160,14 +160,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                   <button
                     type="button"
                     onClick={() => this.setState({ confirmStorageReset: false })}
-                    className="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/15 text-xs font-bold text-slate-200 transition-colors cursor-pointer"
+                    className="px-3.5 py-1.5 rounded-full bg-white hover:bg-[#FAF7F2] border border-[#DDD2C3] text-xs font-bold text-[#1F1B18] transition-colors cursor-pointer"
                   >
                     Abbrechen
                   </button>
                   <button
                     type="button"
                     onClick={this.handleSafeStorageReset}
-                    className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-rose-500 hover:bg-rose-400 text-white text-xs font-extrabold transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold transition-colors cursor-pointer"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Ja, sicher zurücksetzen</span>

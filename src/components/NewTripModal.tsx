@@ -40,7 +40,7 @@ const TRIP_TEMPLATES: TripTemplate[] = [
     defaultSubtitle: 'Sonne, versteckte Buchten, Pool & lange Abende',
     placeholderDest: 'z. B. Mallorca, Kreta, Algarve...',
     icon: Palmtree,
-    accentClass: 'border-amber-400/40 bg-amber-400/12 text-amber-200',
+    accentClass: 'border-[#D9822B]/50 bg-[#D9822B]/14 text-[#9E5A14]',
   },
   {
     id: 'city',
@@ -49,7 +49,7 @@ const TRIP_TEMPLATES: TripTemplate[] = [
     defaultSubtitle: 'Spots, Food-Märkte, Kultur & Rooftop-Drinks',
     placeholderDest: 'z. B. Lissabon, Barcelona, Rom...',
     icon: Building2,
-    accentClass: 'border-cyan-400/40 bg-cyan-400/12 text-cyan-200',
+    accentClass: 'border-[#2A7B88]/50 bg-[#2A7B88]/12 text-[#1F5E68]',
   },
   {
     id: 'roadtrip',
@@ -58,7 +58,7 @@ const TRIP_TEMPLATES: TripTemplate[] = [
     defaultSubtitle: 'Etappen, Küstenstraßen & spontane Stopps',
     placeholderDest: 'z. B. Schottland, Toskana, Norwegen...',
     icon: Car,
-    accentClass: 'border-emerald-400/40 bg-emerald-400/12 text-emerald-200',
+    accentClass: 'border-[#6E7F5E]/50 bg-[#6E7F5E]/14 text-[#4E5F40]',
   },
   {
     id: 'mountain',
@@ -67,7 +67,7 @@ const TRIP_TEMPLATES: TripTemplate[] = [
     defaultSubtitle: 'Gipfeltouren, Hüttenabend & frische Bergluft',
     placeholderDest: 'z. B. Südtirol, Österreich, Allgäu...',
     icon: Mountain,
-    accentClass: 'border-violet-400/40 bg-violet-400/12 text-violet-200',
+    accentClass: 'border-[#C85A38]/50 bg-[#C85A38]/12 text-[#9E3F22]',
   },
 ];
 
@@ -321,23 +321,23 @@ export const NewTripModal: React.FC = () => {
           setIsNewTripModalOpen(false);
         }
       }}
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-[#06080D]/80 backdrop-blur-md p-3 sm:p-4"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-[#1F1B18]/45 backdrop-blur-sm p-3 sm:p-4"
     >
-      <div className="aurora-glass-elevated text-slate-100 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-[30px] shadow-[0_28px_80px_rgba(0,0,0,0.85)]">
+      <div className="surface-glass-elevated text-[#1F1B18] w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-[30px] shadow-2xl">
         {/* Top Header + Step Progress */}
-        <div className="bg-[#0B0E14]/80 border-b border-white/10 px-6 py-5 sticky top-0 z-10 backdrop-blur-xl">
+        <div className="bg-[#FAF7F2]/95 border-b border-[#E6DDD1] px-6 py-5 sticky top-0 z-10 backdrop-blur-xl">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-cyan-400 to-emerald-400 text-[#0B0E14] flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(34,211,238,0.3)]">
+              <div className="w-10 h-10 rounded-2xl bg-[#C85A38] text-white flex items-center justify-center shrink-0 shadow-sm">
                 <Compass className="w-5 h-5" />
               </div>
               <div className="min-w-0">
-                <span className="font-mono tabular-nums text-[11px] font-bold uppercase tracking-wider text-cyan-300 block">
+                <span className="font-mono tabular-nums text-[11px] font-bold uppercase tracking-wider text-[#C85A38] block">
                   Schritt {step} von 3
                 </span>
                 <h2
                   id="new-trip-modal-title"
-                  className="text-lg font-extrabold tracking-tight text-slate-100 truncate"
+                  className="text-lg font-extrabold tracking-tight text-[#1F1B18] truncate"
                 >
                   Neuen Urlaub erstellen
                 </h2>
@@ -348,7 +348,7 @@ export const NewTripModal: React.FC = () => {
               type="button"
               onClick={() => setIsNewTripModalOpen(false)}
               aria-label="Modal schließen"
-              className="w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.18] border border-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-colors cursor-pointer shrink-0"
+              className="w-8 h-8 rounded-full bg-[#F3ECE1] hover:bg-[#E6DDD1] border border-[#DDD2C3] flex items-center justify-center text-[#6B6259] hover:text-[#1F1B18] transition-colors cursor-pointer shrink-0"
             >
               <X className="w-4 h-4" />
             </button>
@@ -360,9 +360,7 @@ export const NewTripModal: React.FC = () => {
               <div
                 key={s}
                 className={`h-1.5 rounded-full transition-all ${
-                  s <= step
-                    ? 'bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.45)]'
-                    : 'bg-white/15'
+                  s <= step ? 'bg-[#C85A38]' : 'bg-[#E6DDD1]'
                 }`}
               />
             ))}
@@ -374,18 +372,18 @@ export const NewTripModal: React.FC = () => {
           {step === 1 && (
             <div className="space-y-5">
               <div>
-                <h3 className="text-xl font-extrabold text-slate-100 flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-cyan-300" />
+                <h3 className="text-xl font-extrabold text-[#1F1B18] flex items-center gap-2">
+                  <MapPin className="w-5 h-5 text-[#C85A38]" />
                   <span>Reiseziel, Stil &amp; Name</span>
                 </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-[#6B6259] mt-0.5">
                   Wähle optional ein Reisetyp-Template und gib euer Ziel ein.
                 </p>
               </div>
 
               {/* Reisetyp-Templates */}
               <div>
-                <span className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-[#6B6259] mb-2">
                   Reisetyp-Template (optional)
                 </span>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -400,8 +398,8 @@ export const NewTripModal: React.FC = () => {
                         aria-pressed={active}
                         className={`p-2.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col gap-1.5 ${
                           active
-                            ? `${tpl.accentClass} shadow-[0_0_18px_rgba(34,211,238,0.14)]`
-                            : 'bg-white/[0.04] hover:bg-white/[0.09] border-white/10 text-slate-300'
+                            ? `${tpl.accentClass} shadow-sm`
+                            : 'bg-[#FAF7F2] hover:bg-[#F3ECE1] border-[#E6DDD1] text-[#6B6259]'
                         }`}
                       >
                         <div className="flex items-center justify-between">
@@ -423,7 +421,7 @@ export const NewTripModal: React.FC = () => {
                 <div>
                   <label
                     htmlFor="new-trip-destination"
-                    className="block text-xs font-bold text-slate-300 mb-1.5"
+                    className="block text-xs font-bold text-[#1F1B18] mb-1.5"
                   >
                     Wo geht es hin? (Land, Ort oder Region) *
                   </label>
@@ -438,14 +436,14 @@ export const NewTripModal: React.FC = () => {
                       activeTemplateObj?.placeholderDest ||
                       'z. B. Italien, Mallorca, Österreich...'
                     }
-                    className="aurora-input w-full rounded-2xl px-4 py-3 text-sm font-semibold"
+                    className="surface-input w-full rounded-2xl px-4 py-3 text-sm font-semibold"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="new-trip-title"
-                    className="block text-xs font-bold text-slate-300 mb-1.5"
+                    className="block text-xs font-bold text-[#1F1B18] mb-1.5"
                   >
                     Wie soll der Urlaub heißen? *
                   </label>
@@ -456,14 +454,14 @@ export const NewTripModal: React.FC = () => {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="z. B. Sommerurlaub 2026"
-                    className="aurora-input w-full rounded-2xl px-4 py-3 text-sm font-semibold"
+                    className="surface-input w-full rounded-2xl px-4 py-3 text-sm font-semibold"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="new-trip-subtitle"
-                    className="block text-xs font-bold text-slate-300 mb-1.5"
+                    className="block text-xs font-bold text-[#1F1B18] mb-1.5"
                   >
                     Kurze Beschreibung / Motto (optional)
                   </label>
@@ -476,17 +474,17 @@ export const NewTripModal: React.FC = () => {
                       setSubtitleWasAuto(false);
                     }}
                     placeholder="Optionales Motto für die Gruppe..."
-                    className="aurora-input w-full rounded-2xl px-4 py-2.5 text-xs font-medium"
+                    className="surface-input w-full rounded-2xl px-4 py-2.5 text-xs font-medium"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center justify-end pt-3 border-t border-white/10">
+              <div className="flex items-center justify-end pt-3 border-t border-[#E6DDD1]">
                 <button
                   type="button"
                   disabled={!canAdvanceStep1}
                   onClick={() => setStep(2)}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-extrabold bg-cyan-400 hover:bg-cyan-300 disabled:opacity-40 text-[#0B0E14] shadow-[0_0_20px_rgba(34,211,238,0.28)] transition-all cursor-pointer"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-extrabold bg-[#C85A38] hover:bg-[#B54B2B] disabled:opacity-40 text-white shadow-sm transition-all cursor-pointer"
                 >
                   <span>Weiter zu Schritt 2</span>
                   <ArrowRight className="w-4 h-4" />
@@ -499,22 +497,22 @@ export const NewTripModal: React.FC = () => {
           {step === 2 && (
             <div className="space-y-5">
               <div>
-                <h3 className="text-xl font-extrabold text-slate-100 flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-cyan-300" />
+                <h3 className="text-xl font-extrabold text-[#1F1B18] flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-[#C85A38]" />
                   <span>Zeitraum &amp; Budget</span>
                 </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-[#6B6259] mt-0.5">
                   Wähle Start- &amp; Enddatum (1–60 Tage) sowie euer Budgetziel.
                 </p>
               </div>
 
               {/* Date Range Card */}
-              <div className="bg-[#0B0E14]/65 border border-cyan-400/20 rounded-[24px] p-4 sm:p-5 space-y-4">
+              <div className="bg-[#FAF7F2] border border-[#E6DDD1] rounded-[24px] p-4 sm:p-5 space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label
                       htmlFor="new-trip-start-date"
-                      className="block text-[11px] font-bold text-slate-300 mb-1.5"
+                      className="block text-[11px] font-bold text-[#6B6259] mb-1.5"
                     >
                       Startdatum
                     </label>
@@ -523,13 +521,13 @@ export const NewTripModal: React.FC = () => {
                       type="date"
                       value={startDate}
                       onChange={(e) => handleStartDateChange(e.target.value)}
-                      className="aurora-input w-full rounded-2xl px-3.5 py-2.5 text-xs font-bold font-mono tabular-nums"
+                      className="surface-input w-full rounded-2xl px-3.5 py-2.5 text-xs font-bold font-mono tabular-nums"
                     />
                   </div>
                   <div>
                     <label
                       htmlFor="new-trip-end-date"
-                      className="block text-[11px] font-bold text-slate-300 mb-1.5"
+                      className="block text-[11px] font-bold text-[#6B6259] mb-1.5"
                     >
                       Enddatum (max. 60 Tage)
                     </label>
@@ -540,7 +538,7 @@ export const NewTripModal: React.FC = () => {
                       max={startDate ? addDaysToIso(startDate, 59) : undefined}
                       value={endDate}
                       onChange={(e) => handleEndDateChange(e.target.value)}
-                      className="aurora-input w-full rounded-2xl px-3.5 py-2.5 text-xs font-bold font-mono tabular-nums"
+                      className="surface-input w-full rounded-2xl px-3.5 py-2.5 text-xs font-bold font-mono tabular-nums"
                     />
                   </div>
                 </div>
@@ -549,11 +547,11 @@ export const NewTripModal: React.FC = () => {
                   <div className="flex items-center justify-between gap-2">
                     <label
                       htmlFor="new-trip-days-range"
-                      className="text-xs font-bold text-slate-300"
+                      className="text-xs font-bold text-[#1F1B18]"
                     >
                       Reisedauer (1–60 Tage)
                     </label>
-                    <span className="font-mono tabular-nums px-3 py-1 rounded-full bg-cyan-400 text-[#0B0E14] text-xs font-black">
+                    <span className="font-mono tabular-nums px-3 py-1 rounded-full bg-[#C85A38] text-white text-xs font-black">
                       {totalDays} {totalDays === 1 ? 'Tag' : 'Tage'}
                     </span>
                   </div>
@@ -565,7 +563,7 @@ export const NewTripModal: React.FC = () => {
                     max={60}
                     value={totalDays}
                     onChange={(e) => handleDaysChange(Number(e.target.value))}
-                    className="w-full accent-cyan-400 cursor-pointer"
+                    className="w-full accent-[#C85A38] cursor-pointer"
                   />
 
                   <div className="flex flex-wrap items-center gap-1.5">
@@ -576,8 +574,8 @@ export const NewTripModal: React.FC = () => {
                         onClick={() => handleDaysChange(preset)}
                         className={`font-mono tabular-nums px-2.5 py-1 rounded-full text-[11px] font-bold border transition-colors cursor-pointer ${
                           totalDays === preset
-                            ? 'bg-cyan-400/20 border-cyan-400/50 text-cyan-200'
-                            : 'bg-white/[0.04] hover:bg-white/[0.1] border-white/10 text-slate-400'
+                            ? 'bg-[#C85A38]/12 border-[#C85A38]/35 text-[#9E3F22]'
+                            : 'bg-white hover:bg-[#F3ECE1] border-[#DDD2C3] text-[#6B6259]'
                         }`}
                       >
                         {preset}T
@@ -592,9 +590,9 @@ export const NewTripModal: React.FC = () => {
                 <div>
                   <label
                     htmlFor="new-trip-budget"
-                    className="block text-xs font-bold text-slate-300 mb-1.5 flex items-center gap-1.5"
+                    className="block text-xs font-bold text-[#1F1B18] mb-1.5 flex items-center gap-1.5"
                   >
-                    <Wallet className="w-3.5 h-3.5 text-emerald-300" />
+                    <Wallet className="w-3.5 h-3.5 text-[#4E5F40]" />
                     <span>Geplantes Budget p.P. (0 = ohne Limit)</span>
                   </label>
                   <input
@@ -605,14 +603,14 @@ export const NewTripModal: React.FC = () => {
                     value={budgetTargetPerPerson}
                     onChange={(e) => setBudgetTargetPerPerson(e.target.value)}
                     placeholder="z. B. 600 oder 0"
-                    className="aurora-input w-full rounded-2xl px-4 py-3 text-xs font-bold font-mono tabular-nums"
+                    className="surface-input w-full rounded-2xl px-4 py-3 text-xs font-bold font-mono tabular-nums"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="new-trip-currency"
-                    className="block text-xs font-bold text-slate-300 mb-1.5"
+                    className="block text-xs font-bold text-[#1F1B18] mb-1.5"
                   >
                     Währung
                   </label>
@@ -620,7 +618,7 @@ export const NewTripModal: React.FC = () => {
                     id="new-trip-currency"
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value as CurrencyCode)}
-                    className="aurora-input w-full rounded-2xl px-3.5 py-3 text-xs font-bold font-mono"
+                    className="surface-input w-full rounded-2xl px-3.5 py-3 text-xs font-bold font-mono"
                   >
                     <option value="EUR">EUR (€)</option>
                     <option value="CHF">CHF</option>
@@ -630,11 +628,11 @@ export const NewTripModal: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-3 border-t border-white/10">
+              <div className="flex items-center justify-between pt-3 border-t border-[#E6DDD1]">
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-bold bg-white/[0.07] hover:bg-white/[0.14] border border-white/10 text-slate-200 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-bold bg-[#F3ECE1] hover:bg-[#E6DDD1] border border-[#DDD2C3] text-[#1F1B18] transition-colors cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span>Zurück</span>
@@ -643,7 +641,7 @@ export const NewTripModal: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setStep(3)}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-extrabold bg-cyan-400 hover:bg-cyan-300 text-[#0B0E14] shadow-[0_0_20px_rgba(34,211,238,0.28)] transition-all cursor-pointer"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-extrabold bg-[#C85A38] hover:bg-[#B54B2B] text-white shadow-sm transition-all cursor-pointer"
                 >
                   <span>Weiter zu Schritt 3</span>
                   <ArrowRight className="w-4 h-4" />
@@ -656,11 +654,11 @@ export const NewTripModal: React.FC = () => {
           {step === 3 && (
             <div className="space-y-5">
               <div>
-                <h3 className="text-xl font-extrabold text-slate-100 flex items-center gap-2">
-                  <Users className="w-5 h-5 text-cyan-300" />
+                <h3 className="text-xl font-extrabold text-[#1F1B18] flex items-center gap-2">
+                  <Users className="w-5 h-5 text-[#C85A38]" />
                   <span>Mitreisende &amp; Deine Auswahl</span>
                 </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-[#6B6259] mt-0.5">
                   Trage die Vornamen eurer Gruppe ein und markiere deinen eigenen
                   Namen.
                 </p>
@@ -688,38 +686,38 @@ export const NewTripModal: React.FC = () => {
                       }
                     }}
                     placeholder="Vorname eingeben (z. B. Lars)..."
-                    className="aurora-input flex-1 min-w-0 rounded-full px-4 py-3 text-sm font-semibold"
+                    className="surface-input flex-1 min-w-0 rounded-full px-4 py-3 text-sm font-semibold"
                   />
                   <button
                     type="button"
                     onClick={handleAddPerson}
-                    className="inline-flex items-center gap-1.5 bg-white/[0.1] hover:bg-white/[0.18] border border-white/15 text-slate-100 px-4 sm:px-5 py-3 rounded-full text-xs font-bold cursor-pointer shrink-0 transition-colors"
+                    className="inline-flex items-center gap-1.5 bg-[#F3ECE1] hover:bg-[#E6DDD1] border border-[#DDD2C3] text-[#1F1B18] px-4 sm:px-5 py-3 rounded-full text-xs font-bold cursor-pointer shrink-0 transition-colors"
                   >
-                    <Plus className="w-4 h-4 text-cyan-300" />
+                    <Plus className="w-4 h-4 text-[#C85A38]" />
                     <span>Hinzufügen</span>
                   </button>
                 </div>
                 {duplicateWarning && (
-                  <p className="text-xs font-semibold text-amber-300 pl-2">
+                  <p className="text-xs font-semibold text-[#9E5A14] pl-2">
                     {duplicateWarning}
                   </p>
                 )}
               </div>
 
               {/* List of added names & active user picker */}
-              <div className="bg-[#0B0E14]/55 border border-white/10 rounded-[24px] p-4 space-y-3">
+              <div className="bg-[#FAF7F2] border border-[#E6DDD1] rounded-[24px] p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400">
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-[#6B6259]">
                     Welcher Nutzer bist du?
                   </span>
-                  <span className="font-mono tabular-nums text-xs font-bold text-cyan-300">
+                  <span className="font-mono tabular-nums text-xs font-bold text-[#C85A38]">
                     {travelerNames.length}{' '}
                     {travelerNames.length === 1 ? 'Person' : 'Personen'}
                   </span>
                 </div>
 
                 {travelerNames.length === 0 ? (
-                  <p className="text-xs text-slate-400 py-2">
+                  <p className="text-xs text-[#6B6259] py-2">
                     Noch keine Namen in der Liste. Tippe oben einen Namen ein —
                     ein eingetippter Name wird beim Erstellen automatisch übernommen.
                   </p>
@@ -732,8 +730,8 @@ export const NewTripModal: React.FC = () => {
                           key={name}
                           className={`inline-flex items-center gap-1 rounded-full border p-1 transition-all max-w-full ${
                             isMe
-                              ? 'bg-cyan-400/20 border-cyan-400/50 text-slate-100 shadow-[0_0_16px_rgba(34,211,238,0.18)]'
-                              : 'bg-white/[0.06] border-white/10 text-slate-200 hover:bg-white/[0.1]'
+                              ? 'bg-[#C85A38]/12 border-[#C85A38]/40 text-[#1F1B18] shadow-sm'
+                              : 'bg-white border-[#DDD2C3] text-[#1F1B18] hover:bg-[#F3ECE1]'
                           }`}
                         >
                           <button
@@ -743,7 +741,7 @@ export const NewTripModal: React.FC = () => {
                           >
                             <span className="truncate max-w-[140px]">{name}</span>
                             {isMe && (
-                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-400 text-[#0B0E14] font-extrabold shrink-0">
+                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#C85A38] text-white font-extrabold shrink-0">
                                 Ich
                               </span>
                             )}
@@ -751,7 +749,7 @@ export const NewTripModal: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleRemovePerson(name)}
-                            className="w-6 h-6 rounded-full hover:bg-rose-500/25 text-slate-400 hover:text-rose-200 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                            className="w-6 h-6 rounded-full hover:bg-rose-500/15 text-[#6B6259] hover:text-rose-700 flex items-center justify-center transition-colors cursor-pointer shrink-0"
                             title={`${name} entfernen`}
                             aria-label={`${name} entfernen`}
                           >
@@ -764,11 +762,11 @@ export const NewTripModal: React.FC = () => {
                 )}
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-white/10">
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-[#E6DDD1]">
                 <button
                   type="button"
                   onClick={() => setStep(2)}
-                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-bold bg-white/[0.07] hover:bg-white/[0.14] border border-white/10 text-slate-200 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-bold bg-[#F3ECE1] hover:bg-[#E6DDD1] border border-[#DDD2C3] text-[#1F1B18] transition-colors cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span>Zurück</span>
@@ -779,7 +777,7 @@ export const NewTripModal: React.FC = () => {
                   disabled={
                     travelerNames.length === 0 && !newPersonInput.trim()
                   }
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-extrabold bg-emerald-400 hover:bg-emerald-300 disabled:opacity-40 text-[#0B0E14] shadow-[0_0_24px_rgba(52,211,153,0.3)] transition-all cursor-pointer"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-extrabold bg-[#6E7F5E] hover:bg-[#5B6B4D] disabled:opacity-40 text-white shadow-sm transition-all cursor-pointer"
                 >
                   <Check className="w-4 h-4" />
                   <span>Urlaub erstellen &amp; starten</span>

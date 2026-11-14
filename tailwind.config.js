@@ -1,6 +1,5 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -12,27 +11,15 @@ export default {
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       colors: {
-        obsidian: '#0B0E14',
-        'aurora-card': '#131823',
-        'aurora-elevated': '#1B2232',
-        'cyan-glow': '#22D3EE',
-        'mint-glow': '#34D399',
-        'amber-glow': '#FBBF24',
-        cream: {
-          outer: '#EFEAE2',
-          inner: '#F9F6F0',
-        },
-        charcoal: {
-          DEFAULT: '#141416',
-          card: '#18181B',
-        },
-        pastel: {
-          lavender: '#E8C2E8',
-          butter: '#F5E284',
-          sage: '#A7B582',
-          periwinkle: '#C4D0F5',
-          peach: '#F7C59F',
-        },
+        limestone: '#FAF7F2',
+        linen: '#FFFFFF',
+        sand: '#F3ECE1',
+        espresso: '#1F1B18',
+        stone: '#6B6259',
+        terracotta: '#C85A38',
+        olive: '#6E7F5E',
+        mediterranean: '#2A7B88',
+        'border-warm': '#E6DDD1',
       },
       keyframes: {
         fadeIn: {

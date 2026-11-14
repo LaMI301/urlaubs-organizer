@@ -165,7 +165,7 @@ export const InfoBoardCard: React.FC = () => {
   return (
     <section
       aria-label="Unterkunfts- und Info-Board"
-      className="aurora-glass rounded-[26px] transition-all overflow-hidden"
+      className="surface-glass rounded-[26px] transition-all overflow-hidden"
     >
       {/* Header Row (sibling buttons, no nested interactive controls) */}
       <div className="px-4 sm:px-5 py-3 flex items-center justify-between gap-3">
@@ -175,15 +175,15 @@ export const InfoBoardCard: React.FC = () => {
           aria-expanded={isExpanded}
           className="flex items-center gap-2.5 min-w-0 flex-1 text-left cursor-pointer focus:outline-none group"
         >
-          <div className="w-8 h-8 rounded-xl bg-amber-400/15 border border-amber-400/30 text-amber-300 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-[#D9822B]/14 border border-[#D9822B]/30 text-[#9E5A14] flex items-center justify-center shrink-0">
             <Home className="w-4 h-4" />
           </div>
           <div className="flex items-center gap-2 min-w-0 flex-1">
-            <span className="text-sm font-extrabold text-slate-100 group-hover:text-cyan-200 transition-colors truncate">
+            <span className="text-sm font-extrabold text-[#1F1B18] group-hover:text-[#C85A38] transition-colors truncate">
               Unterkunfts- &amp; Info-Board
             </span>
             {info.accommodationName && !isExpanded && (
-              <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full bg-white/[0.07] border border-white/10 text-[11px] font-semibold text-slate-300 truncate max-w-[220px]">
+              <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#F3ECE1] border border-[#E6DDD1] text-[11px] font-semibold text-[#6B6259] truncate max-w-[220px]">
                 {info.accommodationName}
               </span>
             )}
@@ -196,7 +196,7 @@ export const InfoBoardCard: React.FC = () => {
               type="button"
               onClick={handleFocusAccommodationOnMap}
               title="Unterkunft auf Karte zeigen"
-              className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-cyan-400/12 hover:bg-cyan-400/22 border border-cyan-400/25 text-cyan-300 text-[11px] font-bold transition-colors cursor-pointer"
+              className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#2A7B88]/12 hover:bg-[#2A7B88]/20 border border-[#2A7B88]/30 text-[#1F5E68] text-[11px] font-bold transition-colors cursor-pointer"
             >
               <MapIcon className="w-3 h-3" />
               <span>Auf Karte</span>
@@ -208,7 +208,7 @@ export const InfoBoardCard: React.FC = () => {
               onClick={handleStartEdit}
               title="Unterkunfts-Infos bearbeiten"
               aria-label="Unterkunfts-Infos bearbeiten"
-              className="w-8 h-8 rounded-full bg-white/[0.07] hover:bg-white/[0.15] border border-white/10 text-slate-300 hover:text-cyan-300 flex items-center justify-center transition-colors cursor-pointer"
+              className="w-8 h-8 rounded-full bg-[#F3ECE1] hover:bg-[#E6DDD1] border border-[#DDD2C3] text-[#6B6259] hover:text-[#1F1B18] flex items-center justify-center transition-colors cursor-pointer"
             >
               <Pencil className="w-3.5 h-3.5" />
             </button>
@@ -217,7 +217,7 @@ export const InfoBoardCard: React.FC = () => {
             type="button"
             onClick={() => setIsExpanded((prev) => !prev)}
             aria-label={isExpanded ? 'Info-Board einklappen' : 'Info-Board ausklappen'}
-            className="w-8 h-8 rounded-full bg-white/[0.07] hover:bg-white/[0.15] border border-white/10 text-slate-300 hover:text-slate-100 flex items-center justify-center transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-full bg-[#F3ECE1] hover:bg-[#E6DDD1] border border-[#DDD2C3] text-[#6B6259] hover:text-[#1F1B18] flex items-center justify-center transition-colors cursor-pointer"
           >
             {isExpanded ? (
               <ChevronUp className="w-4 h-4" />
@@ -230,14 +230,14 @@ export const InfoBoardCard: React.FC = () => {
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="px-4 sm:px-5 pb-5 pt-1 border-t border-white/10">
+        <div className="px-4 sm:px-5 pb-5 pt-1 border-t border-[#E6DDD1]">
           {isEditing ? (
             <form onSubmit={handleSave} className="space-y-3.5 pt-3">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <label
                     htmlFor="info-accommodation-name"
-                    className="block text-[11px] font-bold text-slate-300 mb-1"
+                    className="block text-[11px] font-bold text-[#6B6259] mb-1"
                   >
                     Unterkunft / Name
                   </label>
@@ -252,14 +252,14 @@ export const InfoBoardCard: React.FC = () => {
                       }))
                     }
                     placeholder="z. B. Finca Son Llombards"
-                    className="aurora-input w-full rounded-2xl px-3.5 py-2 text-xs font-semibold"
+                    className="surface-input w-full rounded-2xl px-3.5 py-2 text-xs font-semibold"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="info-address"
-                    className="block text-[11px] font-bold text-slate-300 mb-1"
+                    className="block text-[11px] font-bold text-[#6B6259] mb-1"
                   >
                     Adresse
                   </label>
@@ -271,14 +271,14 @@ export const InfoBoardCard: React.FC = () => {
                       setFormState((s) => ({ ...s, address: e.target.value }))
                     }
                     placeholder="Straße, PLZ, Ort"
-                    className="aurora-input w-full rounded-2xl px-3.5 py-2 text-xs font-semibold"
+                    className="surface-input w-full rounded-2xl px-3.5 py-2 text-xs font-semibold"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="info-wifi-name"
-                    className="block text-[11px] font-bold text-slate-300 mb-1"
+                    className="block text-[11px] font-bold text-[#6B6259] mb-1"
                   >
                     WLAN-Name (SSID)
                   </label>
@@ -290,14 +290,14 @@ export const InfoBoardCard: React.FC = () => {
                       setFormState((s) => ({ ...s, wifiName: e.target.value }))
                     }
                     placeholder="WLAN-Netzwerkname"
-                    className="aurora-input w-full rounded-2xl px-3.5 py-2 text-xs font-semibold font-mono"
+                    className="surface-input w-full rounded-2xl px-3.5 py-2 text-xs font-semibold font-mono"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="info-wifi-password"
-                    className="block text-[11px] font-bold text-slate-300 mb-1"
+                    className="block text-[11px] font-bold text-[#6B6259] mb-1"
                   >
                     WLAN-Passwort
                   </label>
@@ -312,14 +312,14 @@ export const InfoBoardCard: React.FC = () => {
                       }))
                     }
                     placeholder="Passwort"
-                    className="aurora-input w-full rounded-2xl px-3.5 py-2 text-xs font-semibold font-mono"
+                    className="surface-input w-full rounded-2xl px-3.5 py-2 text-xs font-semibold font-mono"
                   />
                 </div>
 
                 <div className="md:col-span-2">
                   <label
                     htmlFor="info-checkin-code"
-                    className="block text-[11px] font-bold text-slate-300 mb-1"
+                    className="block text-[11px] font-bold text-[#6B6259] mb-1"
                   >
                     Check-in / Schlüsselbox-Code
                   </label>
@@ -331,14 +331,14 @@ export const InfoBoardCard: React.FC = () => {
                       setFormState((s) => ({ ...s, checkinCode: e.target.value }))
                     }
                     placeholder="z. B. Schlüsselbox: 4829# (ab 15:00 Uhr)"
-                    className="aurora-input w-full rounded-2xl px-3.5 py-2 text-xs font-semibold font-mono"
+                    className="surface-input w-full rounded-2xl px-3.5 py-2 text-xs font-semibold font-mono"
                   />
                 </div>
 
                 <div className="md:col-span-2">
                   <label
                     htmlFor="info-emergency-notes"
-                    className="block text-[11px] font-bold text-slate-300 mb-1"
+                    className="block text-[11px] font-bold text-[#6B6259] mb-1"
                   >
                     Notfall &amp; Wichtige Hinweise
                   </label>
@@ -353,7 +353,7 @@ export const InfoBoardCard: React.FC = () => {
                       }))
                     }
                     placeholder="Notruf, Vermieter-Kontakt, nächster Supermarkt, Müllregeln..."
-                    className="aurora-input w-full rounded-2xl px-3.5 py-2.5 text-xs font-medium leading-relaxed resize-y"
+                    className="surface-input w-full rounded-2xl px-3.5 py-2.5 text-xs font-medium leading-relaxed resize-y"
                   />
                 </div>
               </div>
@@ -362,14 +362,14 @@ export const InfoBoardCard: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/[0.08] hover:bg-white/[0.14] text-xs font-bold text-slate-200 border border-white/10 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#F3ECE1] hover:bg-[#E6DDD1] text-xs font-bold text-[#1F1B18] border border-[#DDD2C3] transition-colors cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" />
                   <span>Abbrechen</span>
                 </button>
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-cyan-400 hover:bg-cyan-300 text-xs font-extrabold text-[#0B0E14] shadow-[0_0_16px_rgba(34,211,238,0.28)] transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-xs font-extrabold text-white shadow-sm transition-colors cursor-pointer"
                 >
                   <Check className="w-3.5 h-3.5" />
                   <span>Speichern</span>
@@ -377,14 +377,14 @@ export const InfoBoardCard: React.FC = () => {
               </div>
             </form>
           ) : !hasAnyInfo ? (
-            <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0B0E14]/45 rounded-2xl p-4 mt-2 border border-white/10">
-              <p className="text-xs font-medium text-slate-400">
+            <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FAF7F2] rounded-2xl p-4 mt-2 border border-[#E6DDD1]">
+              <p className="text-xs font-medium text-[#6B6259]">
                 Noch keine Unterkunfts-, WLAN- oder Check-in-Daten hinterlegt.
               </p>
               <button
                 type="button"
                 onClick={handleStartEdit}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-cyan-400 hover:bg-cyan-300 text-[#0B0E14] text-xs font-extrabold self-start sm:self-auto cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-white text-xs font-extrabold self-start sm:self-auto cursor-pointer"
               >
                 <Pencil className="w-3.5 h-3.5" />
                 <span>Infos eintragen</span>
@@ -394,22 +394,22 @@ export const InfoBoardCard: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-3">
               {/* Accommodation Name */}
               {info.accommodationName && (
-                <div className="bg-[#0B0E14]/50 rounded-2xl p-3.5 border border-white/10 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-amber-400/15 border border-amber-400/30 flex items-center justify-center shrink-0 text-amber-300">
+                <div className="bg-[#FAF7F2] rounded-2xl p-3.5 border border-[#E6DDD1] flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-[#D9822B]/14 border border-[#D9822B]/30 flex items-center justify-center shrink-0 text-[#9E5A14]">
                     <Home className="w-4 h-4" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#6B6259] block">
                       Unterkunft
                     </span>
-                    <p className="text-xs font-extrabold text-slate-100 mt-0.5 break-words">
+                    <p className="text-xs font-extrabold text-[#1F1B18] mt-0.5 break-words">
                       {info.accommodationName}
                     </p>
                     {!info.address && (
                       <button
                         type="button"
                         onClick={handleFocusAccommodationOnMap}
-                        className="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-cyan-400/15 hover:bg-cyan-400/25 border border-cyan-400/30 text-[11px] font-bold text-cyan-200 transition-colors cursor-pointer"
+                        className="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#2A7B88]/12 hover:bg-[#2A7B88]/20 border border-[#2A7B88]/30 text-[11px] font-bold text-[#1F5E68] transition-colors cursor-pointer"
                       >
                         <MapIcon className="w-3 h-3" />
                         <span>Auf Karte</span>
@@ -421,31 +421,31 @@ export const InfoBoardCard: React.FC = () => {
 
               {/* Address + Copy + Google Maps + Auf Karte */}
               {info.address && (
-                <div className="bg-[#0B0E14]/50 rounded-2xl p-3.5 border border-white/10 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-cyan-400/15 border border-cyan-400/30 flex items-center justify-center shrink-0 text-cyan-300">
+                <div className="bg-[#FAF7F2] rounded-2xl p-3.5 border border-[#E6DDD1] flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-[#2A7B88]/12 border border-[#2A7B88]/30 flex items-center justify-center shrink-0 text-[#2A7B88]">
                     <MapPin className="w-4 h-4" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#6B6259] block">
                       Adresse
                     </span>
-                    <p className="text-xs font-bold text-slate-100 mt-0.5 break-words">
+                    <p className="text-xs font-bold text-[#1F1B18] mt-0.5 break-words">
                       {info.address}
                     </p>
                     <div className="flex flex-wrap items-center gap-1.5 mt-2">
                       <button
                         type="button"
                         onClick={() => handleCopy('address', 'Adresse', info.address)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/[0.07] hover:bg-white/[0.14] border border-white/10 text-[11px] font-bold text-slate-200 transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#F3ECE1] border border-[#DDD2C3] text-[11px] font-bold text-[#1F1B18] transition-colors cursor-pointer"
                       >
                         {copiedField === 'address' ? (
                           <>
-                            <Check className="w-3 h-3 text-emerald-400" />
-                            <span className="text-emerald-300">Kopiert!</span>
+                            <Check className="w-3 h-3 text-[#4E5F40]" />
+                            <span className="text-[#4E5F40]">Kopiert!</span>
                           </>
                         ) : (
                           <>
-                            <Copy className="w-3 h-3 text-cyan-300" />
+                            <Copy className="w-3 h-3 text-[#2A7B88]" />
                             <span>Kopieren</span>
                           </>
                         )}
@@ -454,7 +454,7 @@ export const InfoBoardCard: React.FC = () => {
                       <button
                         type="button"
                         onClick={handleFocusAccommodationOnMap}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-cyan-400/15 hover:bg-cyan-400/25 border border-cyan-400/30 text-[11px] font-bold text-cyan-200 transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#2A7B88]/12 hover:bg-[#2A7B88]/20 border border-[#2A7B88]/30 text-[11px] font-bold text-[#1F5E68] transition-colors cursor-pointer"
                       >
                         <MapIcon className="w-3 h-3" />
                         <span>Auf Karte</span>
@@ -465,7 +465,7 @@ export const InfoBoardCard: React.FC = () => {
                           href={addressMapsUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-400/15 hover:bg-emerald-400/25 border border-emerald-400/30 text-[11px] font-bold text-emerald-200 transition-colors"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#6E7F5E]/14 hover:bg-[#6E7F5E]/22 border border-[#6E7F5E]/30 text-[11px] font-bold text-[#4E5F40] transition-colors"
                         >
                           <span>Maps</span>
                           <ExternalLink className="w-3 h-3" />
@@ -478,18 +478,18 @@ export const InfoBoardCard: React.FC = () => {
 
               {/* WiFi Name & Password + Copy Buttons for BOTH */}
               {(info.wifiName || info.wifiPassword) && (
-                <div className="bg-[#0B0E14]/50 rounded-2xl p-3.5 border border-white/10 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-400/15 border border-emerald-400/30 flex items-center justify-center shrink-0 text-emerald-300">
+                <div className="bg-[#FAF7F2] rounded-2xl p-3.5 border border-[#E6DDD1] flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-[#6E7F5E]/14 border border-[#6E7F5E]/30 flex items-center justify-center shrink-0 text-[#4E5F40]">
                     <Wifi className="w-4 h-4" />
                   </div>
                   <div className="min-w-0 flex-1 space-y-2">
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#6B6259] block">
                       WLAN &amp; Passwort
                     </span>
 
                     {info.wifiName && (
                       <div className="flex flex-wrap items-center justify-between gap-1.5">
-                        <code className="font-mono tabular-nums text-xs font-bold text-slate-100 break-all">
+                        <code className="font-mono tabular-nums text-xs font-bold text-[#1F1B18] break-all">
                           {info.wifiName}
                         </code>
                         <button
@@ -497,16 +497,16 @@ export const InfoBoardCard: React.FC = () => {
                           onClick={() =>
                             handleCopy('wifiName', 'WLAN-Name', info.wifiName)
                           }
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/[0.07] hover:bg-white/[0.14] border border-white/10 text-[10px] font-bold text-slate-200 transition-colors cursor-pointer shrink-0"
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white hover:bg-[#F3ECE1] border border-[#DDD2C3] text-[10px] font-bold text-[#1F1B18] transition-colors cursor-pointer shrink-0"
                         >
                           {copiedField === 'wifiName' ? (
                             <>
-                              <Check className="w-3 h-3 text-emerald-400" />
-                              <span className="text-emerald-300">Kopiert!</span>
+                              <Check className="w-3 h-3 text-[#4E5F40]" />
+                              <span className="text-[#4E5F40]">Kopiert!</span>
                             </>
                           ) : (
                             <>
-                              <Copy className="w-3 h-3 text-cyan-300" />
+                              <Copy className="w-3 h-3 text-[#2A7B88]" />
                               <span>SSID</span>
                             </>
                           )}
@@ -516,7 +516,7 @@ export const InfoBoardCard: React.FC = () => {
 
                     {info.wifiPassword && (
                       <div className="flex flex-wrap items-center justify-between gap-1.5">
-                        <code className="font-mono tabular-nums text-[11px] font-bold bg-[#1B2232] border border-white/10 px-2 py-0.5 rounded-lg text-cyan-200 break-all">
+                        <code className="font-mono tabular-nums text-[11px] font-bold bg-[#F3ECE1] border border-[#DDD2C3] px-2 py-0.5 rounded-lg text-[#1F5E68] break-all">
                           {info.wifiPassword}
                         </code>
                         <button
@@ -528,16 +528,16 @@ export const InfoBoardCard: React.FC = () => {
                               info.wifiPassword
                             )
                           }
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/[0.07] hover:bg-white/[0.14] border border-white/10 text-[10px] font-bold text-slate-200 transition-colors cursor-pointer shrink-0"
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white hover:bg-[#F3ECE1] border border-[#DDD2C3] text-[10px] font-bold text-[#1F1B18] transition-colors cursor-pointer shrink-0"
                         >
                           {copiedField === 'wifiPassword' ? (
                             <>
-                              <Check className="w-3 h-3 text-emerald-400" />
-                              <span className="text-emerald-300">Kopiert!</span>
+                              <Check className="w-3 h-3 text-[#4E5F40]" />
+                              <span className="text-[#4E5F40]">Kopiert!</span>
                             </>
                           ) : (
                             <>
-                              <Copy className="w-3 h-3 text-emerald-300" />
+                              <Copy className="w-3 h-3 text-[#4E5F40]" />
                               <span>Passwort</span>
                             </>
                           )}
@@ -550,15 +550,15 @@ export const InfoBoardCard: React.FC = () => {
 
               {/* Check-in / Keybox Code + Copy */}
               {info.checkinCode && (
-                <div className="bg-[#0B0E14]/50 rounded-2xl p-3.5 border border-white/10 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-violet-400/15 border border-violet-400/30 flex items-center justify-center shrink-0 text-violet-300">
+                <div className="bg-[#FAF7F2] rounded-2xl p-3.5 border border-[#E6DDD1] flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-[#C85A38]/12 border border-[#C85A38]/30 flex items-center justify-center shrink-0 text-[#9E3F22]">
                     <KeyRound className="w-4 h-4" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#6B6259] block">
                       Check-in &amp; Schlüssel
                     </span>
-                    <p className="font-mono tabular-nums text-xs font-bold text-slate-100 mt-0.5 break-words">
+                    <p className="font-mono tabular-nums text-xs font-bold text-[#1F1B18] mt-0.5 break-words">
                       {info.checkinCode}
                     </p>
                     <button
@@ -566,16 +566,16 @@ export const InfoBoardCard: React.FC = () => {
                       onClick={() =>
                         handleCopy('checkin', 'Check-in-Code', info.checkinCode)
                       }
-                      className="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/[0.07] hover:bg-white/[0.14] border border-white/10 text-[11px] font-bold text-slate-200 transition-colors cursor-pointer"
+                      className="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#F3ECE1] border border-[#DDD2C3] text-[11px] font-bold text-[#1F1B18] transition-colors cursor-pointer"
                     >
                       {copiedField === 'checkin' ? (
                         <>
-                          <Check className="w-3 h-3 text-emerald-400" />
-                          <span className="text-emerald-300">Kopiert!</span>
+                          <Check className="w-3 h-3 text-[#4E5F40]" />
+                          <span className="text-[#4E5F40]">Kopiert!</span>
                         </>
                       ) : (
                         <>
-                          <Copy className="w-3 h-3 text-violet-300" />
+                          <Copy className="w-3 h-3 text-[#C85A38]" />
                           <span>Code kopieren</span>
                         </>
                       )}
@@ -586,15 +586,15 @@ export const InfoBoardCard: React.FC = () => {
 
               {/* Emergency / Notes (multiline support) */}
               {info.emergencyNotes && (
-                <div className="bg-[#0B0E14]/50 rounded-2xl p-3.5 border border-amber-400/20 flex items-start gap-3 md:col-span-2">
-                  <div className="w-8 h-8 rounded-xl bg-amber-400/15 border border-amber-400/30 flex items-center justify-center shrink-0 text-amber-300">
+                <div className="bg-[#FAF7F2] rounded-2xl p-3.5 border border-[#D9822B]/30 flex items-start gap-3 md:col-span-2">
+                  <div className="w-8 h-8 rounded-xl bg-[#D9822B]/14 border border-[#D9822B]/30 flex items-center justify-center shrink-0 text-[#9E5A14]">
                     <AlertCircle className="w-4 h-4" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-300/90 block">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#9E5A14] block">
                       Notfall &amp; Wichtige Hinweise
                     </span>
-                    <p className="text-xs font-medium text-slate-200 mt-1 break-words whitespace-pre-line leading-relaxed">
+                    <p className="text-xs font-medium text-[#1F1B18] mt-1 break-words whitespace-pre-line leading-relaxed">
                       {info.emergencyNotes}
                     </p>
                   </div>

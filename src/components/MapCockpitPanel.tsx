@@ -69,33 +69,33 @@ const KIND_STYLE: Record<
   { color: string; glow: string; badgeBg: string; label: string }
 > = {
   activity: {
-    color: '#22D3EE',
-    glow: 'rgba(34, 211, 238, 0.55)',
-    badgeBg: 'bg-cyan-400/15 text-cyan-300 border-cyan-400/30',
+    color: '#C85A38',
+    glow: 'rgba(200, 90, 56, 0.25)',
+    badgeBg: 'bg-[#C85A38]/12 text-[#9E3F22] border-[#C85A38]/30',
     label: 'Aktivität',
   },
   meal: {
-    color: '#34D399',
-    glow: 'rgba(52, 211, 153, 0.55)',
-    badgeBg: 'bg-emerald-400/15 text-emerald-300 border-emerald-400/30',
+    color: '#4E5F40',
+    glow: 'rgba(110, 127, 94, 0.28)',
+    badgeBg: 'bg-[#6E7F5E]/14 text-[#4E5F40] border-[#6E7F5E]/30',
     label: 'Essen',
   },
   idea: {
-    color: '#A78BFA',
-    glow: 'rgba(167, 139, 250, 0.55)',
-    badgeBg: 'bg-violet-400/15 text-violet-300 border-violet-400/30',
+    color: '#D9822B',
+    glow: 'rgba(217, 130, 43, 0.28)',
+    badgeBg: 'bg-[#D9822B]/14 text-[#9E5A14] border-[#D9822B]/30',
     label: 'Idee',
   },
   accommodation: {
-    color: '#FBBF24',
-    glow: 'rgba(251, 191, 36, 0.55)',
-    badgeBg: 'bg-amber-400/15 text-amber-300 border-amber-400/30',
+    color: '#2A7B88',
+    glow: 'rgba(42, 123, 136, 0.28)',
+    badgeBg: 'bg-[#2A7B88]/12 text-[#1F5E68] border-[#2A7B88]/30',
     label: 'Unterkunft',
   },
   place: {
-    color: '#38BDF8',
-    glow: 'rgba(56, 189, 248, 0.55)',
-    badgeBg: 'bg-sky-400/15 text-sky-300 border-sky-400/30',
+    color: '#2A7B88',
+    glow: 'rgba(42, 123, 136, 0.28)',
+    badgeBg: 'bg-[#2A7B88]/12 text-[#1F5E68] border-[#2A7B88]/30',
     label: 'Ort',
   },
 };
@@ -413,7 +413,7 @@ export const MapCockpitPanel: React.FC = () => {
 
     const markersLayer = L.layerGroup().addTo(map);
     const routeLayer = L.polyline([], {
-      color: '#22D3EE',
+      color: '#C85A38',
       weight: 2.5,
       opacity: 0.85,
       dashArray: '7 7',
@@ -450,7 +450,7 @@ export const MapCockpitPanel: React.FC = () => {
     };
   }, []);
 
-  // Manage tile layer & automatic fallback (Carto dark_all -> OSM -> Offline Spatial)
+  // Manage tile layer & automatic fallback (Carto Voyager -> OSM -> Offline Spatial)
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
@@ -469,7 +469,7 @@ export const MapCockpitPanel: React.FC = () => {
 
     const url =
       tileMode === 'carto'
-        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
         : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
     const attribution =
@@ -538,11 +538,11 @@ export const MapCockpitPanel: React.FC = () => {
 
       const size = isSelected ? 36 : 30;
       const ringShadow = isSelected
-        ? `0 0 0 4px rgba(255,255,255,0.28), 0 0 22px ${style.glow}`
-        : `0 4px 14px rgba(0,0,0,0.65), 0 0 12px ${style.glow}`;
+        ? `0 0 0 4px rgba(255,255,255,0.85), 0 6px 18px ${style.glow}`
+        : `0 3px 10px rgba(31,27,24,0.22), 0 0 8px ${style.glow}`;
 
       const icon = L.divIcon({
-        className: 'aurora-map-marker',
+        className: 'map-pin-marker',
         iconSize: [size, size],
         iconAnchor: [size / 2, size / 2],
         popupAnchor: [0, -size / 2],
@@ -550,7 +550,7 @@ export const MapCockpitPanel: React.FC = () => {
           width:${size}px;
           height:${size}px;
           border-radius:9999px;
-          background:#0B0E14;
+          background:#FAF7F2;
           border:2.5px solid ${style.color};
           color:${style.color};
           display:flex;
@@ -586,10 +586,10 @@ export const MapCockpitPanel: React.FC = () => {
           <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:${style.color};margin-bottom:3px;">
             ${safeMeta}
           </div>
-          <div style="font-size:13px;font-weight:800;color:#F8FAFC;line-height:1.3;">
+          <div style="font-size:13px;font-weight:800;color:#1F1B18;line-height:1.3;">
             ${safeTitle}
           </div>
-          <div style="font-size:11px;color:#94A3B8;margin-top:4px;line-height:1.35;">
+          <div style="font-size:11px;color:#6B6259;margin-top:4px;line-height:1.35;">
             ${safeLoc}
           </div>
         </div>`
@@ -731,15 +731,15 @@ export const MapCockpitPanel: React.FC = () => {
   const renderKindIcon = (kind: MapFocusTarget['kind']) => {
     switch (kind) {
       case 'accommodation':
-        return <Home className="w-3.5 h-3.5 text-amber-300" />;
+        return <Home className="w-3.5 h-3.5 text-[#1F5E68]" />;
       case 'meal':
-        return <UtensilsCrossed className="w-3.5 h-3.5 text-emerald-300" />;
+        return <UtensilsCrossed className="w-3.5 h-3.5 text-[#4E5F40]" />;
       case 'idea':
-        return <Lightbulb className="w-3.5 h-3.5 text-violet-300" />;
+        return <Lightbulb className="w-3.5 h-3.5 text-[#9E5A14]" />;
       case 'activity':
-        return <Compass className="w-3.5 h-3.5 text-cyan-300" />;
+        return <Compass className="w-3.5 h-3.5 text-[#9E3F22]" />;
       default:
-        return <MapPin className="w-3.5 h-3.5 text-sky-300" />;
+        return <MapPin className="w-3.5 h-3.5 text-[#1F5E68]" />;
     }
   };
 
@@ -748,24 +748,24 @@ export const MapCockpitPanel: React.FC = () => {
   return (
     <aside
       aria-label="Karten-Cockpit"
-      className="aurora-glass-elevated rounded-[28px] flex flex-col h-full w-full overflow-hidden border border-cyan-400/20 shadow-[0_24px_60px_rgba(0,0,0,0.65)]"
+      className="surface-glass-elevated rounded-[28px] flex flex-col h-full w-full overflow-hidden border border-[#DDD2C3] shadow-xl"
     >
       {/* Top Cockpit Header */}
-      <div className="px-4 py-3.5 border-b border-white/10 flex items-center justify-between gap-2 bg-[#0B0E14]/55">
+      <div className="px-4 py-3.5 border-b border-[#E6DDD1] flex items-center justify-between gap-2 bg-[#FAF7F2]">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-cyan-400/15 border border-cyan-400/35 text-cyan-300 flex items-center justify-center shrink-0 shadow-[0_0_14px_rgba(34,211,238,0.22)]">
+          <div className="w-8 h-8 rounded-xl bg-[#2A7B88]/12 border border-[#2A7B88]/30 text-[#1F5E68] flex items-center justify-center shrink-0">
             <MapIcon className="w-4 h-4" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <h2 className="text-sm font-extrabold text-slate-100 truncate">
+              <h2 className="text-sm font-extrabold text-[#1F1B18] truncate">
                 Map-Cockpit
               </h2>
-              <span className="font-mono tabular-nums text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-400/15 text-cyan-300 border border-cyan-400/25 shrink-0">
+              <span className="font-mono tabular-nums text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#2A7B88]/12 text-[#1F5E68] border border-[#2A7B88]/25 shrink-0">
                 {plottedPins.length} Pins
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 truncate">
+            <p className="text-[11px] text-[#6B6259] truncate">
               {dayScope === 'day'
                 ? `Tag ${selectedDay} · ${formatTripDayDate(trip.startDate, selectedDay)}`
                 : `Alle ${totalDays} Tage · ${trip.destination}`}
@@ -779,7 +779,7 @@ export const MapCockpitPanel: React.FC = () => {
             onClick={handleFitAllPins}
             disabled={plottedPins.length === 0}
             title="Auf alle Pins zoomen"
-            className="w-8 h-8 rounded-full bg-white/[0.06] hover:bg-white/[0.14] disabled:opacity-35 border border-white/10 text-slate-300 hover:text-cyan-300 flex items-center justify-center transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-full bg-white hover:bg-[#F3ECE1] disabled:opacity-35 border border-[#DDD2C3] text-[#6B6259] hover:text-[#2A7B88] flex items-center justify-center transition-colors cursor-pointer"
           >
             <Crosshair className="w-3.5 h-3.5" />
           </button>
@@ -791,7 +791,7 @@ export const MapCockpitPanel: React.FC = () => {
             }}
             title="Karte schließen"
             aria-label="Karte schließen"
-            className="w-8 h-8 rounded-full bg-white/[0.06] hover:bg-rose-500/20 border border-white/10 hover:border-rose-400/40 text-slate-300 hover:text-rose-200 flex items-center justify-center transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-full bg-white hover:bg-rose-500/12 border border-[#DDD2C3] hover:border-rose-500/35 text-[#6B6259] hover:text-rose-700 flex items-center justify-center transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -799,16 +799,16 @@ export const MapCockpitPanel: React.FC = () => {
       </div>
 
       {/* Controls: Day Scope + Day Switcher + Filter Pills */}
-      <div className="px-4 py-2.5 border-b border-white/10 space-y-2 bg-[#131823]/75">
+      <div className="px-4 py-2.5 border-b border-[#E6DDD1] space-y-2 bg-white/75">
         <div className="flex items-center justify-between gap-2">
-          <div className="inline-flex items-center rounded-full bg-[#0B0E14]/80 p-0.5 border border-white/10">
+          <div className="inline-flex items-center rounded-full bg-[#F3ECE1] p-0.5 border border-[#DDD2C3]">
             <button
               type="button"
               onClick={() => setDayScope('day')}
               className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors cursor-pointer ${
                 dayScope === 'day'
-                  ? 'bg-cyan-400 text-[#0B0E14]'
-                  : 'text-slate-400 hover:text-slate-100'
+                  ? 'bg-[#C85A38] text-white'
+                  : 'text-[#6B6259] hover:text-[#1F1B18]'
               }`}
             >
               Tag {selectedDay}
@@ -818,8 +818,8 @@ export const MapCockpitPanel: React.FC = () => {
               onClick={() => setDayScope('all')}
               className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors cursor-pointer ${
                 dayScope === 'all'
-                  ? 'bg-cyan-400 text-[#0B0E14]'
-                  : 'text-slate-400 hover:text-slate-100'
+                  ? 'bg-[#C85A38] text-white'
+                  : 'text-[#6B6259] hover:text-[#1F1B18]'
               }`}
             >
               Alle Tage
@@ -833,11 +833,11 @@ export const MapCockpitPanel: React.FC = () => {
                 onClick={() => setSelectedDay(Math.max(1, selectedDay - 1))}
                 disabled={selectedDay <= 1}
                 aria-label="Vorheriger Tag"
-                className="w-7 h-7 rounded-full bg-white/[0.06] hover:bg-white/[0.14] disabled:opacity-30 border border-white/10 text-slate-200 flex items-center justify-center transition-colors cursor-pointer"
+                className="w-7 h-7 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] disabled:opacity-30 border border-[#DDD2C3] text-[#1F1B18] flex items-center justify-center transition-colors cursor-pointer"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
-              <span className="font-mono tabular-nums text-xs font-bold text-slate-200 px-1.5">
+              <span className="font-mono tabular-nums text-xs font-bold text-[#1F1B18] px-1.5">
                 {selectedDay}/{totalDays}
               </span>
               <button
@@ -845,7 +845,7 @@ export const MapCockpitPanel: React.FC = () => {
                 onClick={() => setSelectedDay(Math.min(totalDays, selectedDay + 1))}
                 disabled={selectedDay >= totalDays}
                 aria-label="Nächster Tag"
-                className="w-7 h-7 rounded-full bg-white/[0.06] hover:bg-white/[0.14] disabled:opacity-30 border border-white/10 text-slate-200 flex items-center justify-center transition-colors cursor-pointer"
+                className="w-7 h-7 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] disabled:opacity-30 border border-[#DDD2C3] text-[#1F1B18] flex items-center justify-center transition-colors cursor-pointer"
               >
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
@@ -864,8 +864,8 @@ export const MapCockpitPanel: React.FC = () => {
                 onClick={() => setFilter(opt.id)}
                 className={`px-2.5 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer border ${
                   active
-                    ? 'bg-white/[0.14] text-cyan-300 border-cyan-400/40 shadow-[0_0_12px_rgba(34,211,238,0.16)]'
-                    : 'bg-white/[0.03] text-slate-400 border-white/10 hover:text-slate-200 hover:bg-white/[0.08]'
+                    ? 'bg-[#C85A38]/12 text-[#9E3F22] border-[#C85A38]/35'
+                    : 'bg-[#FAF7F2] text-[#6B6259] border-[#E6DDD1] hover:text-[#1F1B18] hover:bg-[#F3ECE1]'
                 }`}
               >
                 {opt.label}
@@ -876,41 +876,36 @@ export const MapCockpitPanel: React.FC = () => {
       </div>
 
       {/* Leaflet Interactive Map Canvas */}
-      <div className="relative w-full h-[270px] sm:h-[300px] lg:h-[320px] shrink-0 bg-[#0B0E14] overflow-hidden border-b border-white/10">
-        {/* Subtle Dark Spatial Grid behind/under tiles */}
+      <div className="relative w-full h-[270px] sm:h-[300px] lg:h-[320px] shrink-0 bg-[#F3ECE1] overflow-hidden border-b border-[#E6DDD1]">
+        {/* Subtle Warm Spatial Grid behind/under tiles */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-35"
+          className="absolute inset-0 pointer-events-none opacity-60"
           style={{
             backgroundImage:
-              'linear-gradient(to right, rgba(34,211,238,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(34,211,238,0.08) 1px, transparent 1px)',
+              'linear-gradient(to right, rgba(200,90,56,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(200,90,56,0.08) 1px, transparent 1px)',
             backgroundSize: '28px 28px',
           }}
         />
 
-        <div
-          ref={mapContainerRef}
-          className={`w-full h-full z-0 ${
-            tileMode === 'osm' ? 'leaflet-tiles-aurora-dark' : ''
-          }`}
-        />
+        <div ref={mapContainerRef} className="w-full h-full z-0" />
 
         {/* Geocoding Progress Pill */}
         {isGeocoding && (
-          <div className="absolute top-3 left-3 z-[450] inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#0B0E14]/90 backdrop-blur-md border border-cyan-400/30 text-[11px] font-semibold text-cyan-300 shadow-lg">
+          <div className="absolute top-3 left-3 z-[450] inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.95] backdrop-blur-md border border-[#DDD2C3] text-[11px] font-semibold text-[#1F5E68] shadow-md">
             <Loader2 className="w-3 h-3 animate-spin" />
             <span>Orte werden verortet…</span>
           </div>
         )}
 
-        {/* Offline Dark Spatial Overlay Badge */}
+        {/* Offline Warm Spatial Overlay Badge */}
         {tileMode === 'offline' && (
-          <div className="absolute top-3 right-3 z-[450] flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#131823]/92 backdrop-blur-md border border-amber-400/35 text-[11px] font-bold text-amber-300 shadow-lg">
+          <div className="absolute top-3 right-3 z-[450] flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/[0.96] backdrop-blur-md border border-[#D9822B]/40 text-[11px] font-bold text-[#9E5A14] shadow-md">
             <WifiOff className="w-3 h-3" />
-            <span>Dark-Spatial-Modus</span>
+            <span>Offline-Kartenmodus</span>
             <button
               type="button"
               onClick={() => setTileMode('carto')}
-              className="underline text-cyan-300 hover:text-cyan-200 cursor-pointer"
+              className="underline text-[#2A7B88] hover:text-[#1F5E68] cursor-pointer"
             >
               Tiles neu laden
             </button>
@@ -919,14 +914,14 @@ export const MapCockpitPanel: React.FC = () => {
 
         {/* Empty Spatial Overlay when no pins have coordinates */}
         {plottedPins.length === 0 && !isGeocoding && (
-          <div className="absolute inset-0 z-[420] flex flex-col items-center justify-center p-5 text-center bg-[#0B0E14]/60 backdrop-blur-[2px] pointer-events-auto">
-            <div className="w-11 h-11 rounded-2xl bg-cyan-400/15 border border-cyan-400/30 text-cyan-300 flex items-center justify-center mb-2.5">
+          <div className="absolute inset-0 z-[420] flex flex-col items-center justify-center p-5 text-center bg-[#F3ECE1]/80 backdrop-blur-[2px] pointer-events-auto">
+            <div className="w-11 h-11 rounded-2xl bg-[#2A7B88]/12 border border-[#2A7B88]/30 text-[#1F5E68] flex items-center justify-center mb-2.5">
               <Sparkles className="w-5 h-5" />
             </div>
-            <p className="text-xs font-extrabold text-slate-100">
+            <p className="text-xs font-extrabold text-[#1F1B18]">
               Noch keine verorteten Orte für diesen Filter
             </p>
-            <p className="text-[11px] text-slate-400 mt-1 max-w-[240px] leading-relaxed">
+            <p className="text-[11px] text-[#6B6259] mt-1 max-w-[240px] leading-relaxed">
               Trage konkrete Ortsnamen oder Adressen ein, damit Pins automatisch auf der
               Karte erscheinen.
             </p>
@@ -934,7 +929,7 @@ export const MapCockpitPanel: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setFilter('all')}
-                className="mt-3 px-3.5 py-1.5 rounded-full bg-cyan-400/20 hover:bg-cyan-400/30 border border-cyan-400/35 text-cyan-200 text-[11px] font-bold transition-colors cursor-pointer"
+                className="mt-3 px-3.5 py-1.5 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-white text-[11px] font-bold transition-colors cursor-pointer"
               >
                 Alle Kategorien anzeigen
               </button>
@@ -944,9 +939,9 @@ export const MapCockpitPanel: React.FC = () => {
       </div>
 
       {/* Waypoint List + 1-Click Day Route Action */}
-      <div className="flex-1 min-h-0 flex flex-col bg-[#0B0E14]/45">
-        <div className="px-4 py-2.5 border-b border-white/10 flex items-center justify-between gap-2">
-          <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
+      <div className="flex-1 min-h-0 flex flex-col bg-[#FAF7F2]/80">
+        <div className="px-4 py-2.5 border-b border-[#E6DDD1] flex items-center justify-between gap-2">
+          <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#6B6259]">
             Stationen ({allPins.length})
           </span>
           {dayRouteUrl ? (
@@ -954,14 +949,14 @@ export const MapCockpitPanel: React.FC = () => {
               href={dayRouteUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-400/15 hover:bg-emerald-400/25 border border-emerald-400/35 text-emerald-300 text-[11px] font-extrabold transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#6E7F5E]/14 hover:bg-[#6E7F5E]/22 border border-[#6E7F5E]/30 text-[#4E5F40] text-[11px] font-extrabold transition-colors"
             >
               <Navigation className="w-3 h-3" />
               <span>1-Klick Tagesroute</span>
               <ExternalLink className="w-2.5 h-2.5" />
             </a>
           ) : (
-            <span className="text-[11px] text-slate-500">
+            <span className="text-[11px] text-[#8C8277]">
               Route ab 1 konkretem Ort
             </span>
           )}
@@ -969,7 +964,7 @@ export const MapCockpitPanel: React.FC = () => {
 
         <div className="flex-1 overflow-y-auto p-3 space-y-2">
           {allPins.length === 0 ? (
-            <p className="text-xs text-slate-400 text-center py-6">
+            <p className="text-xs text-[#6B6259] text-center py-6">
               Keine Einträge für diese Auswahl gefunden.
             </p>
           ) : (
@@ -984,8 +979,8 @@ export const MapCockpitPanel: React.FC = () => {
                   key={pin.pinKey}
                   className={`rounded-2xl p-2.5 border transition-all ${
                     isSelected
-                      ? 'bg-[#1B2232]/95 border-cyan-400/45 shadow-[0_0_20px_rgba(34,211,238,0.14)]'
-                      : 'bg-white/[0.04] hover:bg-white/[0.08] border-white/10'
+                      ? 'bg-white border-[#C85A38]/45 shadow-sm'
+                      : 'bg-white/75 hover:bg-white border-[#E6DDD1]'
                   }`}
                 >
                   <div className="flex items-start gap-2.5">
@@ -995,9 +990,8 @@ export const MapCockpitPanel: React.FC = () => {
                       className="flex items-start gap-2.5 flex-1 min-w-0 text-left cursor-pointer"
                     >
                       <div
-                        className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 font-mono tabular-nums text-[11px] font-extrabold border mt-0.5"
+                        className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 font-mono tabular-nums text-[11px] font-extrabold border mt-0.5 bg-[#FAF7F2]"
                         style={{
-                          backgroundColor: '#0B0E14',
                           borderColor: style.color,
                           color: style.color,
                         }}
@@ -1017,20 +1011,20 @@ export const MapCockpitPanel: React.FC = () => {
                             <span>{style.label}</span>
                           </span>
                           {pin.time && (
-                            <span className="font-mono tabular-nums text-[10px] font-semibold text-slate-300">
+                            <span className="font-mono tabular-nums text-[10px] font-semibold text-[#1F1B18]">
                               {pin.time}
                             </span>
                           )}
                           {dayScope === 'all' && pin.dayNumber && (
-                            <span className="font-mono tabular-nums text-[10px] text-slate-400">
+                            <span className="font-mono tabular-nums text-[10px] text-[#6B6259]">
                               Tag {pin.dayNumber}
                             </span>
                           )}
                         </div>
-                        <p className="text-xs font-bold text-slate-100 truncate mt-1">
+                        <p className="text-xs font-bold text-[#1F1B18] truncate mt-1">
                           {pin.title}
                         </p>
-                        <p className="text-[11px] text-slate-400 truncate">
+                        <p className="text-[11px] text-[#6B6259] truncate">
                           {pin.location || 'Kein konkreter Ort'}
                           {!coords && !isGenericLocation(pin.location) && !isGeocoding
                             ? ' · offline/ungeprüft'
@@ -1046,7 +1040,7 @@ export const MapCockpitPanel: React.FC = () => {
                           target="_blank"
                           rel="noopener noreferrer"
                           title="In Google Maps öffnen"
-                          className="w-7 h-7 rounded-full bg-white/[0.06] hover:bg-white/[0.14] border border-white/10 text-slate-300 hover:text-emerald-300 flex items-center justify-center transition-colors"
+                          className="w-7 h-7 rounded-full bg-[#FAF7F2] hover:bg-[#6E7F5E]/15 border border-[#DDD2C3] text-[#6B6259] hover:text-[#4E5F40] flex items-center justify-center transition-colors"
                         >
                           <ExternalLink className="w-3 h-3" />
                         </a>
@@ -1056,7 +1050,7 @@ export const MapCockpitPanel: React.FC = () => {
                           type="button"
                           onClick={() => handleOpenInTab(pin)}
                           title="In Planungsansicht öffnen"
-                          className="w-7 h-7 rounded-full bg-white/[0.06] hover:bg-cyan-400/20 border border-white/10 hover:border-cyan-400/40 text-slate-300 hover:text-cyan-200 flex items-center justify-center transition-colors cursor-pointer"
+                          className="w-7 h-7 rounded-full bg-[#FAF7F2] hover:bg-[#2A7B88]/15 border border-[#DDD2C3] hover:border-[#2A7B88]/40 text-[#6B6259] hover:text-[#1F5E68] flex items-center justify-center transition-colors cursor-pointer"
                         >
                           <ArrowUpRight className="w-3.5 h-3.5" />
                         </button>

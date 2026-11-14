@@ -391,23 +391,23 @@ export const IdeasPoolView: React.FC = () => {
     switch (priority) {
       case 'must_do':
         return (
-          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold px-3 py-1 rounded-full bg-amber-400/15 text-amber-300 border border-amber-400/30">
-            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold px-3 py-1 rounded-full bg-[#D9822B]/14 text-[#9E5A14] border border-[#D9822B]/30">
+            <Star className="w-3 h-3 fill-[#D9822B] text-[#D9822B]" />
             Must-Do
           </span>
         );
       case 'nice_to_have':
         return (
-          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold px-3 py-1 rounded-full bg-emerald-400/15 text-emerald-300 border border-emerald-400/30">
-            <Sparkles className="w-3 h-3 text-emerald-400" />
+          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold px-3 py-1 rounded-full bg-[#6E7F5E]/14 text-[#4B593E] border border-[#6E7F5E]/30">
+            <Sparkles className="w-3 h-3 text-[#6E7F5E]" />
             Nice to have
           </span>
         );
       case 'chill':
       default:
         return (
-          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold px-3 py-1 rounded-full bg-violet-400/15 text-violet-300 border border-violet-400/30">
-            <Coffee className="w-3 h-3 text-violet-400" />
+          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold px-3 py-1 rounded-full bg-[#2A7B88]/12 text-[#1F5E68] border border-[#2A7B88]/30">
+            <Coffee className="w-3 h-3 text-[#2A7B88]" />
             Entspannt
           </span>
         );
@@ -417,37 +417,34 @@ export const IdeasPoolView: React.FC = () => {
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'beach':
-        return <Palmtree className="w-4 h-4 text-cyan-400" />;
+        return <Palmtree className="w-4 h-4 text-[#2A7B88]" />;
       case 'food':
-        return <Utensils className="w-4 h-4 text-amber-400" />;
+        return <Utensils className="w-4 h-4 text-[#D9822B]" />;
       case 'culture':
-        return <Compass className="w-4 h-4 text-violet-400" />;
+        return <Compass className="w-4 h-4 text-[#C85A38]" />;
       case 'transport':
-        return <Car className="w-4 h-4 text-emerald-400" />;
+        return <Car className="w-4 h-4 text-[#6E7F5E]" />;
       case 'nightlife':
-        return <PartyPopper className="w-4 h-4 text-pink-400" />;
+        return <PartyPopper className="w-4 h-4 text-[#C85A38]" />;
       default:
-        return <Lightbulb className="w-4 h-4 text-amber-300" />;
+        return <Lightbulb className="w-4 h-4 text-[#D9822B]" />;
     }
   };
 
   return (
     <div className="space-y-6">
-      {/* AURORA HERO HEADER */}
-      <div className="relative overflow-hidden rounded-[28px] p-6 md:p-8 aurora-glass-elevated">
-        <div className="absolute -top-12 -right-12 w-56 h-56 bg-cyan-400/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-12 right-36 w-52 h-52 bg-violet-500/15 rounded-full blur-3xl pointer-events-none" />
-
+      {/* HERO HEADER */}
+      <div className="relative overflow-hidden rounded-[28px] p-6 md:p-8 surface-glass-elevated">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-300 text-xs font-bold mb-2.5">
-              <Lightbulb className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D9822B]/14 border border-[#D9822B]/30 text-[#9E5A14] text-xs font-bold mb-2.5">
+              <Lightbulb className="w-3.5 h-3.5 fill-[#D9822B] text-[#D9822B]" />
               <span>Brainstorming & Ideen-Pool</span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-black text-slate-100 tracking-tight">
+            <h1 className="text-2xl md:text-3xl font-black text-[#1F1B18] tracking-tight">
               Vorschläge & Ideen der Gruppe
             </h1>
-            <p className="text-sm text-slate-400 mt-1.5 max-w-2xl leading-relaxed">
+            <p className="text-sm text-[#6B6259] mt-1.5 max-w-2xl leading-relaxed">
               Sammelt Spots, Aktivitäten & Erlebnisse – stimmt gemeinsam ab und zieht eure
               Favoriten per Drag & Drop oder Klick direkt in einen Reisetag.
             </p>
@@ -459,7 +456,7 @@ export const IdeasPoolView: React.FC = () => {
               resetIdeaForm();
               setIsAddIdeaOpen(true);
             }}
-            className="self-start md:self-center px-6 py-3 rounded-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-extrabold text-sm shadow-[0_0_24px_rgba(34,211,238,0.28)] flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer whitespace-nowrap"
+            className="self-start md:self-center px-6 py-3 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-white font-extrabold text-sm shadow-sm flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer whitespace-nowrap"
           >
             <Plus className="w-4 h-4" />
             <span>Idee vorschlagen</span>
@@ -467,9 +464,9 @@ export const IdeasPoolView: React.FC = () => {
         </div>
 
         {/* TRAVELER FILTER TABS */}
-        <div className="relative z-10 mt-6 pt-5 border-t border-white/10 flex flex-wrap items-center gap-2">
-          <span className="text-xs font-bold text-slate-400 mr-1 flex items-center gap-1.5">
-            <Filter className="w-3.5 h-3.5 text-cyan-400" /> Nach Person:
+        <div className="relative z-10 mt-6 pt-5 border-t border-[#E6DDD1] flex flex-wrap items-center gap-2">
+          <span className="text-xs font-bold text-[#6B6259] mr-1 flex items-center gap-1.5">
+            <Filter className="w-3.5 h-3.5 text-[#C85A38]" /> Nach Person:
           </span>
 
           <button
@@ -477,8 +474,8 @@ export const IdeasPoolView: React.FC = () => {
             onClick={() => setSelectedTravelerFilter('all')}
             className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
               selectedTravelerFilter === 'all'
-                ? 'bg-cyan-400 text-slate-950 shadow-[0_0_16px_rgba(34,211,238,0.3)]'
-                : 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10'
+                ? 'bg-[#C85A38] text-white shadow-sm'
+                : 'bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#6B6259] border border-[#E6DDD1]'
             }`}
           >
             Alle Personen (
@@ -493,14 +490,14 @@ export const IdeasPoolView: React.FC = () => {
                 key={traveler.id}
                 type="button"
                 onClick={() => setSelectedTravelerFilter(traveler.id)}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
                   isSelected
-                    ? 'bg-cyan-400/20 text-cyan-200 border border-cyan-400/60 shadow-[0_0_16px_rgba(34,211,238,0.2)]'
-                    : 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10'
+                    ? 'bg-[#C85A38]/12 text-[#A34224] border-[#C85A38]/40'
+                    : 'bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#1F1B18] border-[#E6DDD1]'
                 }`}
               >
                 <span
-                  className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-slate-950 shrink-0"
+                  className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-white shrink-0"
                   style={{ backgroundColor: traveler.color }}
                 >
                   {traveler.initials}
@@ -509,8 +506,8 @@ export const IdeasPoolView: React.FC = () => {
                 <span
                   className={`text-[10px] font-mono tabular-nums font-bold px-1.5 py-0.5 rounded-full ${
                     isSelected
-                      ? 'bg-cyan-400/25 text-cyan-200'
-                      : 'bg-white/10 text-slate-400'
+                      ? 'bg-[#C85A38]/15 text-[#A34224]'
+                      : 'bg-[#EFE7DB] text-[#6B6259]'
                   }`}
                 >
                   {count}
@@ -523,17 +520,17 @@ export const IdeasPoolView: React.FC = () => {
             <button
               type="button"
               onClick={() => setSelectedTravelerFilter('__unknown__')}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
                 selectedTravelerFilter === '__unknown__'
-                  ? 'bg-amber-400/20 text-amber-200 border border-amber-400/60'
-                  : 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10'
+                  ? 'bg-[#D9822B]/14 text-[#9E5A14] border-[#D9822B]/40'
+                  : 'bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#6B6259] border-[#E6DDD1]'
               }`}
             >
-              <span className="w-5 h-5 rounded-full bg-slate-500/50 flex items-center justify-center text-[10px] font-black text-slate-100">
+              <span className="w-5 h-5 rounded-full bg-[#D8CFC2] flex items-center justify-center text-[10px] font-black text-[#1F1B18]">
                 ?
               </span>
               <span>Unbekannt</span>
-              <span className="text-[10px] font-mono tabular-nums px-1.5 py-0.5 rounded-full bg-white/10 text-slate-300">
+              <span className="text-[10px] font-mono tabular-nums px-1.5 py-0.5 rounded-full bg-[#EFE7DB] text-[#6B6259]">
                 {unknownIdeasCount}
               </span>
             </button>
@@ -542,10 +539,10 @@ export const IdeasPoolView: React.FC = () => {
       </div>
 
       {/* FILTER BAR: PRIORITY + CATEGORY */}
-      <div className="aurora-glass rounded-[22px] p-4 space-y-3">
+      <div className="surface-glass rounded-[22px] p-4 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-xs font-bold text-slate-400 mr-1">Priorität:</span>
+            <span className="text-xs font-bold text-[#6B6259] mr-1">Priorität:</span>
             {[
               { id: 'all', label: 'Alle' },
               { id: 'must_do', label: '⭐ Must-Do' },
@@ -556,10 +553,10 @@ export const IdeasPoolView: React.FC = () => {
                 key={item.id}
                 type="button"
                 onClick={() => setPriorityFilter(item.id)}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
                   priorityFilter === item.id
-                    ? 'bg-amber-400/20 text-amber-200 border border-amber-400/50'
-                    : 'bg-white/5 text-slate-300 hover:bg-white/10 border border-white/5'
+                    ? 'bg-[#D9822B]/14 text-[#9E5A14] border-[#D9822B]/40'
+                    : 'bg-[#FAF7F2] text-[#6B6259] hover:bg-[#F3ECE1] border-[#E6DDD1]'
                 }`}
               >
                 {item.label}
@@ -572,13 +569,13 @@ export const IdeasPoolView: React.FC = () => {
               <button
                 type="button"
                 onClick={resetAllFilters}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-white/10 hover:bg-white/15 text-cyan-300 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#A34224] border border-[#E6DDD1] transition-colors cursor-pointer"
               >
                 <RotateCcw className="w-3 h-3" />
                 <span>Filter zurücksetzen</span>
               </button>
             )}
-            <p className="text-xs font-semibold text-slate-400 font-mono tabular-nums">
+            <p className="text-xs font-semibold text-[#6B6259] font-mono tabular-nums">
               {filteredIdeas.length}{' '}
               {filteredIdeas.length === 1 ? 'Vorschlag' : 'Vorschläge'}
             </p>
@@ -586,17 +583,17 @@ export const IdeasPoolView: React.FC = () => {
         </div>
 
         {/* VISIBLE CATEGORY FILTER BAR */}
-        <div className="flex flex-wrap items-center gap-1.5 pt-2.5 border-t border-white/10">
-          <span className="text-xs font-bold text-slate-400 mr-1">Kategorie:</span>
+        <div className="flex flex-wrap items-center gap-1.5 pt-2.5 border-t border-[#E6DDD1]">
+          <span className="text-xs font-bold text-[#6B6259] mr-1">Kategorie:</span>
           {CATEGORY_FILTER_OPTIONS.map((cat) => (
             <button
               key={cat.id}
               type="button"
               onClick={() => setCategoryFilter(cat.id)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
                 categoryFilter === cat.id
-                  ? 'bg-violet-400/20 text-violet-200 border border-violet-400/50'
-                  : 'bg-white/5 text-slate-300 hover:bg-white/10 border border-white/5'
+                  ? 'bg-[#C85A38]/12 text-[#A34224] border-[#C85A38]/35'
+                  : 'bg-[#FAF7F2] text-[#6B6259] hover:bg-[#F3ECE1] border-[#E6DDD1]'
               }`}
             >
               {cat.id !== 'all' && getCategoryIcon(cat.id)}
@@ -611,20 +608,20 @@ export const IdeasPoolView: React.FC = () => {
         <div
           className={`rounded-[22px] p-3.5 transition-all border ${
             draggingIdeaId
-              ? 'bg-cyan-500/15 border-cyan-400/60 shadow-[0_0_25px_rgba(34,211,238,0.2)]'
-              : 'aurora-glass'
+              ? 'bg-[#C85A38]/10 border-[#C85A38]/50 shadow-sm'
+              : 'surface-glass'
           }`}
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-200">
-              <Calendar className="w-4 h-4 text-cyan-400" />
+            <div className="flex items-center gap-2 text-xs font-bold text-[#1F1B18]">
+              <Calendar className="w-4 h-4 text-[#C85A38]" />
               <span>
                 {draggingIdeaId
                   ? 'Auf einen Reisetag fallen lassen, um um 10:00 Uhr einzuplanen:'
                   : 'Schnell-Übernahme: Idee hierhin auf einen Reisetag ziehen'}
               </span>
             </div>
-            <span className="text-[11px] text-slate-400">
+            <span className="text-[11px] text-[#6B6259]">
               Alternativ „In Tagesplan“ auf der Karte nutzen
             </span>
           </div>
@@ -653,10 +650,10 @@ export const IdeasPoolView: React.FC = () => {
                   title={`Idee auf Tag ${dayNum} ziehen oder Tag ${dayNum} im Tagesplan öffnen`}
                   className={`px-3.5 py-2 rounded-xl text-xs font-bold font-mono tabular-nums shrink-0 transition-all border cursor-pointer ${
                     isDropActive
-                      ? 'bg-cyan-400 text-slate-950 border-cyan-300 scale-105 shadow-[0_0_18px_rgba(34,211,238,0.45)]'
+                      ? 'bg-[#C85A38] text-white border-[#C85A38] scale-105 shadow-sm'
                       : isCurrentSelected
-                      ? 'bg-cyan-500/15 text-cyan-200 border-cyan-400/40 hover:bg-cyan-500/25'
-                      : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'
+                      ? 'bg-[#C85A38]/12 text-[#A34224] border-[#C85A38]/35 hover:bg-[#C85A38]/20'
+                      : 'bg-[#FAF7F2] text-[#6B6259] border-[#E6DDD1] hover:bg-[#F3ECE1]'
                   }`}
                 >
                   Tag {dayNum}
@@ -669,14 +666,14 @@ export const IdeasPoolView: React.FC = () => {
 
       {/* IDEAS GROUPED BY PERSON */}
       {groupedByTraveler.length === 0 ? (
-        <div className="aurora-glass rounded-[28px] p-12 text-center border-dashed border-white/15">
-          <Lightbulb className="w-12 h-12 text-amber-400 mx-auto mb-3 opacity-80" />
-          <h3 className="text-lg font-black text-slate-100">
+        <div className="surface-glass rounded-[28px] p-12 text-center border-dashed border-[#E6DDD1]">
+          <Lightbulb className="w-12 h-12 text-[#D9822B] mx-auto mb-3 opacity-80" />
+          <h3 className="text-lg font-black text-[#1F1B18]">
             {hasActiveFilters
               ? 'Keine Ideen für diese Filterkombination gefunden'
               : 'Noch keine Ideen im Pool'}
           </h3>
-          <p className="text-sm text-slate-400 mt-1.5 max-w-md mx-auto">
+          <p className="text-sm text-[#6B6259] mt-1.5 max-w-md mx-auto">
             {hasActiveFilters
               ? 'Passe deine Filter an oder setze alle Filter zurück, um wieder alle Vorschläge zu sehen.'
               : 'Reiche als Erste/r eine coole Idee, einen Ausflug oder einen Restaurant-Tipp ein!'}
@@ -686,9 +683,9 @@ export const IdeasPoolView: React.FC = () => {
               <button
                 type="button"
                 onClick={resetAllFilters}
-                className="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/15 text-slate-100 font-bold text-xs cursor-pointer inline-flex items-center gap-2 border border-white/10"
+                className="px-5 py-2.5 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#1F1B18] font-bold text-xs cursor-pointer inline-flex items-center gap-2 border border-[#E6DDD1]"
               >
-                <RotateCcw className="w-3.5 h-3.5 text-cyan-400" />
+                <RotateCcw className="w-3.5 h-3.5 text-[#C85A38]" />
                 <span>Filter zurücksetzen</span>
               </button>
             )}
@@ -698,7 +695,7 @@ export const IdeasPoolView: React.FC = () => {
                 resetIdeaForm();
                 setIsAddIdeaOpen(true);
               }}
-              className="px-6 py-2.5 rounded-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-extrabold text-xs cursor-pointer shadow-[0_0_20px_rgba(34,211,238,0.25)] inline-flex items-center gap-2"
+              className="px-6 py-2.5 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-white font-extrabold text-xs cursor-pointer shadow-sm inline-flex items-center gap-2"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Jetzt Idee einreichen</span>
@@ -716,31 +713,31 @@ export const IdeasPoolView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => toggleTravelerCollapse(traveler.id)}
-                  className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-[22px] aurora-glass hover:bg-white/[0.06] transition-all text-left cursor-pointer"
+                  className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-[22px] surface-glass hover:bg-white/90 transition-all text-left cursor-pointer"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div
-                      className="w-9 h-9 rounded-2xl flex items-center justify-center font-black text-sm text-slate-950 shadow-sm shrink-0"
+                      className="w-9 h-9 rounded-2xl flex items-center justify-center font-black text-sm text-white shadow-sm shrink-0"
                       style={{ backgroundColor: traveler.color }}
                     >
                       {traveler.initials}
                     </div>
                     <div className="min-w-0">
-                      <h2 className="text-base md:text-lg font-black text-slate-100 flex items-center gap-2 flex-wrap">
+                      <h2 className="text-base md:text-lg font-black text-[#1F1B18] flex items-center gap-2 flex-wrap">
                         <span className="truncate">Ideen von {traveler.name}</span>
-                        <span className="text-xs font-mono tabular-nums font-bold px-2 py-0.5 rounded-full bg-white/10 text-cyan-300 border border-white/10">
+                        <span className="text-xs font-mono tabular-nums font-bold px-2 py-0.5 rounded-full bg-[#FAF7F2] text-[#A34224] border border-[#E6DDD1]">
                           {travelerIdeas.length}
                         </span>
                       </h2>
                       {traveler.role && (
-                        <p className="text-xs text-slate-400 truncate">{traveler.role}</p>
+                        <p className="text-xs text-[#6B6259] truncate">{traveler.role}</p>
                       )}
                     </div>
                   </div>
                   {isCollapsed ? (
-                    <ChevronDown className="w-5 h-5 text-slate-400 shrink-0" />
+                    <ChevronDown className="w-5 h-5 text-[#6B6259] shrink-0" />
                   ) : (
-                    <ChevronUp className="w-5 h-5 text-slate-400 shrink-0" />
+                    <ChevronUp className="w-5 h-5 text-[#6B6259] shrink-0" />
                   )}
                 </button>
 
@@ -774,48 +771,48 @@ export const IdeasPoolView: React.FC = () => {
                           }}
                           className={`group relative rounded-[26px] p-5 flex flex-col justify-between transition-all duration-300 cursor-grab active:cursor-grabbing ${
                             isHighlighted
-                              ? 'aurora-glass-elevated ring-2 ring-cyan-400 shadow-[0_0_28px_rgba(34,211,238,0.3)]'
+                              ? 'surface-glass-elevated ring-2 ring-[#C85A38] shadow-md'
                               : draggingIdeaId === idea.id
-                              ? 'aurora-glass opacity-60 scale-[0.98] border-cyan-400/50'
-                              : 'aurora-glass hover:border-cyan-400/35 hover:-translate-y-0.5'
+                              ? 'surface-glass opacity-60 scale-[0.98] border-[#C85A38]/50'
+                              : 'surface-glass hover:border-[#C85A38]/35 hover:-translate-y-0.5'
                           }`}
                         >
                           {/* TOP ROW: PRIORITY, DRAG HANDLE & ACTIONS */}
                           <div>
                             <div className="flex items-center justify-between gap-2 mb-3">
                               <div className="flex items-center gap-1.5">
-                                <GripVertical className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                                <GripVertical className="w-3.5 h-3.5 text-[#8C8277] shrink-0" />
                                 {getPriorityBadge(idea.priority)}
                               </div>
                               <div className="flex items-center gap-1">
-                                <span className="p-1.5 rounded-full bg-white/5 border border-white/10">
+                                <span className="p-1.5 rounded-full bg-[#FAF7F2] border border-[#E6DDD1]">
                                   {getCategoryIcon(idea.category)}
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => handleStartEditIdea(idea)}
                                   title="Idee bearbeiten"
-                                  className="p-1.5 rounded-full hover:bg-white/10 text-slate-400 hover:text-cyan-300 transition-all cursor-pointer"
+                                  className="p-1.5 rounded-full hover:bg-[#F3ECE1] text-[#6B6259] hover:text-[#A34224] transition-all cursor-pointer"
                                 >
                                   <Pencil className="w-3.5 h-3.5" />
                                 </button>
                                 {isConfirmingDelete ? (
-                                  <div className="inline-flex items-center gap-1 bg-rose-500/15 border border-rose-400/40 rounded-full px-2 py-0.5 text-[10px] font-bold">
-                                    <span className="text-rose-200">Löschen?</span>
+                                  <div className="inline-flex items-center gap-1 bg-rose-600/12 border border-rose-500/30 rounded-full px-2 py-0.5 text-[10px] font-bold">
+                                    <span className="text-rose-800">Löschen?</span>
                                     <button
                                       type="button"
                                       onClick={() => {
                                         deleteIdea(idea.id);
                                         setConfirmDeleteId(null);
                                       }}
-                                      className="px-1.5 py-0.5 rounded-full bg-rose-500 text-white hover:bg-rose-400 cursor-pointer"
+                                      className="px-1.5 py-0.5 rounded-full bg-rose-600 text-white hover:bg-rose-500 cursor-pointer"
                                     >
                                       Ja
                                     </button>
                                     <button
                                       type="button"
                                       onClick={() => setConfirmDeleteId(null)}
-                                      className="px-1.5 py-0.5 rounded-full bg-white/10 text-slate-200 hover:bg-white/20 cursor-pointer"
+                                      className="px-1.5 py-0.5 rounded-full bg-white text-[#1F1B18] border border-[#E6DDD1] hover:bg-[#FAF7F2] cursor-pointer"
                                     >
                                       Nein
                                     </button>
@@ -825,7 +822,7 @@ export const IdeasPoolView: React.FC = () => {
                                     type="button"
                                     onClick={() => setConfirmDeleteId(idea.id)}
                                     title="Idee löschen"
-                                    className="p-1.5 rounded-full hover:bg-rose-500/15 text-slate-400 hover:text-rose-300 transition-all cursor-pointer"
+                                    className="p-1.5 rounded-full hover:bg-rose-600/12 text-[#6B6259] hover:text-rose-700 transition-all cursor-pointer"
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />
                                   </button>
@@ -834,12 +831,12 @@ export const IdeasPoolView: React.FC = () => {
                             </div>
 
                             {/* TITLE & DESCRIPTION */}
-                            <h3 className="text-base font-black text-slate-100 leading-snug tracking-tight">
+                            <h3 className="text-base font-black text-[#1F1B18] leading-snug tracking-tight">
                               {idea.title}
                             </h3>
 
                             {idea.description && (
-                              <p className="text-xs text-slate-400 mt-2 leading-relaxed line-clamp-3">
+                              <p className="text-xs text-[#6B6259] mt-2 leading-relaxed line-clamp-3">
                                 {idea.description}
                               </p>
                             )}
@@ -847,8 +844,8 @@ export const IdeasPoolView: React.FC = () => {
                             {/* META PILLS (ORT, MAPS, KARTE & KOSTEN) */}
                             <div className="flex flex-wrap items-center gap-1.5 mt-3.5 text-[11px] font-bold">
                               {idea.location && (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-white/5 border border-white/10 text-slate-300 max-w-full">
-                                  <MapPin className="w-3 h-3 text-cyan-400 shrink-0" />
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#FAF7F2] border border-[#E6DDD1] text-[#1F1B18] max-w-full">
+                                  <MapPin className="w-3 h-3 text-[#2A7B88] shrink-0" />
                                   <span className="truncate">{idea.location}</span>
                                 </span>
                               )}
@@ -866,8 +863,8 @@ export const IdeasPoolView: React.FC = () => {
                                       dayNumber: effectiveAssignedDay,
                                     })
                                   }
-                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-400/30 transition-colors cursor-pointer"
-                                  title="Standort im Map-Cockpit fokussieren"
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#2A7B88]/12 hover:bg-[#2A7B88]/20 text-[#1F5E68] border border-[#2A7B88]/30 transition-colors cursor-pointer"
+                                  title="Standort auf Karte fokussieren"
                                 >
                                   <MapIcon className="w-3 h-3" />
                                   <span>🗺️ Auf Karte</span>
@@ -878,16 +875,16 @@ export const IdeasPoolView: React.FC = () => {
                                   href={mapsUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-white/5 hover:bg-white/15 text-slate-200 border border-white/10 transition-colors"
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#1F1B18] border border-[#E6DDD1] transition-colors"
                                   title={`In Google Maps öffnen: ${idea.location}`}
                                 >
-                                  <ExternalLink className="w-3 h-3 text-slate-400" />
+                                  <ExternalLink className="w-3 h-3 text-[#6B6259]" />
                                   <span>Maps</span>
                                 </a>
                               )}
                               {typeof idea.estimatedCost === 'number' &&
                                 idea.estimatedCost > 0 && (
-                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-400/10 border border-amber-400/25 text-amber-300 font-mono tabular-nums">
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#D9822B]/14 border border-[#D9822B]/30 text-[#9E5A14] font-mono tabular-nums">
                                     ca. {formatCurrency(idea.estimatedCost, currency)} p.P.
                                   </span>
                                 )}
@@ -901,10 +898,10 @@ export const IdeasPoolView: React.FC = () => {
                                     }
                                     setActiveTab('schedule');
                                   }}
-                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-400/15 hover:bg-emerald-400/25 text-emerald-300 border border-emerald-400/35 font-extrabold cursor-pointer"
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#6E7F5E]/14 hover:bg-[#6E7F5E]/22 text-[#4B593E] border border-[#6E7F5E]/30 font-extrabold cursor-pointer"
                                   title="Im Tagesplan anzeigen"
                                 >
-                                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                                  <CheckCircle2 className="w-3 h-3 text-[#6E7F5E]" />
                                   <span>Tag {effectiveAssignedDay} eingeplant</span>
                                 </button>
                               )}
@@ -912,7 +909,7 @@ export const IdeasPoolView: React.FC = () => {
                           </div>
 
                           {/* BOTTOM ROW: VOTERS & ACTIONS */}
-                          <div className="mt-5 pt-3.5 border-t border-white/10 flex items-center justify-between gap-2 flex-wrap">
+                          <div className="mt-5 pt-3.5 border-t border-[#E6DDD1] flex items-center justify-between gap-2 flex-wrap">
                             {/* VOTER AVATARS */}
                             <div className="flex items-center gap-1.5">
                               <div className="flex -space-x-1.5">
@@ -925,7 +922,7 @@ export const IdeasPoolView: React.FC = () => {
                                     <span
                                       key={voterId}
                                       title={voter.name}
-                                      className="w-6 h-6 rounded-full border-2 border-[#131823] flex items-center justify-center text-[9px] font-black text-slate-950 shadow-sm"
+                                      className="w-6 h-6 rounded-full border-2 border-[#FAF7F2] flex items-center justify-center text-[9px] font-black text-white shadow-sm"
                                       style={{ backgroundColor: voter.color }}
                                     >
                                       {voter.initials}
@@ -934,7 +931,7 @@ export const IdeasPoolView: React.FC = () => {
                                 })}
                               </div>
                               {idea.votes.length > 4 && (
-                                <span className="text-[10px] font-mono tabular-nums font-bold text-slate-400">
+                                <span className="text-[10px] font-mono tabular-nums font-bold text-[#6B6259]">
                                   +{idea.votes.length - 4}
                                 </span>
                               )}
@@ -945,10 +942,10 @@ export const IdeasPoolView: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => toggleIdeaVote(idea.id)}
-                                className={`px-3 py-1.5 rounded-full text-xs font-extrabold transition-all flex items-center gap-1.5 cursor-pointer ${
+                                className={`px-3 py-1.5 rounded-full text-xs font-extrabold transition-all flex items-center gap-1.5 cursor-pointer border ${
                                   hasVoted
-                                    ? 'bg-cyan-400 text-slate-950 shadow-[0_0_14px_rgba(34,211,238,0.3)]'
-                                    : 'bg-white/10 hover:bg-white/15 text-slate-200 border border-white/10'
+                                    ? 'bg-[#C85A38] text-white border-[#C85A38] shadow-sm'
+                                    : 'bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#1F1B18] border-[#E6DDD1]'
                                 }`}
                                 title={
                                   hasVoted ? 'Deine Stimme zurückziehen' : 'Dafür stimmen'
@@ -963,7 +960,7 @@ export const IdeasPoolView: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => openScheduleModal(idea)}
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-400/15 hover:bg-emerald-400/25 border border-emerald-400/35 text-emerald-200 text-xs font-bold transition-all cursor-pointer"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#6E7F5E]/14 hover:bg-[#6E7F5E]/22 border border-[#6E7F5E]/30 text-[#4B593E] text-xs font-bold transition-all cursor-pointer"
                                 title="In den Tagesplan übernehmen"
                               >
                                 <CalendarPlus className="w-3.5 h-3.5" />
@@ -985,7 +982,7 @@ export const IdeasPoolView: React.FC = () => {
       {/* MODAL: NEUE IDEE VORSCHLAGEN / BEARBEITEN */}
       {isAddIdeaOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1F1B18]/40 backdrop-blur-sm animate-fade-in"
           onClick={closeIdeaModal}
         >
           <div
@@ -993,24 +990,24 @@ export const IdeasPoolView: React.FC = () => {
             aria-modal="true"
             aria-labelledby="idea-modal-title"
             onClick={(e) => e.stopPropagation()}
-            className="aurora-glass-elevated w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-[28px] p-6 md:p-7 space-y-5"
+            className="surface-glass-elevated w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-[28px] p-6 md:p-7 space-y-5"
           >
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-amber-400/15 border border-amber-400/30 text-amber-300 flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-2xl bg-[#D9822B]/14 border border-[#D9822B]/30 text-[#9E5A14] flex items-center justify-center shrink-0">
                   <Lightbulb className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 id="idea-modal-title" className="text-lg font-black text-slate-100">
+                  <h3 id="idea-modal-title" className="text-lg font-black text-[#1F1B18]">
                     {editingIdeaId ? 'Idee bearbeiten' : 'Neue Idee einreichen'}
                   </h3>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-[#6B6259]">
                     {editingIdeaId ? (
                       'Änderungen speichern – alle bisherigen Votes bleiben erhalten.'
                     ) : (
                       <>
                         Vorgeschlagen von:{' '}
-                        <strong className="text-slate-200">{currentUser.name}</strong>
+                        <strong className="text-[#1F1B18]">{currentUser.name}</strong>
                       </>
                     )}
                   </p>
@@ -1020,14 +1017,14 @@ export const IdeasPoolView: React.FC = () => {
                 type="button"
                 onClick={closeIdeaModal}
                 aria-label="Dialog schließen"
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-200 cursor-pointer"
+                className="w-8 h-8 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] border border-[#E6DDD1] flex items-center justify-center text-[#6B6259] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {formError && (
-              <div className="rounded-2xl bg-rose-500/15 border border-rose-400/35 px-4 py-2.5 text-xs font-semibold text-rose-200">
+              <div className="rounded-2xl bg-rose-600/12 border border-rose-500/30 px-4 py-2.5 text-xs font-semibold text-rose-800">
                 {formError}
               </div>
             )}
@@ -1036,7 +1033,7 @@ export const IdeasPoolView: React.FC = () => {
               <div>
                 <label
                   htmlFor="idea-title-input"
-                  className="block text-xs font-bold text-slate-300 mb-1.5"
+                  className="block text-xs font-bold text-[#1F1B18] mb-1.5"
                 >
                   Was möchtest du vorschlagen? *
                 </label>
@@ -1050,7 +1047,7 @@ export const IdeasPoolView: React.FC = () => {
                     setNewTitle(e.target.value);
                     if (formError) setFormError(null);
                   }}
-                  className="w-full aurora-input rounded-2xl px-4 py-3 text-sm font-semibold placeholder:text-slate-500"
+                  className="w-full surface-input rounded-2xl px-4 py-3 text-sm font-semibold placeholder:text-[#8C8277]"
                   autoFocus
                 />
               </div>
@@ -1059,7 +1056,7 @@ export const IdeasPoolView: React.FC = () => {
                 <div>
                   <label
                     htmlFor="idea-priority-select"
-                    className="block text-xs font-bold text-slate-300 mb-1.5"
+                    className="block text-xs font-bold text-[#1F1B18] mb-1.5"
                   >
                     Priorität
                   </label>
@@ -1067,15 +1064,15 @@ export const IdeasPoolView: React.FC = () => {
                     id="idea-priority-select"
                     value={newPriority}
                     onChange={(e) => setNewPriority(e.target.value as IdeaPriority)}
-                    className="w-full aurora-input rounded-2xl px-3.5 py-2.5 text-xs font-bold [color-scheme:dark]"
+                    className="w-full surface-input rounded-2xl px-3.5 py-2.5 text-xs font-bold [color-scheme:light]"
                   >
-                    <option value="must_do" className="bg-[#131823] text-slate-100">
+                    <option value="must_do" className="bg-white text-[#1F1B18]">
                       ⭐ Must-Do (Unbedingt!)
                     </option>
-                    <option value="nice_to_have" className="bg-[#131823] text-slate-100">
+                    <option value="nice_to_have" className="bg-white text-[#1F1B18]">
                       🌴 Nice to have
                     </option>
-                    <option value="chill" className="bg-[#131823] text-slate-100">
+                    <option value="chill" className="bg-white text-[#1F1B18]">
                       ☕ Entspannt / Chillig
                     </option>
                   </select>
@@ -1084,7 +1081,7 @@ export const IdeasPoolView: React.FC = () => {
                 <div>
                   <label
                     htmlFor="idea-category-select"
-                    className="block text-xs font-bold text-slate-300 mb-1.5"
+                    className="block text-xs font-bold text-[#1F1B18] mb-1.5"
                   >
                     Kategorie
                   </label>
@@ -1094,27 +1091,27 @@ export const IdeasPoolView: React.FC = () => {
                     onChange={(e) =>
                       setNewCategory(e.target.value as ActivityCategory | 'food')
                     }
-                    className="w-full aurora-input rounded-2xl px-3.5 py-2.5 text-xs font-bold [color-scheme:dark]"
+                    className="w-full surface-input rounded-2xl px-3.5 py-2.5 text-xs font-bold [color-scheme:light]"
                   >
-                    <option value="activity" className="bg-[#131823] text-slate-100">
+                    <option value="activity" className="bg-white text-[#1F1B18]">
                       Aktivität / Action
                     </option>
-                    <option value="beach" className="bg-[#131823] text-slate-100">
+                    <option value="beach" className="bg-white text-[#1F1B18]">
                       Strand & Meer
                     </option>
-                    <option value="food" className="bg-[#131823] text-slate-100">
+                    <option value="food" className="bg-white text-[#1F1B18]">
                       Essen & Kulinarik
                     </option>
-                    <option value="culture" className="bg-[#131823] text-slate-100">
+                    <option value="culture" className="bg-white text-[#1F1B18]">
                       Kultur & Sightseeing
                     </option>
-                    <option value="transport" className="bg-[#131823] text-slate-100">
+                    <option value="transport" className="bg-white text-[#1F1B18]">
                       Transfer & Route
                     </option>
-                    <option value="nightlife" className="bg-[#131823] text-slate-100">
+                    <option value="nightlife" className="bg-white text-[#1F1B18]">
                       Abend & Feiern
                     </option>
-                    <option value="other" className="bg-[#131823] text-slate-100">
+                    <option value="other" className="bg-white text-[#1F1B18]">
                       Sonstiges
                     </option>
                   </select>
@@ -1124,7 +1121,7 @@ export const IdeasPoolView: React.FC = () => {
               <div>
                 <label
                   htmlFor="idea-desc-input"
-                  className="block text-xs font-bold text-slate-300 mb-1.5"
+                  className="block text-xs font-bold text-[#1F1B18] mb-1.5"
                 >
                   Beschreibung / Notiz (optional)
                 </label>
@@ -1134,7 +1131,7 @@ export const IdeasPoolView: React.FC = () => {
                   placeholder="Warum hast du Lust darauf? Gibt es Details oder Tipps?"
                   value={newDesc}
                   onChange={(e) => setNewDesc(e.target.value)}
-                  className="w-full aurora-input rounded-2xl p-3.5 text-xs font-medium placeholder:text-slate-500 resize-none"
+                  className="w-full surface-input rounded-2xl p-3.5 text-xs font-medium placeholder:text-[#8C8277] resize-none"
                 />
               </div>
 
@@ -1142,7 +1139,7 @@ export const IdeasPoolView: React.FC = () => {
                 <div>
                   <label
                     htmlFor="idea-location-input"
-                    className="block text-xs font-bold text-slate-300 mb-1.5"
+                    className="block text-xs font-bold text-[#1F1B18] mb-1.5"
                   >
                     Ort / Spot (optional)
                   </label>
@@ -1152,14 +1149,14 @@ export const IdeasPoolView: React.FC = () => {
                     placeholder="z.B. Cala Varques, Palma..."
                     value={newLocation}
                     onChange={(e) => setNewLocation(e.target.value)}
-                    className="w-full aurora-input rounded-2xl px-3.5 py-2.5 text-xs font-semibold placeholder:text-slate-500"
+                    className="w-full surface-input rounded-2xl px-3.5 py-2.5 text-xs font-semibold placeholder:text-[#8C8277]"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="idea-cost-input"
-                    className="block text-xs font-bold text-slate-300 mb-1.5"
+                    className="block text-xs font-bold text-[#1F1B18] mb-1.5"
                   >
                     Kosten p.P. in {currency} (optional)
                   </label>
@@ -1174,7 +1171,7 @@ export const IdeasPoolView: React.FC = () => {
                       setNewCost(e.target.value);
                       if (formError) setFormError(null);
                     }}
-                    className="w-full aurora-input rounded-2xl px-3.5 py-2.5 text-xs font-mono tabular-nums font-semibold placeholder:text-slate-500"
+                    className="w-full surface-input rounded-2xl px-3.5 py-2.5 text-xs font-mono tabular-nums font-semibold placeholder:text-[#8C8277]"
                   />
                 </div>
               </div>
@@ -1183,13 +1180,13 @@ export const IdeasPoolView: React.FC = () => {
                 <button
                   type="button"
                   onClick={closeIdeaModal}
-                  className="px-5 py-2.5 rounded-full text-xs font-bold bg-white/10 hover:bg-white/15 text-slate-200 cursor-pointer"
+                  className="px-5 py-2.5 rounded-full text-xs font-bold bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#6B6259] border border-[#E6DDD1] cursor-pointer"
                 >
                   Abbrechen
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-extrabold text-xs shadow-[0_0_20px_rgba(34,211,238,0.25)] cursor-pointer flex items-center gap-1.5"
+                  className="px-6 py-2.5 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-white font-extrabold text-xs shadow-sm cursor-pointer flex items-center gap-1.5"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>{editingIdeaId ? 'Änderungen speichern' : 'Idee einreichen'}</span>
@@ -1203,7 +1200,7 @@ export const IdeasPoolView: React.FC = () => {
       {/* MODAL: IN TAGESPLAN ÜBERNEHMEN */}
       {schedulingIdea && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1F1B18]/40 backdrop-blur-sm animate-fade-in"
           onClick={closeScheduleModal}
         >
           <div
@@ -1211,21 +1208,21 @@ export const IdeasPoolView: React.FC = () => {
             aria-modal="true"
             aria-labelledby="schedule-idea-modal-title"
             onClick={(e) => e.stopPropagation()}
-            className="aurora-glass-elevated w-full max-w-md max-h-[90vh] overflow-y-auto rounded-[28px] p-6 md:p-7 space-y-5"
+            className="surface-glass-elevated w-full max-w-md max-h-[90vh] overflow-y-auto rounded-[28px] p-6 md:p-7 space-y-5"
           >
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-400/15 border border-emerald-400/30 text-emerald-300 flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-2xl bg-[#6E7F5E]/14 border border-[#6E7F5E]/30 text-[#4B593E] flex items-center justify-center shrink-0">
                   <CalendarPlus className="w-5 h-5" />
                 </div>
                 <div className="min-w-0">
                   <h3
                     id="schedule-idea-modal-title"
-                    className="text-lg font-black text-slate-100"
+                    className="text-lg font-black text-[#1F1B18]"
                   >
                     In Tagesplan übernehmen
                   </h3>
-                  <p className="text-xs text-slate-400 truncate">
+                  <p className="text-xs text-[#6B6259] truncate">
                     „{schedulingIdea.title}“
                   </p>
                 </div>
@@ -1234,14 +1231,14 @@ export const IdeasPoolView: React.FC = () => {
                 type="button"
                 onClick={closeScheduleModal}
                 aria-label="Dialog schließen"
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-200 cursor-pointer shrink-0"
+                className="w-8 h-8 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] border border-[#E6DDD1] flex items-center justify-center text-[#6B6259] cursor-pointer shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {scheduleTimeError && (
-              <div className="rounded-2xl bg-rose-500/15 border border-rose-400/35 px-4 py-2.5 text-xs font-semibold text-rose-200">
+              <div className="rounded-2xl bg-rose-600/12 border border-rose-500/30 px-4 py-2.5 text-xs font-semibold text-rose-800">
                 {scheduleTimeError}
               </div>
             )}
@@ -1250,7 +1247,7 @@ export const IdeasPoolView: React.FC = () => {
               <div>
                 <label
                   htmlFor="schedule-idea-day"
-                  className="block text-xs font-bold text-slate-300 mb-1.5"
+                  className="block text-xs font-bold text-[#1F1B18] mb-1.5"
                 >
                   An welchem Tag soll die Aktivität stattfinden?
                 </label>
@@ -1258,10 +1255,10 @@ export const IdeasPoolView: React.FC = () => {
                   id="schedule-idea-day"
                   value={scheduleDay}
                   onChange={(e) => setScheduleDay(Number(e.target.value))}
-                  className="w-full aurora-input rounded-2xl px-4 py-3 text-sm font-bold [color-scheme:dark]"
+                  className="w-full surface-input rounded-2xl px-4 py-3 text-sm font-bold [color-scheme:light]"
                 >
                   {Array.from({ length: safeTotalDays }, (_, i) => i + 1).map((day) => (
-                    <option key={day} value={day} className="bg-[#131823] text-slate-100">
+                    <option key={day} value={day} className="bg-white text-[#1F1B18]">
                       Tag {day}
                     </option>
                   ))}
@@ -1272,7 +1269,7 @@ export const IdeasPoolView: React.FC = () => {
                 <div>
                   <label
                     htmlFor="schedule-idea-start"
-                    className="block text-xs font-bold text-slate-300 mb-1.5"
+                    className="block text-xs font-bold text-[#1F1B18] mb-1.5"
                   >
                     Startzeit
                   </label>
@@ -1284,13 +1281,13 @@ export const IdeasPoolView: React.FC = () => {
                       setScheduleTime(e.target.value);
                       if (scheduleTimeError) setScheduleTimeError(null);
                     }}
-                    className="w-full aurora-input rounded-2xl px-3.5 py-2.5 text-sm font-mono tabular-nums font-bold [color-scheme:dark]"
+                    className="w-full surface-input rounded-2xl px-3.5 py-2.5 text-sm font-mono tabular-nums font-bold [color-scheme:light]"
                   />
                 </div>
                 <div>
                   <label
                     htmlFor="schedule-idea-end"
-                    className="block text-xs font-bold text-slate-300 mb-1.5"
+                    className="block text-xs font-bold text-[#1F1B18] mb-1.5"
                   >
                     Endzeit (optional)
                   </label>
@@ -1302,7 +1299,7 @@ export const IdeasPoolView: React.FC = () => {
                       setScheduleEndTime(e.target.value);
                       if (scheduleTimeError) setScheduleTimeError(null);
                     }}
-                    className="w-full aurora-input rounded-2xl px-3.5 py-2.5 text-sm font-mono tabular-nums font-bold [color-scheme:dark]"
+                    className="w-full surface-input rounded-2xl px-3.5 py-2.5 text-sm font-mono tabular-nums font-bold [color-scheme:light]"
                   />
                 </div>
               </div>
@@ -1311,13 +1308,13 @@ export const IdeasPoolView: React.FC = () => {
                 <button
                   type="button"
                   onClick={closeScheduleModal}
-                  className="px-5 py-2.5 rounded-full text-xs font-bold bg-white/10 hover:bg-white/15 text-slate-200 cursor-pointer"
+                  className="px-5 py-2.5 rounded-full text-xs font-bold bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#6B6259] border border-[#E6DDD1] cursor-pointer"
                 >
                   Abbrechen
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-full bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-extrabold text-xs shadow-[0_0_20px_rgba(52,211,153,0.28)] cursor-pointer flex items-center gap-1.5"
+                  className="px-6 py-2.5 rounded-full bg-[#6E7F5E] hover:bg-[#5B6B4D] text-white font-extrabold text-xs shadow-sm cursor-pointer flex items-center gap-1.5"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   <span>Jetzt fest einplanen</span>

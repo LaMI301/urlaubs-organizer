@@ -36,27 +36,27 @@ const CATEGORY_META: Record<
   { badgeClass: string; icon: React.ReactNode }
 > = {
   beach: {
-    badgeClass: 'bg-amber-400/15 text-amber-300 border border-amber-400/30',
+    badgeClass: 'bg-[#D9822B]/14 text-[#9E5A14] border border-[#D9822B]/30',
     icon: <Sun className="w-3.5 h-3.5" />,
   },
   activity: {
-    badgeClass: 'bg-cyan-400/15 text-cyan-300 border border-cyan-400/30',
+    badgeClass: 'bg-[#6E7F5E]/14 text-[#4B593E] border border-[#6E7F5E]/30',
     icon: <Compass className="w-3.5 h-3.5" />,
   },
   culture: {
-    badgeClass: 'bg-violet-400/15 text-violet-300 border border-violet-400/30',
+    badgeClass: 'bg-[#2A7B88]/12 text-[#1F5E68] border border-[#2A7B88]/30',
     icon: <Landmark className="w-3.5 h-3.5" />,
   },
   transport: {
-    badgeClass: 'bg-emerald-400/15 text-emerald-300 border border-emerald-400/30',
+    badgeClass: 'bg-[#F3ECE1]/80 text-[#6B6259] border border-[#E6DDD1]',
     icon: <Car className="w-3.5 h-3.5" />,
   },
   nightlife: {
-    badgeClass: 'bg-rose-400/15 text-rose-300 border border-rose-400/30',
+    badgeClass: 'bg-[#C85A38]/12 text-[#A34224] border border-[#C85A38]/30',
     icon: <Music className="w-3.5 h-3.5" />,
   },
   other: {
-    badgeClass: 'bg-white/10 text-slate-300 border border-white/15',
+    badgeClass: 'bg-[#FAF7F2] text-[#6B6259] border border-[#E6DDD1]',
     icon: <Sparkles className="w-3.5 h-3.5" />,
   },
 };
@@ -74,15 +74,15 @@ const ACTIVITY_STATUS_META: Record<
 > = {
   confirmed: {
     label: 'Bestätigt',
-    badgeClass: 'bg-emerald-400/15 text-emerald-300 border border-emerald-400/35',
+    badgeClass: 'bg-[#6E7F5E]/14 text-[#4B593E] border border-[#6E7F5E]/30',
   },
   planned: {
     label: 'Geplant',
-    badgeClass: 'bg-cyan-400/15 text-cyan-300 border border-cyan-400/35',
+    badgeClass: 'bg-[#2A7B88]/12 text-[#1F5E68] border border-[#2A7B88]/30',
   },
   idea: {
     label: 'Idee',
-    badgeClass: 'bg-amber-400/15 text-amber-300 border border-amber-400/35',
+    badgeClass: 'bg-[#D9822B]/14 text-[#9E5A14] border border-[#D9822B]/30',
   },
 };
 
@@ -158,24 +158,24 @@ export const WeekOverviewView: React.FC = () => {
 
   return (
     <div className="space-y-5 min-w-0 w-full">
-      {/* Midnight Aurora Header */}
-      <div className="aurora-glass rounded-[28px] p-4 sm:p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4 min-w-0">
+      {/* Header */}
+      <div className="surface-glass rounded-[28px] p-4 sm:p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4 min-w-0">
         <div className="min-w-0">
-          <div className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-cyan-400/15 text-cyan-300 border border-cyan-400/30 mb-1.5">
+          <div className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#C85A38]/12 text-[#A34224] border border-[#C85A38]/30 mb-1.5">
             <CalendarDays className="w-3.5 h-3.5" />
             <span>Wochen- &amp; Mehrtages-Kalender</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-100 tracking-tight break-words">
+          <h1 className="text-xl sm:text-2xl font-black text-[#1F1B18] tracking-tight break-words">
             Alle Termine im Überblick
           </h1>
-          <p className="text-xs font-medium text-slate-400 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span className="truncate text-slate-300">{trip.destination}</span>
-            <span className="text-slate-600">•</span>
-            <span className="font-mono tabular-nums text-cyan-300 font-bold">
+          <p className="text-xs font-medium text-[#6B6259] mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="truncate text-[#1F1B18] font-semibold">{trip.destination}</span>
+            <span className="text-[#8C8277]">•</span>
+            <span className="font-mono tabular-nums text-[#A34224] font-bold">
               {dayRangeLabel} von {safeTotalDays}
             </span>
-            <span className="text-slate-600 hidden sm:inline">•</span>
-            <span className="hidden sm:inline text-slate-400">
+            <span className="text-[#8C8277] hidden sm:inline">•</span>
+            <span className="hidden sm:inline text-[#6B6259]">
               Aktivitäten per Drag &amp; Drop zwischen Tagen verschieben
             </span>
           </p>
@@ -183,7 +183,7 @@ export const WeekOverviewView: React.FC = () => {
 
         <div className="flex flex-wrap items-center gap-2 min-w-0">
           {/* Span Selector */}
-          <div className="inline-flex items-center bg-[#0B0E14]/80 p-1 rounded-full border border-white/10">
+          <div className="inline-flex items-center bg-[#FAF7F2] p-1 rounded-full border border-[#E6DDD1]">
             {[
               { id: '3', label: '3 Tage' },
               { id: '7', label: 'Woche (7T)' },
@@ -197,8 +197,8 @@ export const WeekOverviewView: React.FC = () => {
                 }}
                 className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                   spanMode === opt.id
-                    ? 'bg-cyan-400 text-[#0B0E14] shadow-[0_0_12px_rgba(34,211,238,0.35)]'
-                    : 'text-slate-300 hover:text-white'
+                    ? 'bg-[#C85A38] text-white shadow-sm'
+                    : 'text-[#6B6259] hover:text-[#1F1B18]'
                 }`}
               >
                 {opt.label}
@@ -207,7 +207,7 @@ export const WeekOverviewView: React.FC = () => {
           </div>
 
           {/* Type Filter */}
-          <div className="inline-flex items-center bg-[#0B0E14]/80 p-1 rounded-full border border-white/10">
+          <div className="inline-flex items-center bg-[#FAF7F2] p-1 rounded-full border border-[#E6DDD1]">
             {[
               { id: 'all', label: 'Alles' },
               { id: 'activities', label: 'Aktivitäten' },
@@ -221,8 +221,8 @@ export const WeekOverviewView: React.FC = () => {
                 }
                 className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                   typeFilter === opt.id
-                    ? 'bg-white/15 text-slate-100 border border-white/15'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-[#F3ECE1] text-[#1F1B18] border border-[#E6DDD1]'
+                    : 'text-[#6B6259] hover:text-[#1F1B18]'
                 }`}
               >
                 {opt.label}
@@ -232,18 +232,18 @@ export const WeekOverviewView: React.FC = () => {
 
           {/* Pagination with Day-Range Indicator */}
           {maxPages > 1 && (
-            <div className="inline-flex items-center gap-1.5 bg-[#0B0E14]/70 px-2 py-1 rounded-full border border-white/10">
+            <div className="inline-flex items-center gap-1.5 bg-[#FAF7F2] px-2 py-1 rounded-full border border-[#E6DDD1]">
               <button
                 type="button"
                 onClick={() => setPageOffset((p) => Math.max(0, p - 1))}
                 disabled={pageOffset === 0}
                 aria-label="Vorherige Tage"
-                className="w-7 h-7 rounded-full bg-white/5 hover:bg-cyan-400/20 text-slate-200 flex items-center justify-center disabled:opacity-35 cursor-pointer"
+                className="w-7 h-7 rounded-full bg-white hover:bg-[#C85A38]/12 text-[#1F1B18] border border-[#E6DDD1] flex items-center justify-center disabled:opacity-35 cursor-pointer"
                 title="Vorherige Tage"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="text-[11px] font-bold text-cyan-300 font-mono tabular-nums px-1.5 whitespace-nowrap">
+              <span className="text-[11px] font-bold text-[#A34224] font-mono tabular-nums px-1.5 whitespace-nowrap">
                 {dayRangeLabel}
               </span>
               <button
@@ -251,7 +251,7 @@ export const WeekOverviewView: React.FC = () => {
                 onClick={() => setPageOffset((p) => Math.min(maxPages - 1, p + 1))}
                 disabled={pageOffset >= maxPages - 1}
                 aria-label="Nächste Tage"
-                className="w-7 h-7 rounded-full bg-white/5 hover:bg-cyan-400/20 text-slate-200 flex items-center justify-center disabled:opacity-35 cursor-pointer"
+                className="w-7 h-7 rounded-full bg-white hover:bg-[#C85A38]/12 text-[#1F1B18] border border-[#E6DDD1] flex items-center justify-center disabled:opacity-35 cursor-pointer"
                 title="Nächste Tage"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -387,15 +387,15 @@ export const WeekOverviewView: React.FC = () => {
               }}
               className={`rounded-[24px] p-3.5 sm:p-4 flex flex-col justify-between gap-3 transition-all border min-w-0 break-words ${
                 isDropTarget
-                  ? 'aurora-glass-elevated border-cyan-400 ring-2 ring-cyan-400/35 shadow-[0_0_24px_rgba(34,211,238,0.22)]'
+                  ? 'surface-glass-elevated border-[#C85A38] ring-2 ring-[#C85A38]/30 shadow-md'
                   : isSelectedDay
-                  ? 'aurora-glass-elevated border-cyan-400/45 shadow-[0_0_24px_rgba(34,211,238,0.12)]'
-                  : 'aurora-glass hover:border-white/20'
+                  ? 'surface-glass-elevated border-[#C85A38]/55 shadow-sm'
+                  : 'surface-glass hover:border-[#D8CFC2]'
               }`}
             >
               <div className="min-w-0">
                 {/* Day Column Header */}
-                <div className="flex items-start justify-between gap-2 pb-3 mb-3 border-b border-white/10 min-w-0">
+                <div className="flex items-start justify-between gap-2 pb-3 mb-3 border-b border-[#E6DDD1] min-w-0">
                   <button
                     type="button"
                     onClick={() => setSelectedDay(day)}
@@ -405,26 +405,26 @@ export const WeekOverviewView: React.FC = () => {
                       <span
                         className={`text-xs font-black px-2.5 py-0.5 rounded-full font-mono tabular-nums shrink-0 ${
                           isSelectedDay
-                            ? 'bg-cyan-400 text-[#0B0E14]'
-                            : 'bg-cyan-400/15 text-cyan-300 border border-cyan-400/30'
+                            ? 'bg-[#C85A38] text-white'
+                            : 'bg-[#C85A38]/12 text-[#A34224] border border-[#C85A38]/30'
                         }`}
                       >
                         Tag {day}
                       </span>
-                      <span className="text-xs font-bold text-slate-300 group-hover:text-cyan-200 transition-colors truncate">
+                      <span className="text-xs font-bold text-[#6B6259] group-hover:text-[#A34224] transition-colors truncate">
                         {formatTripDayDate(trip.startDate, day)}
                       </span>
                     </div>
                   </button>
 
                   <div className="flex flex-col items-end gap-1 shrink-0">
-                    <span className="text-[11px] font-bold text-slate-400 font-mono tabular-nums">
+                    <span className="text-[11px] font-bold text-[#8C8277] font-mono tabular-nums">
                       {items.length} {items.length === 1 ? 'Termin' : 'Termine'}
                     </span>
                     {conflictCount > 0 && (
                       <span
                         title="Zeitkonflikte an diesem Tag"
-                        className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400/15 text-amber-300 border border-amber-400/35 font-mono tabular-nums"
+                        className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#D9822B]/14 text-[#9E5A14] border border-[#D9822B]/30 font-mono tabular-nums"
                       >
                         <AlertTriangle className="w-2.5 h-2.5" />
                         {conflictCount} Konflikt
@@ -436,9 +436,9 @@ export const WeekOverviewView: React.FC = () => {
                 {/* Day Appointments List */}
                 <div className="space-y-2.5 min-w-0">
                   {items.length === 0 ? (
-                    <div className="rounded-2xl p-5 text-center border border-dashed border-white/10 bg-[#0B0E14]/45">
-                      <Clock className="w-4 h-4 text-slate-500 mx-auto mb-1.5" />
-                      <p className="text-[11px] font-semibold text-slate-400">
+                    <div className="rounded-2xl p-5 text-center border border-dashed border-[#E6DDD1] bg-[#FAF7F2]">
+                      <Clock className="w-4 h-4 text-[#8C8277] mx-auto mb-1.5" />
+                      <p className="text-[11px] font-semibold text-[#6B6259]">
                         {isDropTarget ? 'Hier ablegen' : 'Noch frei'}
                       </p>
                     </div>
@@ -457,7 +457,7 @@ export const WeekOverviewView: React.FC = () => {
                           ? CATEGORY_META[item.category] || CATEGORY_META.other
                           : {
                               badgeClass:
-                                'bg-amber-400/15 text-amber-300 border border-amber-400/30',
+                                'bg-[#D9822B]/14 text-[#9E5A14] border border-[#D9822B]/30',
                               icon: <Utensils className="w-3.5 h-3.5" />,
                             };
 
@@ -466,7 +466,7 @@ export const WeekOverviewView: React.FC = () => {
                           ? {
                               label: MEAL_LABELS[item.mealType],
                               badgeClass:
-                                'bg-amber-400/15 text-amber-200 border border-amber-400/30',
+                                'bg-[#D9822B]/14 text-[#9E5A14] border border-[#D9822B]/30',
                             }
                           : ACTIVITY_STATUS_META[item.status] ||
                             ACTIVITY_STATUS_META.planned;
@@ -498,12 +498,12 @@ export const WeekOverviewView: React.FC = () => {
                             setDraggingActivityId(null);
                             setDragOverDay(null);
                           }}
-                          className={`rounded-2xl p-3 bg-[#0B0E14]/70 hover:bg-[#131823]/95 border transition-all space-y-2 min-w-0 break-words ${
+                          className={`rounded-2xl p-3 bg-[#FAF7F2] hover:bg-white border transition-all space-y-2 min-w-0 break-words ${
                             isDragging
-                              ? 'opacity-45 border-cyan-400/60 scale-[0.98]'
+                              ? 'opacity-45 border-[#C85A38] scale-[0.98]'
                               : hasConflict
-                              ? 'border-amber-400/40'
-                              : 'border-white/10 hover:border-white/20'
+                              ? 'border-[#D9822B]/45'
+                              : 'border-[#E6DDD1] hover:border-[#D8CFC2]'
                           }`}
                         >
                           {/* Top Row: Time + Drag Grip + Status Badge */}
@@ -511,7 +511,7 @@ export const WeekOverviewView: React.FC = () => {
                             <div className="flex items-center gap-1.5 min-w-0">
                               {item.kind === 'activity' && (
                                 <GripVertical
-                                  className="w-3.5 h-3.5 text-slate-500 shrink-0 cursor-grab active:cursor-grabbing"
+                                  className="w-3.5 h-3.5 text-[#8C8277] shrink-0 cursor-grab active:cursor-grabbing"
                                   aria-hidden="true"
                                 />
                               )}
@@ -520,7 +520,7 @@ export const WeekOverviewView: React.FC = () => {
                               >
                                 {meta.icon}
                               </span>
-                              <span className="text-[11px] font-extrabold text-cyan-300 font-mono tabular-nums truncate">
+                              <span className="text-[11px] font-extrabold text-[#A34224] font-mono tabular-nums truncate">
                                 {item.time}
                                 {item.kind === 'activity' && item.endTime
                                   ? `–${item.endTime}`
@@ -532,7 +532,7 @@ export const WeekOverviewView: React.FC = () => {
                               {hasConflict && (
                                 <span
                                   title="Zeitkonflikt mit anderem Termin"
-                                  className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/35"
+                                  className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#D9822B]/14 text-[#9E5A14] border border-[#D9822B]/30"
                                 >
                                   <AlertTriangle className="w-3 h-3" />
                                 </span>
@@ -569,9 +569,9 @@ export const WeekOverviewView: React.FC = () => {
                                 });
                               }
                             }}
-                            className="w-full text-left cursor-pointer group min-w-0 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+                            className="w-full text-left cursor-pointer group min-w-0 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C85A38]"
                           >
-                            <h4 className="text-xs font-extrabold text-slate-100 group-hover:text-cyan-200 transition-colors leading-snug break-words">
+                            <h4 className="text-xs font-extrabold text-[#1F1B18] group-hover:text-[#A34224] transition-colors leading-snug break-words">
                               {item.title}
                             </h4>
                           </button>
@@ -580,9 +580,9 @@ export const WeekOverviewView: React.FC = () => {
                           {(item.location ||
                             (typeof item.lat === 'number' &&
                               typeof item.lng === 'number')) && (
-                            <div className="flex items-center justify-between gap-1.5 text-[11px] text-slate-400 min-w-0">
+                            <div className="flex items-center justify-between gap-1.5 text-[11px] text-[#6B6259] min-w-0">
                               <span className="inline-flex items-center gap-1 min-w-0 flex-1">
-                                <MapPin className="w-3 h-3 text-cyan-400/80 shrink-0" />
+                                <MapPin className="w-3 h-3 text-[#2A7B88] shrink-0" />
                                 <span className="truncate break-words">
                                   {item.location || trip.destination}
                                 </span>
@@ -605,7 +605,7 @@ export const WeekOverviewView: React.FC = () => {
                                   }
                                   title="Auf Karte zeigen"
                                   aria-label={`${item.title} auf Karte zeigen`}
-                                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-cyan-400/15 hover:bg-cyan-400/25 text-cyan-300 border border-cyan-400/30 text-[10px] font-bold transition-colors cursor-pointer"
+                                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[#2A7B88]/12 hover:bg-[#2A7B88]/20 text-[#1F5E68] border border-[#2A7B88]/30 text-[10px] font-bold transition-colors cursor-pointer"
                                 >
                                   <Navigation className="w-2.5 h-2.5" />
                                   <span>Karte</span>
@@ -619,7 +619,7 @@ export const WeekOverviewView: React.FC = () => {
                                       href={mapsUrl}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="inline-flex items-center justify-center w-5 h-5 rounded-md bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 transition-colors"
+                                      className="inline-flex items-center justify-center w-5 h-5 rounded-md bg-white hover:bg-[#F3ECE1] text-[#6B6259] hover:text-[#1F1B18] border border-[#E6DDD1] transition-colors"
                                       title="In Google Maps öffnen"
                                       aria-label={`${item.title} in Google Maps öffnen`}
                                     >
@@ -632,7 +632,7 @@ export const WeekOverviewView: React.FC = () => {
 
                           {/* Bottom Row: Cost + Touch Move Selector + Vote */}
                           <div className="flex items-center justify-between gap-2 pt-1 min-w-0">
-                            <span className="text-[11px] font-bold text-emerald-300/90 font-mono tabular-nums truncate">
+                            <span className="text-[11px] font-bold text-[#4B593E] font-mono tabular-nums truncate">
                               {item.cost > 0
                                 ? `~${formatCurrency(item.cost, trip.currency)}`
                                 : 'Kostenlos'}
@@ -651,8 +651,8 @@ export const WeekOverviewView: React.FC = () => {
                                   title="Auf anderen Tag verschieben"
                                   className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold transition-colors cursor-pointer border ${
                                     isMoveMenuOpen
-                                      ? 'bg-cyan-400/20 text-cyan-200 border-cyan-400/45'
-                                      : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
+                                      ? 'bg-[#C85A38]/12 text-[#A34224] border-[#C85A38]/35'
+                                      : 'bg-white hover:bg-[#F3ECE1] text-[#6B6259] border-[#E6DDD1]'
                                   }`}
                                 >
                                   <ArrowRightLeft className="w-2.5 h-2.5" />
@@ -672,8 +672,8 @@ export const WeekOverviewView: React.FC = () => {
                                 aria-label={`Stimmen für ${item.title} (${item.votes.length})`}
                                 className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer font-mono tabular-nums border ${
                                   hasVoted
-                                    ? 'bg-cyan-400/20 text-cyan-200 border-cyan-400/45'
-                                    : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
+                                    ? 'bg-[#C85A38]/12 text-[#A34224] border-[#C85A38]/35'
+                                    : 'bg-white hover:bg-[#F3ECE1] text-[#6B6259] border-[#E6DDD1]'
                                 }`}
                               >
                                 <ThumbsUp className="w-2.5 h-2.5" />
@@ -684,16 +684,16 @@ export const WeekOverviewView: React.FC = () => {
 
                           {/* Touch / Mobile Day Move Picker Drawer */}
                           {isMoveMenuOpen && item.kind === 'activity' && (
-                            <div className="pt-2 mt-1 border-t border-white/10 space-y-1.5 animate-fade-in">
+                            <div className="pt-2 mt-1 border-t border-[#E6DDD1] space-y-1.5 animate-fade-in">
                               <div className="flex items-center justify-between gap-2">
-                                <span className="text-[10px] font-bold text-cyan-300 uppercase tracking-wider">
+                                <span className="text-[10px] font-bold text-[#A34224] uppercase tracking-wider">
                                   Auf Tag verschieben:
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => setMovingActivityId(null)}
                                   aria-label="Verschieben-Auswahl schließen"
-                                  className="text-slate-400 hover:text-slate-200 cursor-pointer"
+                                  className="text-[#8C8277] hover:text-[#1F1B18] cursor-pointer"
                                 >
                                   <X className="w-3 h-3" />
                                 </button>
@@ -714,8 +714,8 @@ export const WeekOverviewView: React.FC = () => {
                                       }
                                       className={`px-2 py-0.5 rounded-full text-[10px] font-bold font-mono tabular-nums transition-colors ${
                                         isCurrent
-                                          ? 'bg-cyan-400/20 text-cyan-200 border border-cyan-400/40 cursor-default'
-                                          : 'bg-white/10 hover:bg-cyan-400 hover:text-[#0B0E14] text-slate-200 cursor-pointer'
+                                          ? 'bg-[#C85A38]/12 text-[#A34224] border border-[#C85A38]/30 cursor-default'
+                                          : 'bg-white hover:bg-[#C85A38] hover:text-white text-[#1F1B18] border border-[#E6DDD1] cursor-pointer'
                                       }`}
                                     >
                                       T{targetDay}
@@ -733,16 +733,16 @@ export const WeekOverviewView: React.FC = () => {
               </div>
 
               {/* Footer: Quick Add + Contextual Details Jump */}
-              <div className="pt-2.5 flex items-center justify-between gap-2 border-t border-white/10">
+              <div className="pt-2.5 flex items-center justify-between gap-2 border-t border-[#E6DDD1]">
                 <button
                   type="button"
                   onClick={() => {
                     setSelectedDay(day);
                     setIsQuickAddOpen(true);
                   }}
-                  className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-300 hover:text-cyan-300 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-[#6B6259] hover:text-[#A34224] transition-colors cursor-pointer"
                 >
-                  <Plus className="w-3.5 h-3.5 text-cyan-400" />
+                  <Plus className="w-3.5 h-3.5 text-[#C85A38]" />
                   <span>Termin</span>
                 </button>
 
@@ -757,7 +757,7 @@ export const WeekOverviewView: React.FC = () => {
                       ? 'Essensplan für diesen Tag öffnen'
                       : 'Tagesplan für diesen Tag öffnen'
                   }
-                  className="text-[11px] font-bold text-cyan-300 hover:text-cyan-200 transition-colors cursor-pointer"
+                  className="text-[11px] font-bold text-[#A34224] hover:text-[#C85A38] transition-colors cursor-pointer"
                 >
                   Details →
                 </button>

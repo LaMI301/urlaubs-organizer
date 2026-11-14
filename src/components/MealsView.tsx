@@ -54,29 +54,29 @@ const MEAL_SLOTS: Array<{
     type: 'breakfast',
     label: 'Frühstück',
     defaultTime: '09:00',
-    iconBg: 'bg-amber-400/15 border border-amber-400/30 text-amber-300',
-    icon: <Coffee className="w-4 h-4 text-amber-300" />,
+    iconBg: 'bg-[#D9822B]/14 border border-[#D9822B]/30 text-[#9E5A14]',
+    icon: <Coffee className="w-4 h-4 text-[#9E5A14]" />,
   },
   {
     type: 'lunch',
     label: 'Mittagessen',
     defaultTime: '13:30',
-    iconBg: 'bg-emerald-400/15 border border-emerald-400/30 text-emerald-300',
-    icon: <Sun className="w-4 h-4 text-emerald-300" />,
+    iconBg: 'bg-[#6E7F5E]/14 border border-[#6E7F5E]/30 text-[#4B593E]',
+    icon: <Sun className="w-4 h-4 text-[#4B593E]" />,
   },
   {
     type: 'dinner',
     label: 'Abendessen',
     defaultTime: '20:00',
-    iconBg: 'bg-violet-400/15 border border-violet-400/30 text-violet-300',
-    icon: <Moon className="w-4 h-4 text-violet-300" />,
+    iconBg: 'bg-[#C85A38]/12 border border-[#C85A38]/30 text-[#A34224]',
+    icon: <Moon className="w-4 h-4 text-[#A34224]" />,
   },
   {
     type: 'snack',
     label: 'Snacks & Drinks',
     defaultTime: '17:00',
-    iconBg: 'bg-cyan-400/15 border border-cyan-400/30 text-cyan-300',
-    icon: <Wine className="w-4 h-4 text-cyan-300" />,
+    iconBg: 'bg-[#2A7B88]/12 border border-[#2A7B88]/30 text-[#1F5E68]',
+    icon: <Wine className="w-4 h-4 text-[#1F5E68]" />,
   },
 ];
 
@@ -86,22 +86,22 @@ const STYLE_META: Record<
 > = {
   cook: {
     label: 'Selbst kochen',
-    badgeClass: 'bg-emerald-400/15 text-emerald-300 border border-emerald-400/30',
+    badgeClass: 'bg-[#6E7F5E]/14 text-[#4B593E] border border-[#6E7F5E]/30',
     icon: <ChefHat className="w-3.5 h-3.5" />,
   },
   restaurant: {
     label: 'Restaurant',
-    badgeClass: 'bg-violet-400/15 text-violet-300 border border-violet-400/30',
+    badgeClass: 'bg-[#C85A38]/12 text-[#A34224] border border-[#C85A38]/30',
     icon: <Store className="w-3.5 h-3.5" />,
   },
   bakery: {
     label: 'Bäckerei / Café',
-    badgeClass: 'bg-amber-400/15 text-amber-300 border border-amber-400/30',
+    badgeClass: 'bg-[#D9822B]/14 text-[#9E5A14] border border-[#D9822B]/30',
     icon: <Croissant className="w-3.5 h-3.5" />,
   },
   delivery: {
     label: 'Lieferservice',
-    badgeClass: 'bg-cyan-400/15 text-cyan-300 border border-cyan-400/30',
+    badgeClass: 'bg-[#2A7B88]/12 text-[#1F5E68] border border-[#2A7B88]/30',
     icon: <Bike className="w-3.5 h-3.5" />,
   },
 };
@@ -432,21 +432,21 @@ export const MealsView: React.FC = () => {
         data-search-id={meal.id}
         className={`rounded-[20px] p-4 transition-all border ${
           isHighlighted
-            ? 'aurora-glass-elevated ring-2 ring-cyan-400 shadow-[0_0_26px_rgba(34,211,238,0.3)]'
+            ? 'surface-glass-elevated ring-2 ring-[#C85A38] shadow-[0_8px_24px_rgba(200,90,56,0.18)]'
             : isLeading
-            ? 'aurora-glass-elevated border-amber-400/45 shadow-[0_0_20px_rgba(251,191,36,0.1)]'
-            : 'bg-white/[0.04] border-white/10 hover:border-white/20'
+            ? 'surface-glass-elevated border-[#D9822B]/45 shadow-[0_6px_20px_rgba(217,130,43,0.1)]'
+            : 'bg-white/90 border-[#E6DDD1] hover:border-[#D5C9BA]'
         }`}
       >
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-1.5 flex-wrap">
             {(meal.dayNumber < 1 || meal.dayNumber > safeTotalDays) && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono tabular-nums font-extrabold bg-amber-400/20 text-amber-200 border border-amber-400/40">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono tabular-nums font-extrabold bg-[#D9822B]/14 text-[#9E5A14] border border-[#D9822B]/30">
                 Tag {meal.dayNumber}
               </span>
             )}
-            <span className="inline-flex items-center gap-1 text-[11px] font-mono tabular-nums font-bold bg-white/10 border border-white/10 px-2.5 py-0.5 rounded-full text-slate-100">
-              <Clock className="w-3 h-3 text-cyan-400" />
+            <span className="inline-flex items-center gap-1 text-[11px] font-mono tabular-nums font-bold bg-[#F3ECE1]/80 border border-[#E6DDD1] px-2.5 py-0.5 rounded-full text-[#1F1B18]">
+              <Clock className="w-3 h-3 text-[#C85A38]" />
               {meal.time}
             </span>
             <span
@@ -457,12 +457,12 @@ export const MealsView: React.FC = () => {
             </span>
             {isLeading &&
               (isTied ? (
-                <span className="inline-flex items-center gap-1 text-[10px] font-extrabold bg-violet-400/20 text-violet-200 border border-violet-400/40 px-2 py-0.5 rounded-full">
+                <span className="inline-flex items-center gap-1 text-[10px] font-extrabold bg-[#2A7B88]/12 text-[#1F5E68] border border-[#2A7B88]/30 px-2 py-0.5 rounded-full">
                   <Scale className="w-3 h-3" /> Gleichstand
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 text-[10px] font-extrabold bg-amber-400/20 text-amber-200 border border-amber-400/40 px-2 py-0.5 rounded-full">
-                  <Trophy className="w-3 h-3 text-amber-300" /> Favorit
+                <span className="inline-flex items-center gap-1 text-[10px] font-extrabold bg-[#D9822B]/14 text-[#9E5A14] border border-[#D9822B]/30 px-2 py-0.5 rounded-full">
+                  <Trophy className="w-3 h-3 text-[#D9822B]" /> Favorit
                 </span>
               ))}
           </div>
@@ -471,29 +471,29 @@ export const MealsView: React.FC = () => {
             <button
               type="button"
               onClick={() => handleStartEdit(meal)}
-              className="text-slate-400 hover:text-cyan-300 p-1.5 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+              className="text-[#8C8277] hover:text-[#C85A38] p-1.5 rounded-full hover:bg-[#F3ECE1] transition-colors cursor-pointer"
               title="Essensvorschlag bearbeiten"
             >
               <Pencil className="w-3.5 h-3.5" />
             </button>
 
             {isConfirmingDelete ? (
-              <div className="inline-flex items-center gap-1 bg-rose-500/15 border border-rose-400/40 rounded-full px-2 py-0.5 text-[10px] font-bold">
-                <span className="text-rose-200">Löschen?</span>
+              <div className="inline-flex items-center gap-1 bg-rose-600/12 border border-rose-500/30 rounded-full px-2 py-0.5 text-[10px] font-bold">
+                <span className="text-rose-800">Löschen?</span>
                 <button
                   type="button"
                   onClick={() => {
                     deleteMeal(meal.id);
                     setConfirmDeleteId(null);
                   }}
-                  className="px-1.5 py-0.5 rounded-full bg-rose-500 text-white hover:bg-rose-400 cursor-pointer"
+                  className="px-1.5 py-0.5 rounded-full bg-rose-600 text-white hover:bg-rose-700 cursor-pointer"
                 >
                   Ja
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirmDeleteId(null)}
-                  className="px-1.5 py-0.5 rounded-full bg-white/10 text-slate-200 hover:bg-white/20 cursor-pointer"
+                  className="px-1.5 py-0.5 rounded-full bg-[#F3ECE1] text-[#1F1B18] hover:bg-[#E6DDD1] cursor-pointer"
                 >
                   Nein
                 </button>
@@ -502,7 +502,7 @@ export const MealsView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setConfirmDeleteId(meal.id)}
-                className="text-slate-400 hover:text-rose-300 p-1.5 rounded-full hover:bg-rose-500/15 transition-colors cursor-pointer"
+                className="text-[#8C8277] hover:text-rose-700 p-1.5 rounded-full hover:bg-rose-600/12 transition-colors cursor-pointer"
                 title="Essensvorschlag löschen"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -512,21 +512,21 @@ export const MealsView: React.FC = () => {
         </div>
 
         {conflictLabels.length > 0 && (
-          <div className="mt-2.5 rounded-xl bg-amber-500/15 border border-amber-400/40 px-2.5 py-1.5 text-[11px] text-amber-200 flex items-start gap-1.5">
-            <AlertTriangle className="w-3.5 h-3.5 text-amber-300 shrink-0 mt-0.5" />
+          <div className="mt-2.5 rounded-xl bg-[#D9822B]/14 border border-[#D9822B]/30 px-2.5 py-1.5 text-[11px] text-[#9E5A14] flex items-start gap-1.5">
+            <AlertTriangle className="w-3.5 h-3.5 text-[#D9822B] shrink-0 mt-0.5" />
             <span>
               <strong>Zeitkonflikt:</strong> {conflictLabels.join(', ')}
             </span>
           </div>
         )}
 
-        <h4 className="text-sm font-extrabold text-slate-100 mt-2.5">
+        <h4 className="text-sm font-extrabold text-[#1F1B18] mt-2.5">
           {meal.title}
         </h4>
 
-        <div className="text-xs text-slate-400 mt-1.5 flex flex-wrap items-center gap-1.5">
-          <span className="inline-flex items-center gap-1 text-slate-200 font-semibold">
-            <MapPin className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+        <div className="text-xs text-[#6B6259] mt-1.5 flex flex-wrap items-center gap-1.5">
+          <span className="inline-flex items-center gap-1 text-[#1F1B18] font-semibold">
+            <MapPin className="w-3.5 h-3.5 text-[#C85A38] shrink-0" />
             <span>{meal.locationOrRecipe}</span>
           </span>
 
@@ -545,7 +545,7 @@ export const MealsView: React.FC = () => {
                   time: meal.time,
                 })
               }
-              className="inline-flex items-center gap-1 text-[10px] font-bold text-cyan-300 bg-cyan-500/15 hover:bg-cyan-500/25 px-2 py-0.5 rounded-full border border-cyan-400/30 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1 text-[10px] font-bold text-[#1F5E68] bg-[#2A7B88]/12 hover:bg-[#2A7B88]/20 px-2 py-0.5 rounded-full border border-[#2A7B88]/30 transition-colors cursor-pointer"
               title="Im Map-Cockpit fokussieren"
             >
               <MapIcon className="w-2.5 h-2.5" />
@@ -558,7 +558,7 @@ export const MealsView: React.FC = () => {
               href={mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-200 bg-white/10 hover:bg-white/20 px-2 py-0.5 rounded-full border border-white/10 transition-colors"
+              className="inline-flex items-center gap-1 text-[10px] font-bold text-[#1F1B18] bg-[#F3ECE1]/80 hover:bg-[#E6DDD1] px-2 py-0.5 rounded-full border border-[#E6DDD1] transition-colors"
               title={`In Google Maps öffnen: ${meal.locationOrRecipe}`}
             >
               <ExternalLink className="w-2.5 h-2.5" />
@@ -566,32 +566,32 @@ export const MealsView: React.FC = () => {
             </a>
           )}
 
-          <span className="font-mono tabular-nums text-amber-300 font-bold">
+          <span className="font-mono tabular-nums text-[#9E5A14] font-bold">
             • ca. {formatCurrency(meal.estimatedCostPerPerson, currency)} p.P.
           </span>
         </div>
 
-        <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+        <p className="text-xs text-[#6B6259] mt-2 leading-relaxed">
           {meal.description}
         </p>
 
         {meal.ShoppingNotes && (
-          <div className="mt-2.5 bg-amber-400/10 border border-amber-400/25 rounded-xl px-3 py-2 text-[11px] text-amber-100 flex items-start gap-2">
-            <ShoppingBag className="w-3.5 h-3.5 text-amber-300 shrink-0 mt-0.5" />
+          <div className="mt-2.5 bg-[#D9822B]/10 border border-[#D9822B]/25 rounded-xl px-3 py-2 text-[11px] text-[#1F1B18] flex items-start gap-2">
+            <ShoppingBag className="w-3.5 h-3.5 text-[#9E5A14] shrink-0 mt-0.5" />
             <div>
-              <strong className="font-bold text-amber-300">Einkaufsnotiz: </strong>
+              <strong className="font-bold text-[#9E5A14]">Einkaufsnotiz: </strong>
               {meal.ShoppingNotes}
             </div>
           </div>
         )}
 
         {/* Team & Voting Footer */}
-        <div className="mt-3.5 pt-2.5 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
-            <Users className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+        <div className="mt-3.5 pt-2.5 border-t border-[#E6DDD1] flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 text-[11px] text-[#6B6259]">
+            <Users className="w-3.5 h-3.5 text-[#8C8277] shrink-0" />
             <span>Team:</span>
             {meal.assignedTeam.length === 0 ? (
-              <span className="text-slate-500 italic">Noch offen</span>
+              <span className="text-[#8C8277] italic">Noch offen</span>
             ) : (
               <div className="flex items-center -space-x-1">
                 {meal.assignedTeam.map((tId) => {
@@ -600,7 +600,7 @@ export const MealsView: React.FC = () => {
                     <span
                       key={tId}
                       style={{ backgroundColor: member.color }}
-                      className="w-5 h-5 rounded-full text-[9px] font-black text-slate-950 flex items-center justify-center ring-1 ring-[#131823]"
+                      className="w-5 h-5 rounded-full text-[9px] font-black text-white flex items-center justify-center ring-1 ring-white"
                       title={`Orga/Koch-Team: ${member.name}`}
                     >
                       {member.initials}
@@ -609,7 +609,7 @@ export const MealsView: React.FC = () => {
                 })}
               </div>
             )}
-            <span className="text-[10px] text-slate-500 ml-1">
+            <span className="text-[10px] text-[#8C8277] ml-1">
               (von {proposer.name})
             </span>
           </div>
@@ -623,7 +623,7 @@ export const MealsView: React.FC = () => {
                   <span
                     key={vId}
                     style={{ backgroundColor: voter.color }}
-                    className="w-5 h-5 rounded-full text-[9px] font-black text-slate-950 flex items-center justify-center ring-1 ring-[#131823]"
+                    className="w-5 h-5 rounded-full text-[9px] font-black text-white flex items-center justify-center ring-1 ring-white"
                     title={`${voter.name} stimmt dafür`}
                   >
                     {voter.initials}
@@ -637,8 +637,8 @@ export const MealsView: React.FC = () => {
               onClick={() => toggleMealVote(meal.id)}
               className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold transition-all cursor-pointer ${
                 hasVoted
-                  ? 'bg-cyan-400 text-slate-950 shadow-[0_0_12px_rgba(34,211,238,0.28)]'
-                  : 'bg-white/10 hover:bg-white/15 text-slate-200 border border-white/10'
+                  ? 'bg-[#C85A38] text-white shadow-[0_4px_12px_rgba(200,90,56,0.28)]'
+                  : 'bg-[#F3ECE1]/80 hover:bg-[#E6DDD1] text-[#1F1B18] border border-[#E6DDD1]'
               }`}
             >
               <ThumbsUp className="w-3 h-3" />
@@ -653,33 +653,33 @@ export const MealsView: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="aurora-glass-elevated rounded-[28px] p-6 relative overflow-hidden">
-        <div className="absolute -top-12 -right-12 w-52 h-52 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="surface-glass-elevated rounded-[28px] p-6 relative overflow-hidden">
+        <div className="absolute -top-12 -right-12 w-52 h-52 bg-[#D9822B]/12 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
           <div>
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-300 mb-2">
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#D9822B]/14 border border-[#D9822B]/30 text-[#9E5A14] mb-2">
               <Utensils className="w-3.5 h-3.5" />
               Essensplaner & Kulinarik
             </span>
-            <h1 className="text-2xl font-black text-slate-100">
+            <h1 className="text-2xl font-black text-[#1F1B18]">
               Was essen wir an welchem Tag?
             </h1>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-[#6B6259] mt-1">
               Plant Frühstück, Mittag- & Abendessen, teilt Koch-Teams ein und übernehmt alle Einkaufsnotizen mit einem Klick in eure Checkliste.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
-            <div className="aurora-glass rounded-2xl px-3.5 py-2 text-xs">
-              <span className="text-slate-400 block text-[10px] font-bold uppercase tracking-wide">
+            <div className="surface-glass rounded-2xl px-3.5 py-2 text-xs">
+              <span className="text-[#8C8277] block text-[10px] font-bold uppercase tracking-wide">
                 Kulinarik-Mix (1 Favorit / Slot)
               </span>
-              <span className="font-extrabold text-slate-100 font-mono tabular-nums">
+              <span className="font-extrabold text-[#1F1B18] font-mono tabular-nums">
                 {mealStats.cookCount}x Kochen • {mealStats.restaurantCount}x Restaurant • ~
                 {formatCurrency(mealStats.effectiveCostPerPerson, currency)} p.P.
               </span>
               {mealStats.alternativeCount > 0 && (
-                <span className="block text-[10px] text-amber-300 font-semibold mt-0.5">
+                <span className="block text-[10px] text-[#9E5A14] font-semibold mt-0.5">
                   +{mealStats.alternativeCount}{' '}
                   {mealStats.alternativeCount === 1
                     ? 'Alternativ-Option'
@@ -692,13 +692,13 @@ export const MealsView: React.FC = () => {
             <button
               type="button"
               onClick={handleImportShoppingList}
-              className="inline-flex items-center gap-2 px-4 py-3 rounded-full text-xs font-extrabold bg-emerald-400/15 hover:bg-emerald-400/25 text-emerald-200 border border-emerald-400/40 transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-3 rounded-full text-xs font-extrabold bg-[#6E7F5E]/14 hover:bg-[#6E7F5E]/22 text-[#4B593E] border border-[#6E7F5E]/30 transition-all cursor-pointer"
               title="Alle Einkaufsnotizen aus den Mahlzeiten als Aufgaben in die Einkaufsliste übernehmen"
             >
-              <ListChecks className="w-4 h-4 text-emerald-300" />
+              <ListChecks className="w-4 h-4 text-[#4B593E]" />
               <span>Einkaufsliste in Checkliste übernehmen</span>
               {mealStats.mealsWithShoppingNotes > 0 && (
-                <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono tabular-nums bg-emerald-400 text-slate-950 font-black">
+                <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono tabular-nums bg-[#6E7F5E] text-white font-black">
                   {mealStats.mealsWithShoppingNotes}
                 </span>
               )}
@@ -716,7 +716,7 @@ export const MealsView: React.FC = () => {
                   scrollToForm();
                 }
               }}
-              className="bg-cyan-400 hover:bg-cyan-300 text-slate-950 rounded-full px-5 py-3 text-xs font-extrabold flex items-center gap-2 shadow-[0_0_20px_rgba(34,211,238,0.28)] transition-all cursor-pointer"
+              className="bg-[#C85A38] hover:bg-[#B54B2B] text-white rounded-full px-5 py-3 text-xs font-extrabold flex items-center gap-2 shadow-[0_6px_18px_rgba(200,90,56,0.28)] transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>{showAddForm ? 'Formular schließen' : '+ Essens-Vorschlag'}</span>
@@ -733,8 +733,8 @@ export const MealsView: React.FC = () => {
             onClick={() => setViewAllDays(true)}
             className={`px-4 py-2.5 rounded-full text-xs font-extrabold transition-all shrink-0 cursor-pointer ${
               viewAllDays
-                ? 'bg-cyan-400 text-slate-950 shadow-[0_0_16px_rgba(34,211,238,0.28)]'
-                : 'aurora-glass text-slate-200 hover:bg-white/10'
+                ? 'bg-[#C85A38] text-white shadow-[0_4px_14px_rgba(200,90,56,0.28)]'
+                : 'surface-glass text-[#1F1B18] hover:bg-[#F3ECE1]'
             }`}
           >
             Alle Tage (<span className="font-mono tabular-nums">{trip.meals.length}</span>)
@@ -755,18 +755,18 @@ export const MealsView: React.FC = () => {
                 }}
                 className={`px-4 py-2.5 rounded-full text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer border ${
                   isSelected
-                    ? 'bg-cyan-500/20 text-cyan-100 border-cyan-400/60 shadow-[0_0_16px_rgba(34,211,238,0.2)]'
-                    : 'aurora-glass text-slate-300 hover:bg-white/10'
+                    ? 'bg-[#C85A38]/12 text-[#A34224] border-[#C85A38]/30 shadow-sm'
+                    : 'surface-glass text-[#6B6259] hover:text-[#1F1B18] hover:bg-[#F3ECE1]'
                 }`}
               >
                 <span className="font-mono tabular-nums">Tag {dayNum}</span>
                 {dayHasConflict && (
                   <AlertTriangle
-                    className="w-3 h-3 text-amber-400"
+                    className="w-3 h-3 text-[#D9822B]"
                     aria-label="Zeitkonflikt"
                   />
                 )}
-                <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono tabular-nums bg-white/10 text-slate-200">
+                <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono tabular-nums bg-[#F3ECE1] text-[#1F1B18]">
                   {count}
                 </span>
               </button>
@@ -779,8 +779,8 @@ export const MealsView: React.FC = () => {
           onClick={() => setHideEmptySlots((prev) => !prev)}
           className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold transition-all shrink-0 self-start sm:self-auto border cursor-pointer ${
             hideEmptySlots
-              ? 'bg-violet-400/20 text-violet-200 border-violet-400/50'
-              : 'aurora-glass text-slate-300 hover:bg-white/10'
+              ? 'bg-[#2A7B88]/12 text-[#1F5E68] border-[#2A7B88]/30'
+              : 'surface-glass text-[#6B6259] hover:text-[#1F1B18] hover:bg-[#F3ECE1]'
           }`}
         >
           <EyeOff className="w-3.5 h-3.5" />
@@ -793,16 +793,16 @@ export const MealsView: React.FC = () => {
         <form
           ref={formRef}
           onSubmit={handleCreateMeal}
-          className="aurora-glass-elevated rounded-[26px] p-6 border-amber-400/35 space-y-4 animate-fade-in"
+          className="surface-glass-elevated rounded-[26px] p-6 border-[#D9822B]/35 space-y-4 animate-fade-in"
         >
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h3 className="text-base font-extrabold text-slate-100">
+              <h3 className="text-base font-extrabold text-[#1F1B18]">
                 {editingMealId
                   ? 'Essens-Vorschlag bearbeiten'
                   : 'Neuen Essens-Vorschlag hinzufügen'}
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-[#6B6259]">
                 {editingMealId
                   ? 'Änderungen speichern – alle bisherigen Votes bleiben erhalten.'
                   : 'Mehrere Vorschläge pro Mahlzeit sind möglich – die Gruppe stimmt einfach ab!'}
@@ -814,15 +814,15 @@ export const MealsView: React.FC = () => {
                 resetForm();
                 setShowAddForm(false);
               }}
-              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-200 flex items-center justify-center cursor-pointer"
+              className="w-8 h-8 rounded-full bg-[#F3ECE1] hover:bg-[#E6DDD1] text-[#1F1B18] flex items-center justify-center cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
           {formError && (
-            <div className="rounded-2xl bg-rose-500/15 border border-rose-400/40 px-4 py-2.5 text-xs font-semibold text-rose-200 flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-rose-300 shrink-0" />
+            <div className="rounded-2xl bg-rose-600/12 border border-rose-500/30 px-4 py-2.5 text-xs font-semibold text-rose-800 flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
               <span>{formError}</span>
             </div>
           )}
@@ -831,7 +831,7 @@ export const MealsView: React.FC = () => {
             <div>
               <label
                 htmlFor="meal-day"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Reisetag
               </label>
@@ -839,10 +839,10 @@ export const MealsView: React.FC = () => {
                 id="meal-day"
                 value={formDay}
                 onChange={(e) => setFormDay(Number(e.target.value))}
-                className="w-full aurora-input rounded-2xl px-3 py-2.5 text-xs font-bold [color-scheme:dark]"
+                className="w-full surface-input rounded-2xl px-3 py-2.5 text-xs font-bold [color-scheme:light]"
               >
                 {Array.from({ length: safeTotalDays }, (_, i) => i + 1).map((d) => (
-                  <option key={d} value={d} className="bg-[#131823] text-slate-100">
+                  <option key={d} value={d} className="bg-white text-[#1F1B18]">
                     Tag {d}
                   </option>
                 ))}
@@ -852,7 +852,7 @@ export const MealsView: React.FC = () => {
             <div>
               <label
                 htmlFor="meal-slot"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Mahlzeit-Slot
               </label>
@@ -865,18 +865,18 @@ export const MealsView: React.FC = () => {
                   const slot = MEAL_SLOTS.find((s) => s.type === nextType);
                   if (slot && !editingMealId) setTime(slot.defaultTime);
                 }}
-                className="w-full aurora-input rounded-2xl px-3 py-2.5 text-xs font-bold [color-scheme:dark]"
+                className="w-full surface-input rounded-2xl px-3 py-2.5 text-xs font-bold [color-scheme:light]"
               >
-                <option value="breakfast" className="bg-[#131823] text-slate-100">
+                <option value="breakfast" className="bg-white text-[#1F1B18]">
                   Frühstück
                 </option>
-                <option value="lunch" className="bg-[#131823] text-slate-100">
+                <option value="lunch" className="bg-white text-[#1F1B18]">
                   Mittagessen
                 </option>
-                <option value="dinner" className="bg-[#131823] text-slate-100">
+                <option value="dinner" className="bg-white text-[#1F1B18]">
                   Abendessen
                 </option>
-                <option value="snack" className="bg-[#131823] text-slate-100">
+                <option value="snack" className="bg-white text-[#1F1B18]">
                   Snacks & Drinks
                 </option>
               </select>
@@ -885,7 +885,7 @@ export const MealsView: React.FC = () => {
             <div>
               <label
                 htmlFor="meal-style"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Verpflegungs-Art
               </label>
@@ -893,18 +893,18 @@ export const MealsView: React.FC = () => {
                 id="meal-style"
                 value={style}
                 onChange={(e) => setStyle(e.target.value as MealStyle)}
-                className="w-full aurora-input rounded-2xl px-3 py-2.5 text-xs font-bold [color-scheme:dark]"
+                className="w-full surface-input rounded-2xl px-3 py-2.5 text-xs font-bold [color-scheme:light]"
               >
-                <option value="cook" className="bg-[#131823] text-slate-100">
+                <option value="cook" className="bg-white text-[#1F1B18]">
                   Selbst kochen
                 </option>
-                <option value="restaurant" className="bg-[#131823] text-slate-100">
+                <option value="restaurant" className="bg-white text-[#1F1B18]">
                   Restaurant
                 </option>
-                <option value="bakery" className="bg-[#131823] text-slate-100">
+                <option value="bakery" className="bg-white text-[#1F1B18]">
                   Bäckerei / Café
                 </option>
-                <option value="delivery" className="bg-[#131823] text-slate-100">
+                <option value="delivery" className="bg-white text-[#1F1B18]">
                   Lieferservice
                 </option>
               </select>
@@ -913,7 +913,7 @@ export const MealsView: React.FC = () => {
             <div>
               <label
                 htmlFor="meal-time"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Uhrzeit
               </label>
@@ -925,7 +925,7 @@ export const MealsView: React.FC = () => {
                   setTime(e.target.value);
                   if (formError) setFormError(null);
                 }}
-                className="w-full aurora-input rounded-2xl px-3 py-2.5 text-xs font-mono tabular-nums font-bold [color-scheme:dark]"
+                className="w-full surface-input rounded-2xl px-3 py-2.5 text-xs font-mono tabular-nums font-bold [color-scheme:light]"
               />
             </div>
           </div>
@@ -934,7 +934,7 @@ export const MealsView: React.FC = () => {
             <div>
               <label
                 htmlFor="meal-title"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Gericht / Titel *
               </label>
@@ -948,14 +948,14 @@ export const MealsView: React.FC = () => {
                   setTitle(e.target.value);
                   if (formError) setFormError(null);
                 }}
-                className="w-full aurora-input rounded-2xl px-3.5 py-2.5 text-xs font-semibold placeholder:text-slate-500"
+                className="w-full surface-input rounded-2xl px-3.5 py-2.5 text-xs font-semibold placeholder:text-[#8C8277]"
               />
             </div>
 
             <div>
               <label
                 htmlFor="meal-location"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Ort / Rezept-Idee
               </label>
@@ -965,14 +965,14 @@ export const MealsView: React.FC = () => {
                 placeholder="z.B. Finca-Terrasse oder Tapas Bar Sa Cova"
                 value={locationOrRecipe}
                 onChange={(e) => setLocationOrRecipe(e.target.value)}
-                className="w-full aurora-input rounded-2xl px-3.5 py-2.5 text-xs font-semibold placeholder:text-slate-500"
+                className="w-full surface-input rounded-2xl px-3.5 py-2.5 text-xs font-semibold placeholder:text-[#8C8277]"
               />
             </div>
 
             <div>
               <label
                 htmlFor="meal-cost"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Geschätzte Kosten p.P. ({currency})
               </label>
@@ -983,7 +983,7 @@ export const MealsView: React.FC = () => {
                 step="0.01"
                 value={estimatedCostPerPerson}
                 onChange={(e) => setEstimatedCostPerPerson(e.target.value)}
-                className="w-full aurora-input rounded-2xl px-3.5 py-2.5 text-xs font-mono tabular-nums font-semibold"
+                className="w-full surface-input rounded-2xl px-3.5 py-2.5 text-xs font-mono tabular-nums font-semibold"
               />
             </div>
           </div>
@@ -992,7 +992,7 @@ export const MealsView: React.FC = () => {
             <div>
               <label
                 htmlFor="meal-desc"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Ausführliche Beschreibung
               </label>
@@ -1002,14 +1002,14 @@ export const MealsView: React.FC = () => {
                 placeholder="Details zum Menü, Reservierungshinweise oder besondere Wünsche..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full aurora-input rounded-2xl px-3.5 py-2 text-xs placeholder:text-slate-500 resize-none"
+                className="w-full surface-input rounded-2xl px-3.5 py-2 text-xs placeholder:text-[#8C8277] resize-none"
               />
             </div>
 
             <div>
               <label
                 htmlFor="meal-notes"
-                className="text-xs font-bold text-slate-300 block mb-1.5"
+                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
               >
                 Einkaufsnotizen (ShoppingNotes)
               </label>
@@ -1019,7 +1019,7 @@ export const MealsView: React.FC = () => {
                 placeholder="z.B. Grillgemüse, Halloumi, frisches Baguette, Sangria-Zutaten..."
                 value={shoppingNotes}
                 onChange={(e) => setShoppingNotes(e.target.value)}
-                className="w-full aurora-input rounded-2xl px-3.5 py-2 text-xs placeholder:text-slate-500 resize-none"
+                className="w-full surface-input rounded-2xl px-3.5 py-2 text-xs placeholder:text-[#8C8277] resize-none"
               />
             </div>
           </div>
@@ -1027,14 +1027,14 @@ export const MealsView: React.FC = () => {
           {/* Assigned Team Selector (Empty team [] is preserved!) */}
           <div>
             <div className="flex items-center justify-between gap-2 mb-1.5">
-              <label className="text-xs font-bold text-slate-300">
+              <label className="text-xs font-bold text-[#1F1B18]">
                 Koch- / Orga-Team (leer lassen möglich)
               </label>
               {assignedTeam.length > 0 && (
                 <button
                   type="button"
                   onClick={() => setAssignedTeam([])}
-                  className="text-[11px] font-bold text-slate-400 hover:text-rose-300 transition-colors cursor-pointer"
+                  className="text-[11px] font-bold text-[#8C8277] hover:text-rose-700 transition-colors cursor-pointer"
                 >
                   Team leeren
                 </button>
@@ -1050,13 +1050,13 @@ export const MealsView: React.FC = () => {
                     onClick={() => toggleTeamMember(trav.id)}
                     className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all border cursor-pointer ${
                       selected
-                        ? 'bg-cyan-400 text-slate-950 border-cyan-300'
-                        : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'
+                        ? 'bg-[#C85A38] text-white border-[#C85A38]'
+                        : 'bg-[#FAF7F2] text-[#6B6259] border-[#E6DDD1] hover:bg-[#F3ECE1] hover:text-[#1F1B18]'
                     }`}
                   >
                     <span
                       style={{ backgroundColor: trav.color }}
-                      className="w-5 h-5 rounded-full text-[10px] font-black text-slate-950 flex items-center justify-center"
+                      className="w-5 h-5 rounded-full text-[10px] font-black text-white flex items-center justify-center"
                     >
                       {trav.initials}
                     </span>
@@ -1074,13 +1074,13 @@ export const MealsView: React.FC = () => {
                 resetForm();
                 setShowAddForm(false);
               }}
-              className="px-4 py-2 rounded-full text-xs font-bold bg-white/10 hover:bg-white/15 text-slate-200 cursor-pointer"
+              className="px-4 py-2 rounded-full text-xs font-bold bg-[#F3ECE1] hover:bg-[#E6DDD1] text-[#1F1B18] cursor-pointer"
             >
               Abbrechen
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-full text-xs font-extrabold bg-cyan-400 hover:bg-cyan-300 text-slate-950 shadow-[0_0_18px_rgba(34,211,238,0.28)] cursor-pointer"
+              className="px-5 py-2.5 rounded-full text-xs font-extrabold bg-[#C85A38] hover:bg-[#B54B2B] text-white shadow-[0_6px_18px_rgba(200,90,56,0.28)] cursor-pointer"
             >
               {editingMealId ? 'Änderungen speichern' : 'Essens-Vorschlag speichern'}
             </button>
@@ -1104,31 +1104,31 @@ export const MealsView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => toggleDayCollapse(dayNum)}
-                  className="w-full flex items-center justify-between aurora-glass hover:bg-white/[0.06] rounded-[20px] px-5 py-3.5 transition-all text-left cursor-pointer"
+                  className="w-full flex items-center justify-between surface-glass hover:bg-[#F3ECE1]/80 rounded-[20px] px-5 py-3.5 transition-all text-left cursor-pointer"
                 >
                   <div className="flex items-center gap-2.5 flex-wrap">
-                    <span className="px-2.5 py-1 rounded-full text-xs font-mono tabular-nums font-extrabold bg-cyan-400 text-slate-950">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-mono tabular-nums font-extrabold bg-[#C85A38] text-white">
                       Tag {dayNum}
                     </span>
-                    <span className="text-xs font-bold text-slate-400">
+                    <span className="text-xs font-bold text-[#6B6259]">
                       {formatTripDayDate(trip.startDate, dayNum)}
                     </span>
-                    <span className="text-sm font-extrabold text-slate-100 font-mono tabular-nums">
+                    <span className="text-sm font-extrabold text-[#1F1B18] font-mono tabular-nums">
                       · {dayMeals.length}{' '}
                       {dayMeals.length === 1 ? 'Mahlzeit' : 'Mahlzeiten'}
                     </span>
                   </div>
                   {isCollapsed ? (
-                    <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+                    <ChevronDown className="w-4 h-4 text-[#8C8277] shrink-0" />
                   ) : (
-                    <ChevronUp className="w-4 h-4 text-slate-400 shrink-0" />
+                    <ChevronUp className="w-4 h-4 text-[#8C8277] shrink-0" />
                   )}
                 </button>
               )}
 
               {!isCollapsed &&
                 (visibleSlots.length === 0 ? (
-                  <div className="aurora-glass rounded-[22px] p-5 text-center border-dashed border-white/15 text-xs text-slate-400">
+                  <div className="surface-glass rounded-[22px] p-5 text-center border-dashed border-[#E6DDD1] text-xs text-[#6B6259]">
                     Keine eingetragenen Mahlzeiten für Tag {dayNum}.
                   </div>
                 ) : (
@@ -1155,7 +1155,7 @@ export const MealsView: React.FC = () => {
                       return (
                         <div
                           key={slot.type}
-                          className="aurora-glass rounded-[26px] p-5 flex flex-col justify-between gap-4"
+                          className="surface-glass rounded-[26px] p-5 flex flex-col justify-between gap-4"
                         >
                           <div>
                             {/* Slot Header */}
@@ -1167,10 +1167,10 @@ export const MealsView: React.FC = () => {
                                   {slot.icon}
                                 </div>
                                 <div className="min-w-0">
-                                  <h3 className="text-sm font-extrabold text-slate-100">
+                                  <h3 className="text-sm font-extrabold text-[#1F1B18]">
                                     {slot.label}
                                   </h3>
-                                  <span className="text-[11px] text-slate-400 block truncate">
+                                  <span className="text-[11px] text-[#6B6259] block truncate">
                                     {slotMeals.length === 0
                                       ? 'Noch offen'
                                       : slotMeals.length === 1
@@ -1185,7 +1185,7 @@ export const MealsView: React.FC = () => {
                                 onClick={() =>
                                   openSlotAdd(dayNum, slot.type, slot.defaultTime)
                                 }
-                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-bold bg-white/10 hover:bg-cyan-400 hover:text-slate-950 text-slate-200 transition-colors border border-white/10 cursor-pointer shrink-0"
+                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-bold bg-[#F3ECE1] hover:bg-[#C85A38] hover:text-white text-[#1F1B18] transition-colors border border-[#E6DDD1] cursor-pointer shrink-0"
                               >
                                 <Plus className="w-3.5 h-3.5" />
                                 <span>Option</span>
@@ -1194,8 +1194,8 @@ export const MealsView: React.FC = () => {
 
                             {/* Proposals inside this slot */}
                             {slotMeals.length === 0 ? (
-                              <div className="rounded-2xl bg-white/[0.03] p-5 text-center border border-dashed border-white/15">
-                                <p className="text-xs font-semibold text-slate-400">
+                              <div className="rounded-2xl bg-[#FAF7F2] p-5 text-center border border-dashed border-[#E6DDD1]">
+                                <p className="text-xs font-semibold text-[#6B6259]">
                                   Noch kein {slot.label} für Tag {dayNum} geplant.
                                 </p>
                                 <button
@@ -1203,7 +1203,7 @@ export const MealsView: React.FC = () => {
                                   onClick={() =>
                                     openSlotAdd(dayNum, slot.type, slot.defaultTime)
                                   }
-                                  className="mt-2 text-xs font-bold text-cyan-300 hover:text-cyan-200 underline hover:no-underline cursor-pointer"
+                                  className="mt-2 text-xs font-bold text-[#C85A38] hover:text-[#B54B2B] underline hover:no-underline cursor-pointer"
                                 >
                                   + Jetzt Vorschlag eintragen
                                 </button>
@@ -1232,31 +1232,31 @@ export const MealsView: React.FC = () => {
 
       {/* Collapsible Out-of-Range Meals Section */}
       {outOfRangeMeals.length > 0 && (
-        <div className="aurora-glass rounded-[24px] border-amber-400/35 overflow-hidden">
+        <div className="surface-glass rounded-[24px] border-[#D9822B]/35 overflow-hidden">
           <button
             type="button"
             onClick={() => setShowOutOfRange((prev) => !prev)}
-            className="w-full px-5 py-3.5 flex items-center justify-between gap-3 text-left hover:bg-white/[0.04] transition-colors cursor-pointer"
+            className="w-full px-5 py-3.5 flex items-center justify-between gap-3 text-left hover:bg-[#F3ECE1]/60 transition-colors cursor-pointer"
           >
             <div className="flex items-center gap-2.5 flex-wrap">
-              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-              <span className="text-xs font-extrabold text-amber-200">
+              <AlertTriangle className="w-4 h-4 text-[#D9822B] shrink-0" />
+              <span className="text-xs font-extrabold text-[#9E5A14]">
                 Mahlzeiten außerhalb Reisedauer (Tag &lt; 1 oder Tag &gt; {safeTotalDays})
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono tabular-nums font-bold bg-amber-400/20 text-amber-200">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono tabular-nums font-bold bg-[#D9822B]/14 text-[#9E5A14]">
                 {outOfRangeMeals.length}
               </span>
             </div>
             {showOutOfRange ? (
-              <ChevronUp className="w-4 h-4 text-slate-400 shrink-0" />
+              <ChevronUp className="w-4 h-4 text-[#8C8277] shrink-0" />
             ) : (
-              <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+              <ChevronDown className="w-4 h-4 text-[#8C8277] shrink-0" />
             )}
           </button>
 
           {showOutOfRange && (
             <div className="p-4 pt-1 space-y-3">
-              <p className="text-xs text-slate-400 px-1">
+              <p className="text-xs text-[#6B6259] px-1">
                 Diese Mahlzeiten liegen außerhalb der {safeTotalDays} Reisetage und können
                 bearbeitet oder gelöscht werden.
               </p>
