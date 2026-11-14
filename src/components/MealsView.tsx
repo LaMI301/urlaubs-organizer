@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Utensils,
   Coffee,
@@ -23,44 +23,60 @@ import {
   ChevronUp,
   ExternalLink,
   EyeOff,
+  AlertTriangle,
+  Map as MapIcon,
+  ListChecks,
+  Scale,
 } from 'lucide-react';
 import { useVacation } from '../context/VacationContext';
 import { MealType, MealStyle, MealPlan } from '../types/vacation';
+import {
+  buildGoogleMapsUrl,
+  clampCost,
+  compareTimeSlots,
+  detectDayConflicts,
+  formatCurrency,
+  formatTripDayDate,
+  isGenericLocation,
+  isValidTimeRange,
+  parseTimeToMinutes,
+  roundCents,
+} from '../utils/vacationHelpers';
 
 const MEAL_SLOTS: Array<{
   type: MealType;
   label: string;
   defaultTime: string;
-  accentBg: string;
+  iconBg: string;
   icon: React.ReactNode;
 }> = [
   {
     type: 'breakfast',
     label: 'Frühstück',
     defaultTime: '09:00',
-    accentBg: 'bg-[#F4DF7B]',
-    icon: <Coffee className="w-4 h-4 text-[#141416]" />,
+    iconBg: 'bg-amber-400/15 border border-amber-400/30 text-amber-300',
+    icon: <Coffee className="w-4 h-4 text-amber-300" />,
   },
   {
     type: 'lunch',
     label: 'Mittagessen',
     defaultTime: '13:30',
-    accentBg: 'bg-[#A9B882]',
-    icon: <Sun className="w-4 h-4 text-[#141416]" />,
+    iconBg: 'bg-emerald-400/15 border border-emerald-400/30 text-emerald-300',
+    icon: <Sun className="w-4 h-4 text-emerald-300" />,
   },
   {
     type: 'dinner',
     label: 'Abendessen',
     defaultTime: '20:00',
-    accentBg: 'bg-[#E8C2E8]',
-    icon: <Moon className="w-4 h-4 text-[#141416]" />,
+    iconBg: 'bg-violet-400/15 border border-violet-400/30 text-violet-300',
+    icon: <Moon className="w-4 h-4 text-violet-300" />,
   },
   {
     type: 'snack',
     label: 'Snacks & Drinks',
     defaultTime: '17:00',
-    accentBg: 'bg-[#C5D1F5]',
-    icon: <Wine className="w-4 h-4 text-[#141416]" />,
+    iconBg: 'bg-cyan-400/15 border border-cyan-400/30 text-cyan-300',
+    icon: <Wine className="w-4 h-4 text-cyan-300" />,
   },
 ];
 
@@ -70,22 +86,22 @@ const STYLE_META: Record<
 > = {
   cook: {
     label: 'Selbst kochen',
-    badgeClass: 'bg-[#A9B882]/60 text-[#141416]',
+    badgeClass: 'bg-emerald-400/15 text-emerald-300 border border-emerald-400/30',
     icon: <ChefHat className="w-3.5 h-3.5" />,
   },
   restaurant: {
     label: 'Restaurant',
-    badgeClass: 'bg-[#E8C2E8]/70 text-[#141416]',
+    badgeClass: 'bg-violet-400/15 text-violet-300 border border-violet-400/30',
     icon: <Store className="w-3.5 h-3.5" />,
   },
   bakery: {
     label: 'Bäckerei / Café',
-    badgeClass: 'bg-[#F4DF7B]/70 text-[#141416]',
+    badgeClass: 'bg-amber-400/15 text-amber-300 border border-amber-400/30',
     icon: <Croissant className="w-3.5 h-3.5" />,
   },
   delivery: {
     label: 'Lieferservice',
-    badgeClass: 'bg-[#C5D1F5]/70 text-[#141416]',
+    badgeClass: 'bg-cyan-400/15 text-cyan-300 border border-cyan-400/30',
     icon: <Bike className="w-3.5 h-3.5" />,
   },
 };
@@ -100,6 +116,11 @@ export const MealsView: React.FC = () => {
     updateMeal,
     toggleMealVote,
     deleteMeal,
+    addShoppingTasksFromMeals,
+    focusOnMap,
+    searchTarget,
+    setSearchTarget,
+    showToast,
   } = useVacation();
 
   const [viewAllDays, setViewAllDays] = useState(false);
@@ -108,8 +129,10 @@ export const MealsView: React.FC = () => {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [collapsedDays, setCollapsedDays] = useState<Record<number, boolean>>({});
   const [hideEmptySlots, setHideEmptySlots] = useState(false);
+  const [showOutOfRange, setShowOutOfRange] = useState(true);
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
-  // Add Meal Form State
+  // Add / Edit Meal Form State
   const [formDay, setFormDay] = useState<number>(selectedDay);
   const [mealType, setMealType] = useState<MealType>('dinner');
   const [style, setStyle] = useState<MealStyle>('cook');
@@ -120,10 +143,69 @@ export const MealsView: React.FC = () => {
   const [shoppingNotes, setShoppingNotes] = useState('');
   const [estimatedCostPerPerson, setEstimatedCostPerPerson] = useState('18');
   const [assignedTeam, setAssignedTeam] = useState<string[]>([currentUser.id]);
+  const [formError, setFormError] = useState<string | null>(null);
 
-  React.useEffect(() => {
-    setFormDay(selectedDay);
-  }, [selectedDay]);
+  const formRef = useRef<HTMLFormElement | null>(null);
+  const highlightTimerRef = useRef<number | null>(null);
+
+  const safeTotalDays = Math.max(1, trip.totalDays || 1);
+  const currency = trip.currency || 'EUR';
+
+  // Sync formDay only when NOT editing and NOT adding
+  useEffect(() => {
+    if (!editingMealId && !showAddForm) {
+      setFormDay(selectedDay);
+    }
+  }, [selectedDay, editingMealId, showAddForm]);
+
+  // Spotlight search target handler
+  useEffect(() => {
+    if (!searchTarget || searchTarget.kind !== 'meal') return;
+    const targetId = searchTarget.id;
+    const targetMeal = trip.meals.find((m) => m.id === targetId);
+    if (targetMeal) {
+      setHideEmptySlots(false);
+      if (targetMeal.dayNumber >= 1 && targetMeal.dayNumber <= safeTotalDays) {
+        setViewAllDays(false);
+        setSelectedDay(targetMeal.dayNumber);
+        setCollapsedDays((prev) => ({ ...prev, [targetMeal.dayNumber]: false }));
+      } else {
+        setShowOutOfRange(true);
+      }
+    }
+    setHighlightedId(targetId);
+    setSearchTarget(null);
+  }, [searchTarget, trip.meals, safeTotalDays, setSelectedDay, setSearchTarget]);
+
+  useEffect(() => {
+    if (!highlightedId) return;
+    const scrollTimer = window.setTimeout(() => {
+      const el = document.querySelector<HTMLElement>(
+        `[data-search-id="${highlightedId}"]`
+      );
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 80);
+
+    if (highlightTimerRef.current !== null) {
+      window.clearTimeout(highlightTimerRef.current);
+    }
+    highlightTimerRef.current = window.setTimeout(() => {
+      setHighlightedId(null);
+    }, 3500);
+
+    return () => {
+      window.clearTimeout(scrollTimer);
+      if (highlightTimerRef.current !== null) {
+        window.clearTimeout(highlightTimerRef.current);
+      }
+    };
+  }, [highlightedId]);
+
+  const scrollToForm = () => {
+    window.setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 40);
+  };
 
   const toggleTeamMember = (travelerId: string) => {
     setAssignedTeam((prev) =>
@@ -145,22 +227,33 @@ export const MealsView: React.FC = () => {
     setEstimatedCostPerPerson('18');
     setAssignedTeam([currentUser.id]);
     setEditingMealId(null);
+    setFormError(null);
   };
 
   const openSlotAdd = (dayNum: number, slotType: MealType, defaultTime: string) => {
-    resetForm();
+    setEditingMealId(null);
     setFormDay(dayNum);
     setMealType(slotType);
+    setStyle('cook');
+    setTitle('');
     setTime(defaultTime);
-    if (!assignedTeam.includes(currentUser.id)) {
-      setAssignedTeam([currentUser.id]);
-    }
+    setLocationOrRecipe('');
+    setDescription('');
+    setShoppingNotes('');
+    setEstimatedCostPerPerson('18');
+    setAssignedTeam([currentUser.id]);
+    setFormError(null);
     setShowAddForm(true);
+    scrollToForm();
   };
 
   const handleStartEdit = (meal: MealPlan) => {
     setEditingMealId(meal.id);
-    setFormDay(meal.dayNumber);
+    setFormDay(
+      meal.dayNumber >= 1 && meal.dayNumber <= safeTotalDays
+        ? meal.dayNumber
+        : selectedDay
+    );
     setMealType(meal.mealType);
     setStyle(meal.style);
     setTitle(meal.title);
@@ -169,19 +262,33 @@ export const MealsView: React.FC = () => {
     setDescription(meal.description);
     setShoppingNotes(meal.ShoppingNotes || '');
     setEstimatedCostPerPerson(String(meal.estimatedCostPerPerson));
-    setAssignedTeam(meal.assignedTeam.length > 0 ? meal.assignedTeam : [currentUser.id]);
+    // Preserve intentionally empty team []!
+    setAssignedTeam([...meal.assignedTeam]);
+    setFormError(null);
     setShowAddForm(true);
+    scrollToForm();
   };
 
   const handleCreateMeal = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return;
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle) {
+      setFormError('Bitte gib einen Titel für das Gericht ein.');
+      return;
+    }
+
+    if (parseTimeToMinutes(time) === null || !isValidTimeRange(time)) {
+      setFormError('Bitte gib eine gültige Uhrzeit (HH:MM) an.');
+      return;
+    }
+
+    const parsedCost = clampCost(estimatedCostPerPerson) ?? 0;
 
     const payload = {
-      dayNumber: formDay,
+      dayNumber: Math.max(1, Math.min(Math.round(formDay) || 1, safeTotalDays)),
       mealType,
       style,
-      title: title.trim(),
+      title: trimmedTitle,
       time,
       locationOrRecipe:
         locationOrRecipe.trim() ||
@@ -189,14 +296,17 @@ export const MealsView: React.FC = () => {
       description:
         description.trim() || 'Kulinarischer Vorschlag für die Gruppe.',
       ShoppingNotes: shoppingNotes.trim() || undefined,
-      estimatedCostPerPerson: Math.max(0, Number(estimatedCostPerPerson) || 0),
-      assignedTeam: assignedTeam.length > 0 ? assignedTeam : [currentUser.id],
+      estimatedCostPerPerson: parsedCost,
+      // Respect intentionally empty team []!
+      assignedTeam: [...assignedTeam],
     };
 
     if (editingMealId) {
       updateMeal(editingMealId, payload);
+      showToast(`Mahlzeit „${trimmedTitle}“ gespeichert`, 'success');
     } else {
       addMeal(payload);
+      showToast(`Essensvorschlag „${trimmedTitle}“ hinzugefügt`, 'success');
     }
 
     resetForm();
@@ -210,66 +320,408 @@ export const MealsView: React.FC = () => {
   const getTraveler = (id: string) =>
     trip.travelers.find((t) => t.id === id) || {
       id,
-      name: 'Mitreisender',
-      initials: 'MR',
-      color: '#E8C2E8',
+      name: 'Unbekannt',
+      initials: '?',
+      color: '#94A3B8',
     };
 
+  // Lookup labels for conflict notices
+  const itemLabelById = useMemo(() => {
+    const map = new Map<string, string>();
+    trip.activities.forEach((a) => map.set(a.id, `Aktivität: ${a.title} (${a.timeSlot})`));
+    trip.meals.forEach((m) => map.set(m.id, `Essen: ${m.title} (${m.time})`));
+    return map;
+  }, [trip.activities, trip.meals]);
+
+  // Conflict detection per day
+  const conflictsByDay = useMemo(() => {
+    const daySet = new Set<number>();
+    trip.meals.forEach((m) => daySet.add(m.dayNumber));
+    const map: Record<number, Record<string, string[]>> = {};
+    daySet.forEach((d) => {
+      map[d] = detectDayConflicts(trip.activities, trip.meals, d);
+    });
+    return map;
+  }, [trip.activities, trip.meals]);
+
+  // Budget calculation per slot (1 leading option per dayNumber+mealType slot)
+  const mealStats = useMemo(() => {
+    const cookCount = trip.meals.filter((m) => m.style === 'cook').length;
+    const restaurantCount = trip.meals.filter((m) => m.style === 'restaurant').length;
+    const mealsWithShoppingNotes = trip.meals.filter(
+      (m) => Boolean(m.ShoppingNotes?.trim())
+    ).length;
+
+    const bySlot = new Map<string, MealPlan[]>();
+    trip.meals.forEach((m) => {
+      const key = `${m.dayNumber}::${m.mealType}`;
+      const list = bySlot.get(key) || [];
+      list.push(m);
+      bySlot.set(key, list);
+    });
+
+    let effectiveCostPerPerson = 0;
+    let multiOptionSlotCount = 0;
+    let alternativeCount = 0;
+
+    bySlot.forEach((slotItems) => {
+      if (slotItems.length > 1) {
+        multiOptionSlotCount += 1;
+        alternativeCount += slotItems.length - 1;
+      }
+      const sorted = [...slotItems].sort(
+        (a, b) =>
+          b.votes.length - a.votes.length || compareTimeSlots(a.time, b.time)
+      );
+      effectiveCostPerPerson = roundCents(
+        effectiveCostPerPerson + (Number(sorted[0]?.estimatedCostPerPerson) || 0)
+      );
+    });
+
+    return {
+      cookCount,
+      restaurantCount,
+      mealsWithShoppingNotes,
+      effectiveCostPerPerson,
+      multiOptionSlotCount,
+      alternativeCount,
+    };
+  }, [trip.meals]);
+
+  const outOfRangeMeals = useMemo(() => {
+    return trip.meals
+      .filter((m) => m.dayNumber < 1 || m.dayNumber > safeTotalDays)
+      .sort(
+        (a, b) => a.dayNumber - b.dayNumber || compareTimeSlots(a.time, b.time)
+      );
+  }, [trip.meals, safeTotalDays]);
+
   const daysToRender = viewAllDays
-    ? Array.from({ length: trip.totalDays }, (_, i) => i + 1)
+    ? Array.from({ length: safeTotalDays }, (_, i) => i + 1)
     : [selectedDay];
 
-  // Quick stats
-  const cookCount = trip.meals.filter((m) => m.style === 'cook').length;
-  const restaurantCount = trip.meals.filter((m) => m.style === 'restaurant').length;
-  const totalMealCostPerPerson = trip.meals.reduce(
-    (sum, m) => sum + m.estimatedCostPerPerson,
-    0
-  );
+  const handleImportShoppingList = () => {
+    if (mealStats.mealsWithShoppingNotes === 0) {
+      showToast('Noch keine Einkaufsnotizen in den Mahlzeiten hinterlegt', 'info');
+      return;
+    }
+    addShoppingTasksFromMeals();
+  };
+
+  const renderMealCard = (meal: MealPlan, isLeading: boolean, isTied: boolean) => {
+    const styleMeta = STYLE_META[meal.style] || STYLE_META.restaurant;
+    const proposer = getTraveler(meal.proposedBy);
+    const hasVoted = meal.votes.includes(currentUser.id);
+    const isConfirmingDelete = confirmDeleteId === meal.id;
+    const isHighlighted = highlightedId === meal.id;
+
+    const mapsUrl = buildGoogleMapsUrl(meal.locationOrRecipe);
+    const canFocusOnMap =
+      !isGenericLocation(meal.locationOrRecipe) ||
+      (typeof meal.lat === 'number' && typeof meal.lng === 'number');
+
+    const dayConflicts = conflictsByDay[meal.dayNumber] || {};
+    const conflictingIds = dayConflicts[meal.id] || [];
+    const conflictLabels = conflictingIds
+      .map((id) => itemLabelById.get(id))
+      .filter((lbl): lbl is string => Boolean(lbl));
+
+    return (
+      <div
+        key={meal.id}
+        data-search-id={meal.id}
+        className={`rounded-[20px] p-4 transition-all border ${
+          isHighlighted
+            ? 'aurora-glass-elevated ring-2 ring-cyan-400 shadow-[0_0_26px_rgba(34,211,238,0.3)]'
+            : isLeading
+            ? 'aurora-glass-elevated border-amber-400/45 shadow-[0_0_20px_rgba(251,191,36,0.1)]'
+            : 'bg-white/[0.04] border-white/10 hover:border-white/20'
+        }`}
+      >
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {(meal.dayNumber < 1 || meal.dayNumber > safeTotalDays) && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono tabular-nums font-extrabold bg-amber-400/20 text-amber-200 border border-amber-400/40">
+                Tag {meal.dayNumber}
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1 text-[11px] font-mono tabular-nums font-bold bg-white/10 border border-white/10 px-2.5 py-0.5 rounded-full text-slate-100">
+              <Clock className="w-3 h-3 text-cyan-400" />
+              {meal.time}
+            </span>
+            <span
+              className={`inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full ${styleMeta.badgeClass}`}
+            >
+              {styleMeta.icon}
+              <span>{styleMeta.label}</span>
+            </span>
+            {isLeading &&
+              (isTied ? (
+                <span className="inline-flex items-center gap-1 text-[10px] font-extrabold bg-violet-400/20 text-violet-200 border border-violet-400/40 px-2 py-0.5 rounded-full">
+                  <Scale className="w-3 h-3" /> Gleichstand
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 text-[10px] font-extrabold bg-amber-400/20 text-amber-200 border border-amber-400/40 px-2 py-0.5 rounded-full">
+                  <Trophy className="w-3 h-3 text-amber-300" /> Favorit
+                </span>
+              ))}
+          </div>
+
+          <div className="flex items-center gap-1 shrink-0">
+            <button
+              type="button"
+              onClick={() => handleStartEdit(meal)}
+              className="text-slate-400 hover:text-cyan-300 p-1.5 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+              title="Essensvorschlag bearbeiten"
+            >
+              <Pencil className="w-3.5 h-3.5" />
+            </button>
+
+            {isConfirmingDelete ? (
+              <div className="inline-flex items-center gap-1 bg-rose-500/15 border border-rose-400/40 rounded-full px-2 py-0.5 text-[10px] font-bold">
+                <span className="text-rose-200">Löschen?</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    deleteMeal(meal.id);
+                    setConfirmDeleteId(null);
+                  }}
+                  className="px-1.5 py-0.5 rounded-full bg-rose-500 text-white hover:bg-rose-400 cursor-pointer"
+                >
+                  Ja
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmDeleteId(null)}
+                  className="px-1.5 py-0.5 rounded-full bg-white/10 text-slate-200 hover:bg-white/20 cursor-pointer"
+                >
+                  Nein
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setConfirmDeleteId(meal.id)}
+                className="text-slate-400 hover:text-rose-300 p-1.5 rounded-full hover:bg-rose-500/15 transition-colors cursor-pointer"
+                title="Essensvorschlag löschen"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {conflictLabels.length > 0 && (
+          <div className="mt-2.5 rounded-xl bg-amber-500/15 border border-amber-400/40 px-2.5 py-1.5 text-[11px] text-amber-200 flex items-start gap-1.5">
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-300 shrink-0 mt-0.5" />
+            <span>
+              <strong>Zeitkonflikt:</strong> {conflictLabels.join(', ')}
+            </span>
+          </div>
+        )}
+
+        <h4 className="text-sm font-extrabold text-slate-100 mt-2.5">
+          {meal.title}
+        </h4>
+
+        <div className="text-xs text-slate-400 mt-1.5 flex flex-wrap items-center gap-1.5">
+          <span className="inline-flex items-center gap-1 text-slate-200 font-semibold">
+            <MapPin className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+            <span>{meal.locationOrRecipe}</span>
+          </span>
+
+          {canFocusOnMap && (
+            <button
+              type="button"
+              onClick={() =>
+                focusOnMap({
+                  kind: 'meal',
+                  id: meal.id,
+                  title: meal.title,
+                  location: meal.locationOrRecipe || trip.destination,
+                  lat: meal.lat,
+                  lng: meal.lng,
+                  dayNumber: meal.dayNumber,
+                  time: meal.time,
+                })
+              }
+              className="inline-flex items-center gap-1 text-[10px] font-bold text-cyan-300 bg-cyan-500/15 hover:bg-cyan-500/25 px-2 py-0.5 rounded-full border border-cyan-400/30 transition-colors cursor-pointer"
+              title="Im Map-Cockpit fokussieren"
+            >
+              <MapIcon className="w-2.5 h-2.5" />
+              <span>Auf Karte</span>
+            </button>
+          )}
+
+          {mapsUrl && (
+            <a
+              href={mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-200 bg-white/10 hover:bg-white/20 px-2 py-0.5 rounded-full border border-white/10 transition-colors"
+              title={`In Google Maps öffnen: ${meal.locationOrRecipe}`}
+            >
+              <ExternalLink className="w-2.5 h-2.5" />
+              <span>Maps</span>
+            </a>
+          )}
+
+          <span className="font-mono tabular-nums text-amber-300 font-bold">
+            • ca. {formatCurrency(meal.estimatedCostPerPerson, currency)} p.P.
+          </span>
+        </div>
+
+        <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+          {meal.description}
+        </p>
+
+        {meal.ShoppingNotes && (
+          <div className="mt-2.5 bg-amber-400/10 border border-amber-400/25 rounded-xl px-3 py-2 text-[11px] text-amber-100 flex items-start gap-2">
+            <ShoppingBag className="w-3.5 h-3.5 text-amber-300 shrink-0 mt-0.5" />
+            <div>
+              <strong className="font-bold text-amber-300">Einkaufsnotiz: </strong>
+              {meal.ShoppingNotes}
+            </div>
+          </div>
+        )}
+
+        {/* Team & Voting Footer */}
+        <div className="mt-3.5 pt-2.5 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+            <Users className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            <span>Team:</span>
+            {meal.assignedTeam.length === 0 ? (
+              <span className="text-slate-500 italic">Noch offen</span>
+            ) : (
+              <div className="flex items-center -space-x-1">
+                {meal.assignedTeam.map((tId) => {
+                  const member = getTraveler(tId);
+                  return (
+                    <span
+                      key={tId}
+                      style={{ backgroundColor: member.color }}
+                      className="w-5 h-5 rounded-full text-[9px] font-black text-slate-950 flex items-center justify-center ring-1 ring-[#131823]"
+                      title={`Orga/Koch-Team: ${member.name}`}
+                    >
+                      {member.initials}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
+            <span className="text-[10px] text-slate-500 ml-1">
+              (von {proposer.name})
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="flex items-center -space-x-1.5">
+              {meal.votes.slice(0, 4).map((vId) => {
+                const voter = trip.travelers.find((t) => t.id === vId);
+                if (!voter) return null;
+                return (
+                  <span
+                    key={vId}
+                    style={{ backgroundColor: voter.color }}
+                    className="w-5 h-5 rounded-full text-[9px] font-black text-slate-950 flex items-center justify-center ring-1 ring-[#131823]"
+                    title={`${voter.name} stimmt dafür`}
+                  >
+                    {voter.initials}
+                  </span>
+                );
+              })}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => toggleMealVote(meal.id)}
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold transition-all cursor-pointer ${
+                hasVoted
+                  ? 'bg-cyan-400 text-slate-950 shadow-[0_0_12px_rgba(34,211,238,0.28)]'
+                  : 'bg-white/10 hover:bg-white/15 text-slate-200 border border-white/10'
+              }`}
+            >
+              <ThumbsUp className="w-3 h-3" />
+              <span className="font-mono tabular-nums">{meal.votes.length}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="bg-[#EFECE6] rounded-[28px] p-6 border border-black/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#F7C59F] text-[#141416] mb-2">
-            <Utensils className="w-3.5 h-3.5" />
-            Essensplaner & Kulinarik
-          </span>
-          <h1 className="text-2xl font-extrabold text-[#141416]">
-            Was essen wir an welchem Tag?
-          </h1>
-          <p className="text-xs text-neutral-600 mt-1">
-            Plant Frühstück, Mittag- und Abendessen, teilt Koch-Teams ein und stimmt zwischen Restaurant oder Selbstkochen ab.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2.5">
-          <div className="bg-white/80 rounded-2xl px-3.5 py-2 text-xs border border-black/5">
-            <span className="text-neutral-500 block text-[10px] font-bold uppercase">
-              Kulinarik-Mix
+      <div className="aurora-glass-elevated rounded-[28px] p-6 relative overflow-hidden">
+        <div className="absolute -top-12 -right-12 w-52 h-52 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+          <div>
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-300 mb-2">
+              <Utensils className="w-3.5 h-3.5" />
+              Essensplaner & Kulinarik
             </span>
-            <span className="font-extrabold text-[#141416]">
-              {cookCount}x Kochen • {restaurantCount}x Restaurant • ~{totalMealCostPerPerson} € p.P.
-            </span>
+            <h1 className="text-2xl font-black text-slate-100">
+              Was essen wir an welchem Tag?
+            </h1>
+            <p className="text-xs text-slate-400 mt-1">
+              Plant Frühstück, Mittag- & Abendessen, teilt Koch-Teams ein und übernehmt alle Einkaufsnotizen mit einem Klick in eure Checkliste.
+            </p>
           </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              if (showAddForm) {
-                resetForm();
-                setShowAddForm(false);
-              } else {
-                resetForm();
-                setShowAddForm(true);
-              }
-            }}
-            className="bg-[#141416] hover:bg-neutral-800 text-white rounded-full px-5 py-3 text-xs font-bold flex items-center gap-2 shadow-sm transition-all"
-          >
-            <Plus className="w-4 h-4" />
-            <span>{showAddForm ? 'Formular schließen' : '+ Essens-Vorschlag'}</span>
-          </button>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <div className="aurora-glass rounded-2xl px-3.5 py-2 text-xs">
+              <span className="text-slate-400 block text-[10px] font-bold uppercase tracking-wide">
+                Kulinarik-Mix (1 Favorit / Slot)
+              </span>
+              <span className="font-extrabold text-slate-100 font-mono tabular-nums">
+                {mealStats.cookCount}x Kochen • {mealStats.restaurantCount}x Restaurant • ~
+                {formatCurrency(mealStats.effectiveCostPerPerson, currency)} p.P.
+              </span>
+              {mealStats.alternativeCount > 0 && (
+                <span className="block text-[10px] text-amber-300 font-semibold mt-0.5">
+                  +{mealStats.alternativeCount}{' '}
+                  {mealStats.alternativeCount === 1
+                    ? 'Alternativ-Option'
+                    : 'Alternativ-Optionen'}{' '}
+                  in {mealStats.multiOptionSlotCount} Slots (nicht doppelt gezählt)
+                </span>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={handleImportShoppingList}
+              className="inline-flex items-center gap-2 px-4 py-3 rounded-full text-xs font-extrabold bg-emerald-400/15 hover:bg-emerald-400/25 text-emerald-200 border border-emerald-400/40 transition-all cursor-pointer"
+              title="Alle Einkaufsnotizen aus den Mahlzeiten als Aufgaben in die Einkaufsliste übernehmen"
+            >
+              <ListChecks className="w-4 h-4 text-emerald-300" />
+              <span>Einkaufsliste in Checkliste übernehmen</span>
+              {mealStats.mealsWithShoppingNotes > 0 && (
+                <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono tabular-nums bg-emerald-400 text-slate-950 font-black">
+                  {mealStats.mealsWithShoppingNotes}
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (showAddForm) {
+                  resetForm();
+                  setShowAddForm(false);
+                } else {
+                  resetForm();
+                  setShowAddForm(true);
+                  scrollToForm();
+                }
+              }}
+              className="bg-cyan-400 hover:bg-cyan-300 text-slate-950 rounded-full px-5 py-3 text-xs font-extrabold flex items-center gap-2 shadow-[0_0_20px_rgba(34,211,238,0.28)] transition-all cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>{showAddForm ? 'Formular schließen' : '+ Essens-Vorschlag'}</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -279,18 +731,19 @@ export const MealsView: React.FC = () => {
           <button
             type="button"
             onClick={() => setViewAllDays(true)}
-            className={`px-4 py-2.5 rounded-full text-xs font-bold transition-all shrink-0 ${
+            className={`px-4 py-2.5 rounded-full text-xs font-extrabold transition-all shrink-0 cursor-pointer ${
               viewAllDays
-                ? 'bg-[#141416] text-white shadow-sm'
-                : 'bg-[#EFECE6] text-[#141416] hover:bg-[#F4DF7B]/60'
+                ? 'bg-cyan-400 text-slate-950 shadow-[0_0_16px_rgba(34,211,238,0.28)]'
+                : 'aurora-glass text-slate-200 hover:bg-white/10'
             }`}
           >
-            Alle Tage Übersicht ({trip.meals.length})
+            Alle Tage (<span className="font-mono tabular-nums">{trip.meals.length}</span>)
           </button>
 
-          {Array.from({ length: trip.totalDays }, (_, i) => i + 1).map((dayNum) => {
+          {Array.from({ length: safeTotalDays }, (_, i) => i + 1).map((dayNum) => {
             const isSelected = !viewAllDays && selectedDay === dayNum;
             const count = trip.meals.filter((m) => m.dayNumber === dayNum).length;
+            const dayHasConflict = Object.keys(conflictsByDay[dayNum] || {}).length > 0;
 
             return (
               <button
@@ -300,14 +753,20 @@ export const MealsView: React.FC = () => {
                   setViewAllDays(false);
                   setSelectedDay(dayNum);
                 }}
-                className={`px-4 py-2.5 rounded-full text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+                className={`px-4 py-2.5 rounded-full text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer border ${
                   isSelected
-                    ? 'bg-[#E8C2E8] text-[#141416] ring-2 ring-[#141416]/15 shadow-xs'
-                    : 'bg-[#EFECE6] text-neutral-700 hover:bg-[#E8C2E8]/50'
+                    ? 'bg-cyan-500/20 text-cyan-100 border-cyan-400/60 shadow-[0_0_16px_rgba(34,211,238,0.2)]'
+                    : 'aurora-glass text-slate-300 hover:bg-white/10'
                 }`}
               >
-                <span>Tag {dayNum}</span>
-                <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-black/10 text-[#141416]">
+                <span className="font-mono tabular-nums">Tag {dayNum}</span>
+                {dayHasConflict && (
+                  <AlertTriangle
+                    className="w-3 h-3 text-amber-400"
+                    aria-label="Zeitkonflikt"
+                  />
+                )}
+                <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono tabular-nums bg-white/10 text-slate-200">
                   {count}
                 </span>
               </button>
@@ -318,10 +777,10 @@ export const MealsView: React.FC = () => {
         <button
           type="button"
           onClick={() => setHideEmptySlots((prev) => !prev)}
-          className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold transition-all shrink-0 self-start sm:self-auto border ${
+          className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold transition-all shrink-0 self-start sm:self-auto border cursor-pointer ${
             hideEmptySlots
-              ? 'bg-[#141416] text-white border-[#141416]'
-              : 'bg-[#EFECE6] text-[#141416] border-black/5 hover:bg-[#F4DF7B]/50'
+              ? 'bg-violet-400/20 text-violet-200 border-violet-400/50'
+              : 'aurora-glass text-slate-300 hover:bg-white/10'
           }`}
         >
           <EyeOff className="w-3.5 h-3.5" />
@@ -329,20 +788,21 @@ export const MealsView: React.FC = () => {
         </button>
       </div>
 
-      {/* Add Meal Proposal Form */}
+      {/* Add / Edit Meal Proposal Form */}
       {showAddForm && (
         <form
+          ref={formRef}
           onSubmit={handleCreateMeal}
-          className="bg-[#F4DF7B]/35 rounded-[26px] p-6 border border-[#141416]/10 space-y-4 animate-in fade-in duration-150"
+          className="aurora-glass-elevated rounded-[26px] p-6 border-amber-400/35 space-y-4 animate-fade-in"
         >
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <div>
-              <h3 className="text-base font-extrabold text-[#141416]">
+              <h3 className="text-base font-extrabold text-slate-100">
                 {editingMealId
                   ? 'Essens-Vorschlag bearbeiten'
                   : 'Neuen Essens-Vorschlag hinzufügen'}
               </h3>
-              <p className="text-xs text-neutral-600">
+              <p className="text-xs text-slate-400">
                 {editingMealId
                   ? 'Änderungen speichern – alle bisherigen Votes bleiben erhalten.'
                   : 'Mehrere Vorschläge pro Mahlzeit sind möglich – die Gruppe stimmt einfach ab!'}
@@ -354,24 +814,35 @@ export const MealsView: React.FC = () => {
                 resetForm();
                 setShowAddForm(false);
               }}
-              className="w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center"
+              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-200 flex items-center justify-center cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
+          {formError && (
+            <div className="rounded-2xl bg-rose-500/15 border border-rose-400/40 px-4 py-2.5 text-xs font-semibold text-rose-200 flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-rose-300 shrink-0" />
+              <span>{formError}</span>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
             <div>
-              <label className="text-xs font-bold text-[#141416] block mb-1">
+              <label
+                htmlFor="meal-day"
+                className="text-xs font-bold text-slate-300 block mb-1.5"
+              >
                 Reisetag
               </label>
               <select
+                id="meal-day"
                 value={formDay}
                 onChange={(e) => setFormDay(Number(e.target.value))}
-                className="w-full bg-white rounded-2xl px-3 py-2.5 text-xs font-semibold border border-black/10"
+                className="w-full aurora-input rounded-2xl px-3 py-2.5 text-xs font-bold [color-scheme:dark]"
               >
-                {Array.from({ length: trip.totalDays }, (_, i) => i + 1).map((d) => (
-                  <option key={d} value={d}>
+                {Array.from({ length: safeTotalDays }, (_, i) => i + 1).map((d) => (
+                  <option key={d} value={d} className="bg-[#131823] text-slate-100">
                     Tag {d}
                   </option>
                 ))}
@@ -379,130 +850,196 @@ export const MealsView: React.FC = () => {
             </div>
 
             <div>
-              <label className="text-xs font-bold text-[#141416] block mb-1">
+              <label
+                htmlFor="meal-slot"
+                className="text-xs font-bold text-slate-300 block mb-1.5"
+              >
                 Mahlzeit-Slot
               </label>
               <select
+                id="meal-slot"
                 value={mealType}
                 onChange={(e) => {
                   const nextType = e.target.value as MealType;
                   setMealType(nextType);
                   const slot = MEAL_SLOTS.find((s) => s.type === nextType);
-                  if (slot) setTime(slot.defaultTime);
+                  if (slot && !editingMealId) setTime(slot.defaultTime);
                 }}
-                className="w-full bg-white rounded-2xl px-3 py-2.5 text-xs font-semibold border border-black/10"
+                className="w-full aurora-input rounded-2xl px-3 py-2.5 text-xs font-bold [color-scheme:dark]"
               >
-                <option value="breakfast">Frühstück</option>
-                <option value="lunch">Mittagessen</option>
-                <option value="dinner">Abendessen</option>
-                <option value="snack">Snacks & Drinks</option>
+                <option value="breakfast" className="bg-[#131823] text-slate-100">
+                  Frühstück
+                </option>
+                <option value="lunch" className="bg-[#131823] text-slate-100">
+                  Mittagessen
+                </option>
+                <option value="dinner" className="bg-[#131823] text-slate-100">
+                  Abendessen
+                </option>
+                <option value="snack" className="bg-[#131823] text-slate-100">
+                  Snacks & Drinks
+                </option>
               </select>
             </div>
 
             <div>
-              <label className="text-xs font-bold text-[#141416] block mb-1">
+              <label
+                htmlFor="meal-style"
+                className="text-xs font-bold text-slate-300 block mb-1.5"
+              >
                 Verpflegungs-Art
               </label>
               <select
+                id="meal-style"
                 value={style}
                 onChange={(e) => setStyle(e.target.value as MealStyle)}
-                className="w-full bg-white rounded-2xl px-3 py-2.5 text-xs font-semibold border border-black/10"
+                className="w-full aurora-input rounded-2xl px-3 py-2.5 text-xs font-bold [color-scheme:dark]"
               >
-                <option value="cook">Selbst kochen</option>
-                <option value="restaurant">Restaurant</option>
-                <option value="bakery">Bäckerei / Café</option>
-                <option value="delivery">Lieferservice</option>
+                <option value="cook" className="bg-[#131823] text-slate-100">
+                  Selbst kochen
+                </option>
+                <option value="restaurant" className="bg-[#131823] text-slate-100">
+                  Restaurant
+                </option>
+                <option value="bakery" className="bg-[#131823] text-slate-100">
+                  Bäckerei / Café
+                </option>
+                <option value="delivery" className="bg-[#131823] text-slate-100">
+                  Lieferservice
+                </option>
               </select>
             </div>
 
             <div>
-              <label className="text-xs font-bold text-[#141416] block mb-1">
+              <label
+                htmlFor="meal-time"
+                className="text-xs font-bold text-slate-300 block mb-1.5"
+              >
                 Uhrzeit
               </label>
               <input
+                id="meal-time"
                 type="time"
                 value={time}
-                onChange={(e) => setTime(e.target.value)}
-                className="w-full bg-white rounded-2xl px-3 py-2.5 text-xs font-semibold border border-black/10"
+                onChange={(e) => {
+                  setTime(e.target.value);
+                  if (formError) setFormError(null);
+                }}
+                className="w-full aurora-input rounded-2xl px-3 py-2.5 text-xs font-mono tabular-nums font-bold [color-scheme:dark]"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              <label className="text-xs font-bold text-[#141416] block mb-1">
+              <label
+                htmlFor="meal-title"
+                className="text-xs font-bold text-slate-300 block mb-1.5"
+              >
                 Gericht / Titel *
               </label>
               <input
+                id="meal-title"
                 type="text"
                 required
                 placeholder="z.B. Großer Grillabend auf der Finca"
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-white rounded-2xl px-3.5 py-2.5 text-xs border border-black/10"
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  if (formError) setFormError(null);
+                }}
+                className="w-full aurora-input rounded-2xl px-3.5 py-2.5 text-xs font-semibold placeholder:text-slate-500"
               />
             </div>
 
             <div>
-              <label className="text-xs font-bold text-[#141416] block mb-1">
+              <label
+                htmlFor="meal-location"
+                className="text-xs font-bold text-slate-300 block mb-1.5"
+              >
                 Ort / Rezept-Idee
               </label>
               <input
+                id="meal-location"
                 type="text"
                 placeholder="z.B. Finca-Terrasse oder Tapas Bar Sa Cova"
                 value={locationOrRecipe}
                 onChange={(e) => setLocationOrRecipe(e.target.value)}
-                className="w-full bg-white rounded-2xl px-3.5 py-2.5 text-xs border border-black/10"
+                className="w-full aurora-input rounded-2xl px-3.5 py-2.5 text-xs font-semibold placeholder:text-slate-500"
               />
             </div>
 
             <div>
-              <label className="text-xs font-bold text-[#141416] block mb-1">
-                Geschätzte Kosten p.P. (€)
+              <label
+                htmlFor="meal-cost"
+                className="text-xs font-bold text-slate-300 block mb-1.5"
+              >
+                Geschätzte Kosten p.P. ({currency})
               </label>
               <input
+                id="meal-cost"
                 type="number"
                 min="0"
+                step="0.01"
                 value={estimatedCostPerPerson}
                 onChange={(e) => setEstimatedCostPerPerson(e.target.value)}
-                className="w-full bg-white rounded-2xl px-3.5 py-2.5 text-xs border border-black/10"
+                className="w-full aurora-input rounded-2xl px-3.5 py-2.5 text-xs font-mono tabular-nums font-semibold"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-bold text-[#141416] block mb-1">
+              <label
+                htmlFor="meal-desc"
+                className="text-xs font-bold text-slate-300 block mb-1.5"
+              >
                 Ausführliche Beschreibung
               </label>
               <textarea
+                id="meal-desc"
                 rows={2}
                 placeholder="Details zum Menü, Reservierungshinweise oder besondere Wünsche..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full bg-white rounded-2xl px-3.5 py-2 text-xs border border-black/10 resize-none"
+                className="w-full aurora-input rounded-2xl px-3.5 py-2 text-xs placeholder:text-slate-500 resize-none"
               />
             </div>
 
             <div>
-              <label className="text-xs font-bold text-[#141416] block mb-1">
+              <label
+                htmlFor="meal-notes"
+                className="text-xs font-bold text-slate-300 block mb-1.5"
+              >
                 Einkaufsnotizen (ShoppingNotes)
               </label>
               <textarea
+                id="meal-notes"
                 rows={2}
                 placeholder="z.B. Grillgemüse, Halloumi, frisches Baguette, Sangria-Zutaten..."
                 value={shoppingNotes}
                 onChange={(e) => setShoppingNotes(e.target.value)}
-                className="w-full bg-white rounded-2xl px-3.5 py-2 text-xs border border-black/10 resize-none"
+                className="w-full aurora-input rounded-2xl px-3.5 py-2 text-xs placeholder:text-slate-500 resize-none"
               />
             </div>
           </div>
 
-          {/* Assigned Team Selector */}
+          {/* Assigned Team Selector (Empty team [] is preserved!) */}
           <div>
-            <label className="text-xs font-bold text-[#141416] block mb-1.5">
-              Koch- / Orga-Team (Wer kümmert sich ums Kochen, Einkaufen oder Reservieren?)
-            </label>
+            <div className="flex items-center justify-between gap-2 mb-1.5">
+              <label className="text-xs font-bold text-slate-300">
+                Koch- / Orga-Team (leer lassen möglich)
+              </label>
+              {assignedTeam.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setAssignedTeam([])}
+                  className="text-[11px] font-bold text-slate-400 hover:text-rose-300 transition-colors cursor-pointer"
+                >
+                  Team leeren
+                </button>
+              )}
+            </div>
             <div className="flex flex-wrap items-center gap-2">
               {trip.travelers.map((trav) => {
                 const selected = assignedTeam.includes(trav.id);
@@ -511,15 +1048,15 @@ export const MealsView: React.FC = () => {
                     key={trav.id}
                     type="button"
                     onClick={() => toggleTeamMember(trav.id)}
-                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all border ${
+                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all border cursor-pointer ${
                       selected
-                        ? 'bg-[#141416] text-white border-[#141416]'
-                        : 'bg-white text-neutral-700 border-black/10 hover:bg-[#EFECE6]'
+                        ? 'bg-cyan-400 text-slate-950 border-cyan-300'
+                        : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'
                     }`}
                   >
                     <span
                       style={{ backgroundColor: trav.color }}
-                      className="w-5 h-5 rounded-full text-[10px] font-bold text-[#141416] flex items-center justify-center"
+                      className="w-5 h-5 rounded-full text-[10px] font-black text-slate-950 flex items-center justify-center"
                     >
                       {trav.initials}
                     </span>
@@ -530,20 +1067,20 @@ export const MealsView: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-1">
+          <div className="flex justify-end gap-2.5 pt-1">
             <button
               type="button"
               onClick={() => {
                 resetForm();
                 setShowAddForm(false);
               }}
-              className="px-4 py-2 rounded-full text-xs font-bold bg-white/80 text-neutral-700"
+              className="px-4 py-2 rounded-full text-xs font-bold bg-white/10 hover:bg-white/15 text-slate-200 cursor-pointer"
             >
               Abbrechen
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-full text-xs font-bold bg-[#141416] text-white hover:bg-neutral-800"
+              className="px-5 py-2.5 rounded-full text-xs font-extrabold bg-cyan-400 hover:bg-cyan-300 text-slate-950 shadow-[0_0_18px_rgba(34,211,238,0.28)] cursor-pointer"
             >
               {editingMealId ? 'Änderungen speichern' : 'Essens-Vorschlag speichern'}
             </button>
@@ -567,27 +1104,31 @@ export const MealsView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => toggleDayCollapse(dayNum)}
-                  className="w-full flex items-center justify-between bg-white/75 hover:bg-white/90 backdrop-blur-md border border-black/5 rounded-[20px] px-5 py-3.5 transition-all shadow-2xs text-left"
+                  className="w-full flex items-center justify-between aurora-glass hover:bg-white/[0.06] rounded-[20px] px-5 py-3.5 transition-all text-left cursor-pointer"
                 >
-                  <div className="flex items-center gap-2.5">
-                    <span className="px-2.5 py-1 rounded-full text-xs font-extrabold bg-[#141416] text-white">
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-mono tabular-nums font-extrabold bg-cyan-400 text-slate-950">
                       Tag {dayNum}
                     </span>
-                    <span className="text-sm font-extrabold text-[#141416]">
-                      Tag {dayNum} · {dayMeals.length} {dayMeals.length === 1 ? 'Mahlzeit' : 'Mahlzeiten'}
+                    <span className="text-xs font-bold text-slate-400">
+                      {formatTripDayDate(trip.startDate, dayNum)}
+                    </span>
+                    <span className="text-sm font-extrabold text-slate-100 font-mono tabular-nums">
+                      · {dayMeals.length}{' '}
+                      {dayMeals.length === 1 ? 'Mahlzeit' : 'Mahlzeiten'}
                     </span>
                   </div>
                   {isCollapsed ? (
-                    <ChevronDown className="w-4 h-4 text-neutral-600 shrink-0" />
+                    <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
                   ) : (
-                    <ChevronUp className="w-4 h-4 text-neutral-600 shrink-0" />
+                    <ChevronUp className="w-4 h-4 text-slate-400 shrink-0" />
                   )}
                 </button>
               )}
 
-              {!isCollapsed && (
-                visibleSlots.length === 0 ? (
-                  <div className="bg-[#EFECE6]/50 rounded-[22px] p-5 text-center border border-dashed border-black/10 text-xs text-neutral-500">
+              {!isCollapsed &&
+                (visibleSlots.length === 0 ? (
+                  <div className="aurora-glass rounded-[22px] p-5 text-center border-dashed border-white/15 text-xs text-slate-400">
                     Keine eingetragenen Mahlzeiten für Tag {dayNum}.
                   </div>
                 ) : (
@@ -595,37 +1136,46 @@ export const MealsView: React.FC = () => {
                     {visibleSlots.map((slot) => {
                       const slotMeals = dayMeals
                         .filter((m) => m.mealType === slot.type)
-                        .sort((a, b) => b.votes.length - a.votes.length);
+                        .sort(
+                          (a, b) =>
+                            b.votes.length - a.votes.length ||
+                            compareTimeSlots(a.time, b.time)
+                        );
 
                       const maxVotes =
                         slotMeals.length > 1
                           ? Math.max(...slotMeals.map((m) => m.votes.length))
                           : 0;
+                      const leadersCount =
+                        maxVotes > 0
+                          ? slotMeals.filter((m) => m.votes.length === maxVotes).length
+                          : 0;
+                      const isTied = leadersCount > 1;
 
                       return (
                         <div
                           key={slot.type}
-                          className="bg-[#EFECE6]/70 rounded-[26px] p-5 border border-black/5 flex flex-col justify-between gap-4"
+                          className="aurora-glass rounded-[26px] p-5 flex flex-col justify-between gap-4"
                         >
                           <div>
                             {/* Slot Header */}
-                            <div className="flex items-center justify-between mb-3.5">
-                              <div className="flex items-center gap-2.5">
+                            <div className="flex items-center justify-between gap-2 mb-3.5">
+                              <div className="flex items-center gap-2.5 min-w-0">
                                 <div
-                                  className={`w-9 h-9 rounded-2xl ${slot.accentBg} flex items-center justify-center shadow-2xs`}
+                                  className={`w-9 h-9 rounded-2xl ${slot.iconBg} flex items-center justify-center shrink-0`}
                                 >
                                   {slot.icon}
                                 </div>
-                                <div>
-                                  <h3 className="text-sm font-extrabold text-[#141416]">
+                                <div className="min-w-0">
+                                  <h3 className="text-sm font-extrabold text-slate-100">
                                     {slot.label}
                                   </h3>
-                                  <span className="text-[11px] text-neutral-500">
+                                  <span className="text-[11px] text-slate-400 block truncate">
                                     {slotMeals.length === 0
                                       ? 'Noch offen'
                                       : slotMeals.length === 1
                                       ? '1 Vorschlag'
-                                      : `${slotMeals.length} Optionen zur Abstimmung`}
+                                      : `${slotMeals.length} Optionen · nur Favorit im Budget`}
                                   </span>
                                 </div>
                               </div>
@@ -635,7 +1185,7 @@ export const MealsView: React.FC = () => {
                                 onClick={() =>
                                   openSlotAdd(dayNum, slot.type, slot.defaultTime)
                                 }
-                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-bold bg-white hover:bg-[#141416] hover:text-white text-[#141416] transition-colors border border-black/5"
+                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-bold bg-white/10 hover:bg-cyan-400 hover:text-slate-950 text-slate-200 transition-colors border border-white/10 cursor-pointer shrink-0"
                               >
                                 <Plus className="w-3.5 h-3.5" />
                                 <span>Option</span>
@@ -644,8 +1194,8 @@ export const MealsView: React.FC = () => {
 
                             {/* Proposals inside this slot */}
                             {slotMeals.length === 0 ? (
-                              <div className="bg-[#F9F6F0]/80 rounded-2xl p-5 text-center border border-dashed border-black/10">
-                                <p className="text-xs font-semibold text-neutral-500">
+                              <div className="rounded-2xl bg-white/[0.03] p-5 text-center border border-dashed border-white/15">
+                                <p className="text-xs font-semibold text-slate-400">
                                   Noch kein {slot.label} für Tag {dayNum} geplant.
                                 </p>
                                 <button
@@ -653,7 +1203,7 @@ export const MealsView: React.FC = () => {
                                   onClick={() =>
                                     openSlotAdd(dayNum, slot.type, slot.defaultTime)
                                   }
-                                  className="mt-2 text-xs font-bold text-[#141416] underline hover:no-underline"
+                                  className="mt-2 text-xs font-bold text-cyan-300 hover:text-cyan-200 underline hover:no-underline cursor-pointer"
                                 >
                                   + Jetzt Vorschlag eintragen
                                 </button>
@@ -661,188 +1211,11 @@ export const MealsView: React.FC = () => {
                             ) : (
                               <div className="space-y-3">
                                 {slotMeals.map((meal) => {
-                                  const styleMeta = STYLE_META[meal.style];
-                                  const proposer = getTraveler(meal.proposedBy);
-                                  const hasVoted = meal.votes.includes(currentUser.id);
                                   const isLeading =
                                     slotMeals.length > 1 &&
                                     meal.votes.length === maxVotes &&
                                     maxVotes > 0;
-                                  const isConfirmingDelete = confirmDeleteId === meal.id;
-                                  const showMapsLink =
-                                    (meal.style === 'restaurant' || meal.style === 'bakery') &&
-                                    !!meal.locationOrRecipe;
-
-                                  return (
-                                    <div
-                                      key={meal.id}
-                                      className={`rounded-[20px] p-4 transition-all border ${
-                                        isLeading
-                                          ? 'bg-white border-[#141416]/20 shadow-xs'
-                                          : 'bg-[#F9F6F0] border-black/5'
-                                      }`}
-                                    >
-                                      <div className="flex items-start justify-between gap-2">
-                                        <div className="flex items-center gap-1.5 flex-wrap">
-                                          <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-[#EFECE6] px-2.5 py-0.5 rounded-full text-[#141416]">
-                                            <Clock className="w-3 h-3 text-neutral-500" />
-                                            {meal.time}
-                                          </span>
-                                          <span
-                                            className={`inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full ${styleMeta.badgeClass}`}
-                                          >
-                                            {styleMeta.icon}
-                                            <span>{styleMeta.label}</span>
-                                          </span>
-                                          {isLeading && (
-                                            <span className="inline-flex items-center gap-1 text-[10px] font-extrabold bg-[#F4DF7B] text-[#141416] px-2 py-0.5 rounded-full">
-                                              <Trophy className="w-3 h-3" /> Favorit
-                                            </span>
-                                          )}
-                                        </div>
-
-                                        <div className="flex items-center gap-1 shrink-0">
-                                          <button
-                                            type="button"
-                                            onClick={() => handleStartEdit(meal)}
-                                            className="text-neutral-500 hover:text-[#141416] p-1 rounded-full hover:bg-black/5 transition-colors"
-                                            title="Essensvorschlag bearbeiten"
-                                          >
-                                            <Pencil className="w-3.5 h-3.5" />
-                                          </button>
-
-                                          {isConfirmingDelete ? (
-                                            <div className="inline-flex items-center gap-1 bg-red-50 border border-red-200 rounded-full px-2 py-0.5 text-[10px] font-bold">
-                                              <span className="text-red-700">Löschen?</span>
-                                              <button
-                                                type="button"
-                                                onClick={() => {
-                                                  deleteMeal(meal.id);
-                                                  setConfirmDeleteId(null);
-                                                }}
-                                                className="px-1.5 py-0.5 rounded-full bg-red-600 text-white hover:bg-red-700"
-                                              >
-                                                Ja
-                                              </button>
-                                              <button
-                                                type="button"
-                                                onClick={() => setConfirmDeleteId(null)}
-                                                className="px-1.5 py-0.5 rounded-full bg-white text-neutral-700 hover:bg-neutral-100"
-                                              >
-                                                Nein
-                                              </button>
-                                            </div>
-                                          ) : (
-                                            <button
-                                              type="button"
-                                              onClick={() => setConfirmDeleteId(meal.id)}
-                                              className="text-neutral-400 hover:text-red-600 p-1 rounded-full hover:bg-red-50 transition-colors"
-                                              title="Essensvorschlag löschen"
-                                            >
-                                              <Trash2 className="w-3.5 h-3.5" />
-                                            </button>
-                                          )}
-                                        </div>
-                                      </div>
-
-                                      <h4 className="text-sm font-extrabold text-[#141416] mt-2">
-                                        {meal.title}
-                                      </h4>
-
-                                      <div className="text-xs text-neutral-600 mt-1 flex flex-wrap items-center gap-1.5">
-                                        <span className="inline-flex items-center gap-1">
-                                          <MapPin className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-                                          <span className="font-semibold text-[#141416]">
-                                            {meal.locationOrRecipe}
-                                          </span>
-                                        </span>
-                                        {showMapsLink && (
-                                          <a
-                                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(meal.locationOrRecipe)}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-1 text-[10px] font-bold text-[#141416] bg-white hover:bg-[#C5D1F5]/70 px-2 py-0.5 rounded-full border border-black/10 transition-colors"
-                                            title={`In Google Maps öffnen: ${meal.locationOrRecipe}`}
-                                          >
-                                            <ExternalLink className="w-2.5 h-2.5" />
-                                            <span>Maps</span>
-                                          </a>
-                                        )}
-                                        <span>• ca. {meal.estimatedCostPerPerson} € p.P.</span>
-                                      </div>
-
-                                      <p className="text-xs text-neutral-600 mt-1.5 leading-relaxed">
-                                        {meal.description}
-                                      </p>
-
-                                      {meal.ShoppingNotes && (
-                                        <div className="mt-2.5 bg-[#F4DF7B]/30 rounded-xl px-3 py-2 text-[11px] text-[#141416] flex items-start gap-2">
-                                          <ShoppingBag className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                                          <div>
-                                            <strong className="font-bold">Einkaufsnotiz: </strong>
-                                            {meal.ShoppingNotes}
-                                          </div>
-                                        </div>
-                                      )}
-
-                                      {/* Team & Voting Footer */}
-                                      <div className="mt-3 pt-2.5 border-t border-black/5 flex flex-wrap items-center justify-between gap-2">
-                                        <div className="flex items-center gap-1.5 text-[11px] text-neutral-600">
-                                          <Users className="w-3.5 h-3.5 text-neutral-400" />
-                                          <span>Team:</span>
-                                          <div className="flex items-center -space-x-1">
-                                            {meal.assignedTeam.map((tId) => {
-                                              const member = getTraveler(tId);
-                                              return (
-                                                <span
-                                                  key={tId}
-                                                  style={{ backgroundColor: member.color }}
-                                                  className="w-5 h-5 rounded-full text-[9px] font-bold text-[#141416] flex items-center justify-center ring-1 ring-white"
-                                                  title={`Orga/Koch-Team: ${member.name}`}
-                                                >
-                                                  {member.initials}
-                                                </span>
-                                              );
-                                            })}
-                                          </div>
-                                          <span className="text-[10px] text-neutral-400 ml-1">
-                                            (von {proposer.name})
-                                          </span>
-                                        </div>
-
-                                        <div className="flex items-center gap-2">
-                                          <div className="flex items-center -space-x-1.5">
-                                            {meal.votes.map((vId) => {
-                                              const voter = getTraveler(vId);
-                                              return (
-                                                <span
-                                                  key={vId}
-                                                  style={{ backgroundColor: voter.color }}
-                                                  className="w-5 h-5 rounded-full text-[9px] font-bold text-[#141416] flex items-center justify-center ring-1 ring-white"
-                                                  title={`${voter.name} stimmt dafür`}
-                                                >
-                                                  {voter.initials}
-                                                </span>
-                                              );
-                                            })}
-                                          </div>
-
-                                          <button
-                                            type="button"
-                                            onClick={() => toggleMealVote(meal.id)}
-                                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold transition-all ${
-                                              hasVoted
-                                                ? 'bg-[#141416] text-white'
-                                                : 'bg-[#EFECE6] hover:bg-[#E8C2E8] text-[#141416]'
-                                            }`}
-                                          >
-                                            <ThumbsUp className="w-3 h-3" />
-                                            <span>{meal.votes.length}</span>
-                                          </button>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  );
+                                  return renderMealCard(meal, isLeading, isTied);
                                 })}
                               </div>
                             )}
@@ -851,12 +1224,49 @@ export const MealsView: React.FC = () => {
                       );
                     })}
                   </div>
-                )
-              )}
+                ))}
             </div>
           );
         })}
       </div>
+
+      {/* Collapsible Out-of-Range Meals Section */}
+      {outOfRangeMeals.length > 0 && (
+        <div className="aurora-glass rounded-[24px] border-amber-400/35 overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setShowOutOfRange((prev) => !prev)}
+            className="w-full px-5 py-3.5 flex items-center justify-between gap-3 text-left hover:bg-white/[0.04] transition-colors cursor-pointer"
+          >
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+              <span className="text-xs font-extrabold text-amber-200">
+                Mahlzeiten außerhalb Reisedauer (Tag &lt; 1 oder Tag &gt; {safeTotalDays})
+              </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono tabular-nums font-bold bg-amber-400/20 text-amber-200">
+                {outOfRangeMeals.length}
+              </span>
+            </div>
+            {showOutOfRange ? (
+              <ChevronUp className="w-4 h-4 text-slate-400 shrink-0" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+            )}
+          </button>
+
+          {showOutOfRange && (
+            <div className="p-4 pt-1 space-y-3">
+              <p className="text-xs text-slate-400 px-1">
+                Diese Mahlzeiten liegen außerhalb der {safeTotalDays} Reisetage und können
+                bearbeitet oder gelöscht werden.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {outOfRangeMeals.map((meal) => renderMealCard(meal, false, false))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Lock,
   Sparkles,
@@ -9,10 +9,10 @@ import {
   Check,
   UserPlus,
   Compass,
-  Calendar,
-  Users,
   KeyRound,
   Trash2,
+  Link2,
+  X,
 } from 'lucide-react';
 import { useVacation } from '../context/VacationContext';
 
@@ -43,8 +43,28 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
   );
   const [newUserName, setNewUserName] = useState('');
   const [confirmDeleteTripId, setConfirmDeleteTripId] = useState<string | null>(null);
+  const [unlockedViaInviteLink, setUnlockedViaInviteLink] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.location.hash.includes('access=') && isUnlocked;
+  });
 
-  // Custom trips vs Demo trip
+  // Reset internal gate state whenever gate closes or app locks
+  useEffect(() => {
+    if (!isUnlocked) {
+      setUnlockedViaInviteLink(false);
+      setWelcomeStep('select-trip');
+      setConfirmDeleteTripId(null);
+    }
+  }, [isUnlocked]);
+
+  useEffect(() => {
+    if (!isWelcomeOpen) {
+      setWelcomeStep('select-trip');
+      setConfirmDeleteTripId(null);
+      setNewUserName('');
+    }
+  }, [isWelcomeOpen]);
+
   const customTrips = savedTrips.filter((t) => !t.isDemo);
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
@@ -54,6 +74,7 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
       setPasswordError(true);
     } else {
       setPasswordError(false);
+      setPasswordInput('');
     }
   };
 
@@ -67,59 +88,74 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
     setWelcomeStep('select-user');
   };
 
+  // Keep Welcome Gate open behind NewTripModal so cancelling modal stays in Gate!
   const handleCreateNewTrip = () => {
-    setIsWelcomeOpen(false);
     setIsNewTripModalOpen(true);
   };
 
   const handleSelectUserAndEnter = (userId: string) => {
     setCurrentUserById(userId);
-    setIsWelcomeOpen(false);
     setWelcomeStep('select-trip');
+    setIsWelcomeOpen(false);
+  };
+
+  const handleContinueAsCurrent = () => {
+    setWelcomeStep('select-trip');
+    setIsWelcomeOpen(false);
   };
 
   const handleAddUserAndEnter = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = newUserName.trim();
     if (!trimmed) return;
-    addTraveler(trimmed, 'Mitreisende/r');
+    const added = addTraveler(trimmed, 'Mitreisende/r');
+    if (!added) return;
     setNewUserName('');
-    setIsWelcomeOpen(false);
     setWelcomeStep('select-trip');
+    setIsWelcomeOpen(false);
   };
 
   // 1. PASSWORD GATE
   if (!isUnlocked) {
     return (
-      <div className="min-h-screen bg-[#EFEAE2] flex items-center justify-center p-4 text-[#141416] font-sans">
-        <div className="bg-[#F9F6F0] w-full max-w-md rounded-[36px] p-8 shadow-2xl border border-black/10 space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-[#141416] text-[#F4DF7B] flex items-center justify-center font-black text-xl shadow-md">
+      <div className="aurora-canvas min-h-screen flex items-center justify-center p-4 text-slate-100 font-sans relative overflow-hidden">
+        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute -top-28 -left-24 w-96 h-96 bg-cyan-400/15 rounded-full blur-3xl" />
+          <div className="absolute -bottom-28 -right-24 w-96 h-96 bg-violet-500/15 rounded-full blur-3xl" />
+        </div>
+
+        <div className="aurora-glass-elevated relative z-10 w-full max-w-md rounded-[32px] p-7 sm:p-8 space-y-6">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-400 to-emerald-400 text-[#0B0E14] flex items-center justify-center font-black text-xl shadow-[0_0_24px_rgba(34,211,238,0.35)] shrink-0">
               VO
             </div>
-            <div>
-              <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#E8C2E8] text-[#141416]">
+            <div className="min-w-0">
+              <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-cyan-400/15 border border-cyan-400/30 text-cyan-300">
                 <Lock className="w-3 h-3" /> Privater Bereich
               </span>
-              <h1 className="text-2xl font-extrabold tracking-tight text-[#141416] mt-0.5">
+              <h1 className="text-2xl font-extrabold tracking-tight text-slate-100 mt-1 truncate">
                 Vacation Organizer
               </h1>
             </div>
           </div>
 
-          <p className="text-sm text-[#141416]/75 leading-relaxed">
-            Dieser Urlaubsplaner ist privat geschützt. Bitte gib das
-            Zugangs-Passwort ein, um fortzufahren.
+          <p className="text-sm text-slate-400 leading-relaxed">
+            Dieser Urlaubsplaner ist privat geschützt. Gib euren Zugangscode ein
+            oder öffne einen privaten Einladungslink.
           </p>
 
           <form onSubmit={handlePasswordSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-[#141416]/80 mb-1.5">
+              <label
+                htmlFor="gate-access-password"
+                className="block text-xs font-bold text-slate-300 mb-1.5"
+              >
                 Zugangs-Passwort
               </label>
               <div className="relative">
-                <KeyRound className="w-4 h-4 text-[#141416]/45 absolute left-4 top-1/2 -translate-y-1/2" />
+                <KeyRound className="w-4 h-4 text-cyan-300/75 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
+                  id="gate-access-password"
                   type="password"
                   value={passwordInput}
                   onChange={(e) => {
@@ -128,11 +164,11 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
                   }}
                   placeholder="Passwort eingeben..."
                   autoFocus
-                  className="w-full bg-white rounded-2xl pl-11 pr-4 py-3.5 text-sm font-semibold text-[#141416] border border-black/15 focus:outline-none focus:border-[#141416]"
+                  className="aurora-input w-full rounded-2xl pl-11 pr-4 py-3.5 text-sm font-semibold"
                 />
               </div>
               {passwordError && (
-                <p className="text-xs font-bold text-red-600 mt-1.5">
+                <p className="text-xs font-bold text-rose-400 mt-1.5">
                   Falsches Passwort. Bitte überprüfe deine Eingabe.
                 </p>
               )}
@@ -140,10 +176,10 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
 
             <button
               type="submit"
-              className="w-full bg-[#141416] hover:bg-black/85 text-white font-bold text-sm py-3.5 rounded-full shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer"
+              className="w-full bg-cyan-400 hover:bg-cyan-300 text-[#0B0E14] font-extrabold text-sm py-3.5 rounded-full shadow-[0_0_24px_rgba(34,211,238,0.3)] flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
               <span>Zugang freischalten</span>
-              <ArrowRight className="w-4 h-4 text-[#F4DF7B]" />
+              <ArrowRight className="w-4 h-4" />
             </button>
           </form>
         </div>
@@ -154,19 +190,45 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
   // 2. GUIDED STEP-BY-STEP START FLOW (Trip Selection -> User Selection -> Dashboard)
   if (isWelcomeOpen) {
     return (
-      <div className="min-h-screen bg-[#EFEAE2] flex items-center justify-center p-4 text-[#141416] font-sans">
-        <div className="bg-[#F9F6F0] w-full max-w-2xl rounded-[36px] p-6 sm:p-9 shadow-2xl border border-black/10 space-y-7">
+      <div className="aurora-canvas min-h-screen flex items-center justify-center p-4 text-slate-100 font-sans relative overflow-hidden">
+        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute -top-28 -left-24 w-96 h-96 bg-cyan-400/14 rounded-full blur-3xl" />
+          <div className="absolute top-1/3 -right-24 w-96 h-96 bg-violet-500/14 rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 left-1/3 w-80 h-80 bg-emerald-400/10 rounded-full blur-3xl" />
+        </div>
+
+        <div className="aurora-glass-elevated relative z-10 w-full max-w-2xl rounded-[32px] p-5 sm:p-8 space-y-6 my-auto">
+          {/* Invite Link Auto-Unlock Banner */}
+          {unlockedViaInviteLink && (
+            <div className="rounded-2xl bg-emerald-400/12 border border-emerald-400/30 px-4 py-2.5 flex items-center justify-between gap-2 text-xs text-emerald-200">
+              <div className="flex items-center gap-2 min-w-0">
+                <Link2 className="w-4 h-4 text-emerald-300 shrink-0" />
+                <span className="font-semibold truncate">
+                  Über deinen privaten Einladungslink automatisch entsperrt!
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setUnlockedViaInviteLink(false)}
+                aria-label="Hinweis ausblenden"
+                className="p-1 rounded-full hover:bg-white/10 text-emerald-200 shrink-0 cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+
           {/* Top Brand & Step Indicator */}
           <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-[#141416] text-[#F4DF7B] flex items-center justify-center font-black text-base shadow-sm">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-cyan-400 to-emerald-400 text-[#0B0E14] flex items-center justify-center font-black text-base shadow-[0_0_20px_rgba(34,211,238,0.3)] shrink-0">
                 VO
               </div>
-              <div>
-                <span className="text-xs font-bold text-[#141416]/55 block">
+              <div className="min-w-0">
+                <span className="text-xs font-semibold text-slate-400 block truncate">
                   Vacation Organizer
                 </span>
-                <span className="text-xs font-extrabold uppercase tracking-wider text-[#141416]">
+                <span className="text-xs font-extrabold uppercase tracking-wider text-cyan-300 block truncate">
                   {welcomeStep === 'select-trip'
                     ? 'Schritt 1 von 2 · Urlaub wählen'
                     : 'Schritt 2 von 2 · Wer bist du?'}
@@ -174,31 +236,31 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 shrink-0">
               <span
                 className={`h-2 rounded-full transition-all ${
                   welcomeStep === 'select-trip'
-                    ? 'w-8 bg-[#141416]'
-                    : 'w-3 bg-[#141416]/25'
+                    ? 'w-8 bg-cyan-400 shadow-[0_0_10px_#22D3EE]'
+                    : 'w-3 bg-white/20'
                 }`}
               />
               <span
                 className={`h-2 rounded-full transition-all ${
                   welcomeStep === 'select-user'
-                    ? 'w-8 bg-[#141416]'
-                    : 'w-3 bg-[#141416]/25'
+                    ? 'w-8 bg-cyan-400 shadow-[0_0_10px_#22D3EE]'
+                    : 'w-3 bg-white/20'
                 }`}
               />
             </div>
           </div>
 
           {welcomeStep === 'select-trip' ? (
-            <div className="space-y-6">
+            <div className="space-y-5">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#141416]">
+                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-100">
                   Welchen Urlaub möchtest du öffnen?
                 </h1>
-                <p className="text-sm text-[#141416]/65 mt-1">
+                <p className="text-sm text-slate-400 mt-1">
                   Wähle eine bestehende Reise aus, erstelle einen neuen Urlaub
                   oder probiere den Testmodus aus.
                 </p>
@@ -206,20 +268,20 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
 
               <div className="space-y-3.5">
                 {/* Option A: Bestehende eigene Urlaube */}
-                <div className="bg-[#EFECE6] rounded-[26px] p-5 border border-black/5 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#141416]/75">
-                      <FolderOpen className="w-4 h-4 text-[#141416]" />
-                      Auf bestehenden Urlaub zugreifen
+                <div className="bg-[#0B0E14]/55 rounded-[24px] p-4 sm:p-5 border border-white/10 space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-slate-300">
+                      <FolderOpen className="w-4 h-4 text-cyan-300" />
+                      Gespeicherte Urlaube
                     </span>
-                    <span className="text-xs font-bold text-[#141416]/55">
+                    <span className="font-mono tabular-nums text-xs font-bold text-slate-400">
                       {customTrips.length}{' '}
                       {customTrips.length === 1 ? 'Reise' : 'Reisen'}
                     </span>
                   </div>
 
                   {customTrips.length === 0 ? (
-                    <p className="text-xs text-[#141416]/60 py-1">
+                    <p className="text-xs text-slate-400 py-1">
                       Noch kein eigener Urlaub gespeichert. Erstelle unten in 3
                       kurzen Schritten deinen ersten eigenen Urlaub!
                     </p>
@@ -230,62 +292,63 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
                         return (
                           <div
                             key={t.id}
-                            onClick={() => {
-                              if (!isConfirmingDelete) {
-                                handleSelectExistingTrip(t.id);
-                              }
-                            }}
-                            className="bg-white hover:bg-[#C5D1F5]/50 text-left p-4 rounded-2xl border border-black/5 transition-all flex items-center justify-between gap-2 group cursor-pointer"
+                            className="bg-[#1B2232]/85 hover:bg-[#1B2232] rounded-2xl border border-white/10 hover:border-cyan-400/35 transition-all flex items-center justify-between gap-2 p-2.5 group"
                           >
-                            <div className="min-w-0 flex-1 pr-1">
-                              <p className="font-extrabold text-sm text-[#141416] truncate">
+                            <button
+                              type="button"
+                              onClick={() => handleSelectExistingTrip(t.id)}
+                              className="min-w-0 flex-1 text-left p-1.5 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
+                            >
+                              <p className="font-extrabold text-sm text-slate-100 truncate">
                                 {t.title}
                               </p>
-                              <p className="text-xs text-[#141416]/60 truncate mt-0.5">
-                                {t.destination} · {t.totalDays} Tage
+                              <p className="text-xs text-slate-400 truncate mt-0.5">
+                                {t.destination} ·{' '}
+                                <span className="font-mono tabular-nums">
+                                  {t.totalDays} Tage
+                                </span>
                               </p>
-                            </div>
+                            </button>
 
                             {isConfirmingDelete ? (
-                              <div
-                                className="flex items-center gap-1 shrink-0"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <span className="text-[10px] font-bold text-red-700 mr-0.5">
-                                  Wirklich?
-                                </span>
+                              <div className="flex items-center gap-1 shrink-0 pr-1">
                                 <button
                                   type="button"
                                   onClick={() => {
                                     deleteTrip(t.id);
                                     setConfirmDeleteTripId(null);
                                   }}
-                                  className="px-2 py-1 rounded-full bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold transition-colors cursor-pointer"
+                                  className="px-2.5 py-1 rounded-full bg-rose-500 hover:bg-rose-400 text-white text-[10px] font-bold transition-colors cursor-pointer"
                                 >
                                   Löschen
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => setConfirmDeleteTripId(null)}
-                                  className="px-2 py-1 rounded-full bg-black/10 hover:bg-black/15 text-[#141416] text-[10px] font-bold transition-colors cursor-pointer"
+                                  className="px-2 py-1 rounded-full bg-white/10 hover:bg-white/20 text-slate-200 text-[10px] font-bold transition-colors cursor-pointer"
                                 >
-                                  Abbrechen
+                                  Abbr.
                                 </button>
                               </div>
                             ) : (
-                              <div className="flex items-center gap-1.5 shrink-0">
+                              <div className="flex items-center gap-1 shrink-0 pr-1">
                                 <button
                                   type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setConfirmDeleteTripId(t.id);
-                                  }}
+                                  onClick={() => setConfirmDeleteTripId(t.id)}
                                   title="Urlaub löschen"
-                                  className="w-7 h-7 rounded-full hover:bg-red-50 text-[#141416]/35 hover:text-red-600 flex items-center justify-center transition-colors cursor-pointer"
+                                  aria-label={`Urlaub ${t.title} löschen`}
+                                  className="w-7 h-7 rounded-full hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 flex items-center justify-center transition-colors cursor-pointer"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
-                                <ArrowRight className="w-4 h-4 text-[#141416]/40 group-hover:text-[#141416] group-hover:translate-x-0.5 transition-all" />
+                                <button
+                                  type="button"
+                                  onClick={() => handleSelectExistingTrip(t.id)}
+                                  aria-label={`Urlaub ${t.title} öffnen`}
+                                  className="w-7 h-7 rounded-full text-slate-400 group-hover:text-cyan-300 flex items-center justify-center transition-colors cursor-pointer"
+                                >
+                                  <ArrowRight className="w-4 h-4" />
+                                </button>
                               </div>
                             )}
                           </div>
@@ -295,80 +358,78 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
                   )}
                 </div>
 
-                {/* Option B: Neuen Urlaub erstellen (Step-by-Step Wizard ohne Vorbelegung) */}
+                {/* Option B: Neuen Urlaub erstellen */}
                 <button
                   type="button"
                   onClick={handleCreateNewTrip}
-                  className="w-full bg-[#F4DF7B] hover:bg-[#f2d961] text-[#141416] rounded-[26px] p-5 text-left transition-all flex items-center justify-between shadow-sm group cursor-pointer"
+                  className="w-full bg-gradient-to-r from-cyan-400/20 via-cyan-400/12 to-emerald-400/20 hover:from-cyan-400/30 hover:to-emerald-400/30 border border-cyan-400/35 text-slate-100 rounded-[24px] p-4 sm:p-5 text-left transition-all flex items-center justify-between gap-3 group cursor-pointer shadow-[0_0_24px_rgba(34,211,238,0.12)]"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-[#141416] text-[#F4DF7B] flex items-center justify-center shrink-0">
-                      <Plus className="w-6 h-6" />
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div className="w-11 h-11 rounded-2xl bg-cyan-400 text-[#0B0E14] flex items-center justify-center shrink-0 shadow-[0_0_16px_rgba(34,211,238,0.35)]">
+                      <Plus className="w-5 h-5 stroke-[2.5]" />
                     </div>
-                    <div>
-                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#141416]/70 block">
-                        Neu starten · Ohne Vorgaben
+                    <div className="min-w-0">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-cyan-300 block">
+                        Neu starten · Mit Templates
                       </span>
-                      <h2 className="text-lg font-extrabold text-[#141416]">
+                      <h2 className="text-base sm:text-lg font-extrabold text-slate-100 truncate">
                         Neuen Urlaub erstellen
                       </h2>
-                      <p className="text-xs text-[#141416]/75 mt-0.5">
-                        Schritt für Schritt Reiseziel, Dauer und Mitreisende
-                        selbst festlegen
+                      <p className="text-xs text-slate-300/80 mt-0.5 line-clamp-2">
+                        Reiseziel, Datumsbereich, Budget &amp; Gruppe festlegen
                       </p>
                     </div>
                   </div>
-                  <ArrowRight className="w-5 h-5 text-[#141416] group-hover:translate-x-1 transition-transform shrink-0" />
+                  <ArrowRight className="w-5 h-5 text-cyan-300 group-hover:translate-x-1 transition-transform shrink-0" />
                 </button>
 
                 {/* Option C: Testmodus öffnen */}
                 <button
                   type="button"
                   onClick={handleSelectDemoTrip}
-                  className="w-full bg-[#E8C2E8]/75 hover:bg-[#E8C2E8] text-[#141416] rounded-[26px] p-5 text-left transition-all flex items-center justify-between group cursor-pointer"
+                  className="w-full bg-white/[0.06] hover:bg-white/[0.11] border border-amber-400/25 text-slate-100 rounded-[24px] p-4 sm:p-5 text-left transition-all flex items-center justify-between gap-3 group cursor-pointer"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-white/80 text-[#141416] flex items-center justify-center shrink-0">
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div className="w-11 h-11 rounded-2xl bg-amber-400/20 border border-amber-400/35 text-amber-300 flex items-center justify-center shrink-0">
                       <Sparkles className="w-5 h-5" />
                     </div>
-                    <div>
-                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#141416]/70 block">
+                    <div className="min-w-0">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-300 block">
                         Beispiel-Reise zum Ausprobieren
                       </span>
-                      <h2 className="text-base font-extrabold text-[#141416]">
+                      <h2 className="text-base font-extrabold text-slate-100 truncate">
                         Testmodus öffnen („Mallorca Sommer-Finca 2026“)
                       </h2>
-                      <p className="text-xs text-[#141416]/75 mt-0.5">
-                        Fertig gefülltes Beispiel mit 7 Tagen, Essen,
-                        Abstimmungen & Checkliste
+                      <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">
+                        7 Tage mit Karte, Essen, Abstimmungen, Reisekasse &amp; Checkliste
                       </p>
                     </div>
                   </div>
-                  <ArrowRight className="w-5 h-5 text-[#141416] group-hover:translate-x-1 transition-transform shrink-0" />
+                  <ArrowRight className="w-5 h-5 text-amber-300 group-hover:translate-x-1 transition-transform shrink-0" />
                 </button>
               </div>
             </div>
           ) : (
             /* STEP 2: WER BIST DU? */
-            <div className="space-y-6">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-[#EFECE6] text-[#141416] mb-2">
-                    <Compass className="w-3.5 h-3.5" />
+            <div className="space-y-5">
+              <div>
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-cyan-400/15 border border-cyan-400/30 text-cyan-300 mb-2 max-w-full">
+                  <Compass className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">
                     {trip.title} ({trip.destination})
                   </span>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#141416]">
-                    Wer bist du?
-                  </h1>
-                  <p className="text-sm text-[#141416]/65 mt-1">
-                    Wähle deinen Namen aus (ganz ohne Login), damit deine
-                    Vorschläge und Stimmen dir zugeordnet werden.
-                  </p>
-                </div>
+                </span>
+                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-100">
+                  Wer bist du?
+                </h1>
+                <p className="text-sm text-slate-400 mt-1">
+                  Wähle deinen Namen aus (ohne Account), damit deine Vorschläge,
+                  Ausgaben und Stimmen dir zugeordnet werden.
+                </p>
               </div>
 
               {/* Traveler Cards */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                 {trip.travelers.map((traveler) => {
                   const isSelected = traveler.id === currentUser.id;
                   return (
@@ -376,14 +437,14 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
                       key={traveler.id}
                       type="button"
                       onClick={() => handleSelectUserAndEnter(traveler.id)}
-                      className={`p-4 rounded-[24px] border text-left transition-all flex items-center gap-3 cursor-pointer group ${
+                      className={`p-3.5 rounded-2xl border text-left transition-all flex items-center gap-2.5 cursor-pointer min-w-0 ${
                         isSelected
-                          ? 'bg-[#141416] text-white border-[#141416] shadow-md'
-                          : 'bg-white hover:bg-[#EFECE6] text-[#141416] border-black/10'
+                          ? 'bg-cyan-400/18 text-slate-100 border-cyan-400/50 shadow-[0_0_20px_rgba(34,211,238,0.18)]'
+                          : 'bg-white/[0.05] hover:bg-white/[0.1] text-slate-200 border-white/10'
                       }`}
                     >
                       <span
-                        className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-black text-[#141416] shrink-0"
+                        className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-black text-[#0B0E14] shrink-0"
                         style={{ backgroundColor: traveler.color }}
                       >
                         {traveler.initials}
@@ -394,7 +455,7 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
                         </p>
                         <p
                           className={`text-[11px] truncate ${
-                            isSelected ? 'text-white/70' : 'text-[#141416]/55'
+                            isSelected ? 'text-cyan-300' : 'text-slate-400'
                           }`}
                         >
                           Auswählen →
@@ -408,32 +469,32 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
               {/* Add new person inline */}
               <form
                 onSubmit={handleAddUserAndEnter}
-                className="bg-[#EFECE6] rounded-[24px] p-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5"
+                className="bg-[#0B0E14]/55 rounded-2xl p-3.5 border border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5"
               >
-                <div className="flex items-center gap-2 flex-1 bg-white rounded-full px-4 py-2.5 border border-black/10">
-                  <UserPlus className="w-4 h-4 text-[#141416]/50 shrink-0" />
+                <div className="flex items-center gap-2 flex-1 aurora-input rounded-full px-4 py-2.5">
+                  <UserPlus className="w-4 h-4 text-cyan-300 shrink-0" />
                   <input
                     type="text"
                     value={newUserName}
                     onChange={(e) => setNewUserName(e.target.value)}
                     placeholder="+ Neuen Namen hinzufügen (z. B. Dein Vorname)..."
-                    className="bg-transparent text-xs font-semibold text-[#141416] focus:outline-none w-full"
+                    className="bg-transparent text-xs font-semibold text-slate-100 placeholder-slate-500 focus:outline-none w-full min-w-0"
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={!newUserName.trim()}
-                  className="bg-[#141416] disabled:opacity-40 text-white text-xs font-bold px-5 py-3 rounded-full hover:bg-black/85 transition-all shrink-0 cursor-pointer"
+                  className="bg-cyan-400 hover:bg-cyan-300 disabled:opacity-40 text-[#0B0E14] text-xs font-extrabold px-5 py-3 rounded-full transition-all shrink-0 cursor-pointer"
                 >
-                  Hinzufügen & starten
+                  Hinzufügen &amp; starten
                 </button>
               </form>
 
-              <div className="flex items-center justify-between pt-2 border-t border-black/10">
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-white/10">
                 <button
                   type="button"
                   onClick={() => setWelcomeStep('select-trip')}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#141416]/70 hover:text-[#141416] py-2 cursor-pointer"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-slate-100 py-2 cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span>Zurück zur Urlaubsauswahl</span>
@@ -441,11 +502,13 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
 
                 <button
                   type="button"
-                  onClick={() => setIsWelcomeOpen(false)}
-                  className="inline-flex items-center gap-1.5 bg-[#141416] text-white text-xs font-bold px-5 py-2.5 rounded-full hover:bg-black/85 cursor-pointer"
+                  onClick={handleContinueAsCurrent}
+                  className="inline-flex items-center gap-1.5 bg-cyan-400 hover:bg-cyan-300 text-[#0B0E14] text-xs font-extrabold px-5 py-2.5 rounded-full transition-colors cursor-pointer max-w-[230px]"
                 >
-                  <Check className="w-3.5 h-3.5 text-[#F4DF7B]" />
-                  <span>Weiter als {currentUser.name}</span>
+                  <Check className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">
+                    Weiter als {currentUser.name}
+                  </span>
                 </button>
               </div>
             </div>

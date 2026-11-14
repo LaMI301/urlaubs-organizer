@@ -8,6 +8,8 @@ export type NavigationTab =
   | 'tasks'
   | 'budget';
 
+export type CurrencyCode = 'EUR' | 'CHF' | 'GBP' | 'USD';
+
 export interface Traveler {
   id: string;
   name: string;
@@ -16,7 +18,13 @@ export interface Traveler {
   role?: string;
 }
 
-export type ActivityCategory = 'activity' | 'beach' | 'culture' | 'transport' | 'nightlife' | 'other';
+export type ActivityCategory =
+  | 'activity'
+  | 'beach'
+  | 'culture'
+  | 'transport'
+  | 'nightlife'
+  | 'other';
 
 export interface DayActivity {
   id: string;
@@ -31,6 +39,9 @@ export interface DayActivity {
   createdBy: string; // Traveler.id
   votes: string[]; // Array of Traveler.id who voted for this
   status: 'planned' | 'confirmed' | 'idea';
+  lat?: number;
+  lng?: number;
+  sourceIdeaId?: string;
 }
 
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
@@ -50,6 +61,8 @@ export interface MealPlan {
   proposedBy: string; // Traveler.id
   assignedTeam: string[]; // Array of Traveler.id
   votes: string[]; // Array of Traveler.id
+  lat?: number;
+  lng?: number;
 }
 
 export interface PollOption {
@@ -66,10 +79,16 @@ export interface Poll {
   createdBy: string; // Traveler.id
   dayNumber?: number;
   isClosed?: boolean;
+  allowMultiple?: boolean;
   options: PollOption[];
 }
 
-export type TaskCategory = 'before_trip' | 'shared_equipment' | 'packing' | 'shopping' | 'documents';
+export type TaskCategory =
+  | 'before_trip'
+  | 'shared_equipment'
+  | 'packing'
+  | 'shopping'
+  | 'documents';
 export type TaskPriority = 'normal' | 'important' | 'critical';
 
 export type IdeaPriority = 'must_do' | 'nice_to_have' | 'chill';
@@ -86,7 +105,11 @@ export interface BrainstormIdea {
   votes: string[]; // Array of Traveler.id who voted for this
   assignedDay?: number;
   createdAt: string;
+  lat?: number;
+  lng?: number;
 }
+
+export type IdeaItem = BrainstormIdea;
 
 export interface TodoTask {
   id: string;
@@ -106,6 +129,68 @@ export interface TripInfo {
   wifiPassword?: string;
   checkinCode?: string;
   emergencyNotes?: string;
+  lat?: number;
+  lng?: number;
+}
+
+export type ExpenseCategory =
+  | 'accommodation'
+  | 'transport'
+  | 'food'
+  | 'activity'
+  | 'shopping'
+  | 'other';
+
+export interface ExpenseItem {
+  id: string;
+  title: string;
+  amount: number;
+  paidBy: string; // Traveler.id
+  splitBetween: string[]; // Array of Traveler.id
+  category: ExpenseCategory;
+  dayNumber?: number;
+  createdAt: string;
+}
+
+export interface Settlement {
+  fromId: string;
+  toId: string;
+  amount: number;
+}
+
+export interface ActivityLogEntry {
+  id: string;
+  actorId: string;
+  action: string;
+  targetLabel: string;
+  createdAt: string;
+}
+
+export interface MapFocusTarget {
+  kind: 'accommodation' | 'activity' | 'meal' | 'idea' | 'place';
+  id: string;
+  title: string;
+  location: string;
+  lat?: number;
+  lng?: number;
+  dayNumber?: number;
+  time?: string;
+}
+
+export interface SearchTarget {
+  tab: NavigationTab;
+  kind: 'activity' | 'meal' | 'idea' | 'poll' | 'task' | 'expense';
+  id: string;
+  dayNumber?: number;
+}
+
+export type ToastType = 'success' | 'info' | 'warning' | 'error';
+
+export interface ToastItem {
+  id: string;
+  message: string;
+  type: ToastType;
+  canUndo?: boolean;
 }
 
 export interface Trip {
@@ -117,6 +202,9 @@ export interface Trip {
   totalDays: number;
   budgetTargetPerPerson: number;
   isDemo: boolean;
+  schemaVersion?: number;
+  updatedAt?: string;
+  currency?: CurrencyCode;
   info?: TripInfo;
   travelers: Traveler[];
   activities: DayActivity[];
@@ -124,4 +212,7 @@ export interface Trip {
   polls: Poll[];
   tasks: TodoTask[];
   ideas: BrainstormIdea[];
+  expenses?: ExpenseItem[];
+  settledPairs?: string[];
+  activityLog?: ActivityLogEntry[];
 }

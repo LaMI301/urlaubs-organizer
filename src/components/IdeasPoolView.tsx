@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Lightbulb,
   Plus,
@@ -6,12 +6,12 @@ import {
   CalendarPlus,
   Trash2,
   MapPin,
-  Euro,
   Sparkles,
   Compass,
   Utensils,
   Palmtree,
   PartyPopper,
+  Car,
   CheckCircle2,
   X,
   Star,
@@ -21,6 +21,10 @@ import {
   ChevronDown,
   ChevronUp,
   ExternalLink,
+  Map as MapIcon,
+  GripVertical,
+  RotateCcw,
+  Calendar,
 } from 'lucide-react';
 import { useVacation } from '../context/VacationContext';
 import {
@@ -28,11 +32,33 @@ import {
   ActivityCategory,
   IdeaPriority,
 } from '../types/vacation';
+import {
+  buildGoogleMapsUrl,
+  clampCost,
+  formatCurrency,
+  isGenericLocation,
+  isValidTimeRange,
+} from '../utils/vacationHelpers';
+
+const CATEGORY_FILTER_OPTIONS: Array<{
+  id: string;
+  label: string;
+}> = [
+  { id: 'all', label: 'Alle Kategorien' },
+  { id: 'activity', label: 'Aktivität & Action' },
+  { id: 'beach', label: 'Strand & Meer' },
+  { id: 'food', label: 'Essen & Kulinarik' },
+  { id: 'culture', label: 'Kultur & Sightseeing' },
+  { id: 'transport', label: 'Transfer & Route' },
+  { id: 'nightlife', label: 'Abend & Feiern' },
+  { id: 'other', label: 'Sonstiges' },
+];
 
 export const IdeasPoolView: React.FC = () => {
   const {
     trip,
     currentUser,
+    selectedDay,
     addIdea,
     updateIdea,
     toggleIdeaVote,
@@ -40,6 +66,11 @@ export const IdeasPoolView: React.FC = () => {
     scheduleIdeaToDay,
     setActiveTab,
     setSelectedDay,
+    setSelectedActivityId,
+    focusOnMap,
+    searchTarget,
+    setSearchTarget,
+    showToast,
   } = useVacation();
 
   const [selectedTravelerFilter, setSelectedTravelerFilter] = useState<string>('all');
@@ -49,21 +80,45 @@ export const IdeasPoolView: React.FC = () => {
   const [editingIdeaId, setEditingIdeaId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [collapsedTravelers, setCollapsedTravelers] = useState<Record<string, boolean>>({});
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
+
+  // Drag & Drop state
+  const [draggingIdeaId, setDraggingIdeaId] = useState<string | null>(null);
+  const [dragOverDay, setDragOverDay] = useState<number | null>(null);
 
   // Transfer to schedule modal state
   const [schedulingIdea, setSchedulingIdea] = useState<BrainstormIdea | null>(null);
-  const [scheduleDay, setScheduleDay] = useState<number>(1);
+  const [scheduleDay, setScheduleDay] = useState<number>(selectedDay || 1);
   const [scheduleTime, setScheduleTime] = useState<string>('10:00');
+  const [scheduleEndTime, setScheduleEndTime] = useState<string>('');
+  const [scheduleTimeError, setScheduleTimeError] = useState<string | null>(null);
 
-  // New Idea Form State
+  // New / Edit Idea Form State
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
   const [newCategory, setNewCategory] = useState<ActivityCategory | 'food'>('activity');
   const [newPriority, setNewPriority] = useState<IdeaPriority>('must_do');
   const [newLocation, setNewLocation] = useState('');
   const [newCost, setNewCost] = useState<string>('');
+  const [formError, setFormError] = useState<string | null>(null);
 
-  const ideas = trip.ideas || [];
+  const highlightTimerRef = useRef<number | null>(null);
+  const ideas = useMemo(() => trip.ideas || [], [trip.ideas]);
+  const currency = trip.currency || 'EUR';
+  const safeTotalDays = Math.max(1, trip.totalDays || 1);
+
+  const travelerIds = useMemo(
+    () => new Set(trip.travelers.map((t) => t.id)),
+    [trip.travelers]
+  );
+
+  const unknownIdeasCount = useMemo(
+    () => ideas.filter((i) => !travelerIds.has(i.createdBy)).length,
+    [ideas, travelerIds]
+  );
+
+  const clampDay = (day: number) =>
+    Math.max(1, Math.min(Math.round(day) || 1, safeTotalDays));
 
   const resetIdeaForm = () => {
     setNewTitle('');
@@ -73,7 +128,78 @@ export const IdeasPoolView: React.FC = () => {
     setNewLocation('');
     setNewCost('');
     setEditingIdeaId(null);
+    setFormError(null);
   };
+
+  const closeIdeaModal = () => {
+    resetIdeaForm();
+    setIsAddIdeaOpen(false);
+  };
+
+  const closeScheduleModal = () => {
+    setSchedulingIdea(null);
+    setScheduleTimeError(null);
+    setScheduleEndTime('');
+  };
+
+  // Spotlight search target handler
+  useEffect(() => {
+    if (!searchTarget || searchTarget.kind !== 'idea') return;
+    const targetId = searchTarget.id;
+    const targetIdea = ideas.find((i) => i.id === targetId);
+    setSelectedTravelerFilter('all');
+    setPriorityFilter('all');
+    setCategoryFilter('all');
+    if (targetIdea) {
+      const groupKey = travelerIds.has(targetIdea.createdBy)
+        ? targetIdea.createdBy
+        : '__unknown__';
+      setCollapsedTravelers((prev) => ({ ...prev, [groupKey]: false }));
+    }
+    setHighlightedId(targetId);
+    setSearchTarget(null);
+  }, [searchTarget, ideas, travelerIds, setSearchTarget]);
+
+  // Scroll highlighted idea into view and clear highlight after 3.5s
+  useEffect(() => {
+    if (!highlightedId) return;
+    const scrollTimer = window.setTimeout(() => {
+      const el = document.querySelector<HTMLElement>(
+        `[data-search-id="${highlightedId}"]`
+      );
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 80);
+
+    if (highlightTimerRef.current !== null) {
+      window.clearTimeout(highlightTimerRef.current);
+    }
+    highlightTimerRef.current = window.setTimeout(() => {
+      setHighlightedId(null);
+    }, 3500);
+
+    return () => {
+      window.clearTimeout(scrollTimer);
+      if (highlightTimerRef.current !== null) {
+        window.clearTimeout(highlightTimerRef.current);
+      }
+    };
+  }, [highlightedId]);
+
+  // ESC key accessibility for modals
+  useEffect(() => {
+    if (!isAddIdeaOpen && !schedulingIdea) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (schedulingIdea) {
+          closeScheduleModal();
+        } else if (isAddIdeaOpen) {
+          closeIdeaModal();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isAddIdeaOpen, schedulingIdea]);
 
   const handleStartEditIdea = (idea: BrainstormIdea) => {
     setEditingIdeaId(idea.id);
@@ -83,95 +209,206 @@ export const IdeasPoolView: React.FC = () => {
     setNewPriority(idea.priority);
     setNewLocation(idea.location || '');
     setNewCost(idea.estimatedCost !== undefined ? String(idea.estimatedCost) : '');
+    setFormError(null);
     setIsAddIdeaOpen(true);
   };
 
   const handleCreateIdea = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTitle.trim()) return;
+    const trimmedTitle = newTitle.trim();
+    if (!trimmedTitle) {
+      setFormError('Bitte gib einen Titel für die Idee ein.');
+      return;
+    }
+
+    let parsedCost: number | undefined;
+    if (newCost.trim() !== '') {
+      const normalized = Number(newCost.trim().replace(',', '.'));
+      if (!Number.isFinite(normalized) || normalized < 0) {
+        setFormError('Bitte gib gültige Kosten (>= 0) ein.');
+        return;
+      }
+      parsedCost = clampCost(normalized);
+    }
 
     const payload = {
-      title: newTitle.trim(),
+      title: trimmedTitle,
       description: newDesc.trim(),
       category: newCategory,
       priority: newPriority,
       location: newLocation.trim() || undefined,
-      estimatedCost: newCost ? Number(newCost) : undefined,
+      estimatedCost: parsedCost,
     };
 
     if (editingIdeaId) {
       updateIdea(editingIdeaId, payload);
+      showToast(`Idee „${trimmedTitle}“ aktualisiert`, 'success');
     } else {
       addIdea(payload);
+      showToast(`Idee „${trimmedTitle}“ eingereicht`, 'success');
     }
 
-    resetIdeaForm();
-    setIsAddIdeaOpen(false);
+    closeIdeaModal();
   };
 
   const toggleTravelerCollapse = (travelerId: string) => {
     setCollapsedTravelers((prev) => ({ ...prev, [travelerId]: !prev[travelerId] }));
   };
 
+  const openScheduleModal = (idea: BrainstormIdea) => {
+    setSchedulingIdea(idea);
+    setScheduleDay(clampDay(idea.assignedDay ?? selectedDay ?? 1));
+    setScheduleTime('10:00');
+    setScheduleEndTime('');
+    setScheduleTimeError(null);
+  };
+
   const handleConfirmSchedule = (e: React.FormEvent) => {
     e.preventDefault();
     if (!schedulingIdea) return;
-    scheduleIdeaToDay(schedulingIdea.id, scheduleDay, scheduleTime);
-    setSchedulingIdea(null);
-    setSelectedDay(scheduleDay);
+    if (scheduleEndTime.trim() && !isValidTimeRange(scheduleTime, scheduleEndTime)) {
+      setScheduleTimeError('Die Endzeit muss nach der Startzeit liegen.');
+      return;
+    }
+    const targetDay = clampDay(scheduleDay);
+    scheduleIdeaToDay(
+      schedulingIdea.id,
+      targetDay,
+      scheduleTime,
+      scheduleEndTime.trim() || undefined
+    );
+    closeScheduleModal();
+    setSelectedDay(targetDay);
     setActiveTab('schedule');
   };
 
-  // Filter ideas
-  const filteredIdeas = ideas.filter((idea) => {
-    if (selectedTravelerFilter !== 'all' && idea.createdBy !== selectedTravelerFilter) {
-      return false;
-    }
-    if (priorityFilter !== 'all' && idea.priority !== priorityFilter) {
-      return false;
-    }
-    if (categoryFilter !== 'all' && idea.category !== categoryFilter) {
-      return false;
-    }
-    return true;
-  });
+  const handleIdeaDragStart = (
+    e: React.DragEvent<HTMLDivElement>,
+    idea: BrainstormIdea
+  ) => {
+    setDraggingIdeaId(idea.id);
+    e.dataTransfer.effectAllowed = 'copyMove';
+    e.dataTransfer.setData('application/x-vacayly-idea', idea.id);
+    e.dataTransfer.setData(
+      'text/plain',
+      JSON.stringify({ kind: 'idea', id: idea.id })
+    );
+  };
 
-  // Group ideas by traveler
-  const groupedByTraveler = trip.travelers.map((traveler) => {
-    const travelerIdeas = filteredIdeas.filter((i) => i.createdBy === traveler.id);
-    return {
-      traveler,
-      ideas: travelerIdeas,
-    };
-  }).filter((group) => {
-    // If a traveler is filtered, only show that traveler
-    if (selectedTravelerFilter !== 'all') {
-      return group.traveler.id === selectedTravelerFilter;
+  const handleDropIdeaOnDay = (
+    e: React.DragEvent<HTMLButtonElement>,
+    dayNum: number
+  ) => {
+    e.preventDefault();
+    setDragOverDay(null);
+    let droppedIdeaId = e.dataTransfer.getData('application/x-vacayly-idea');
+    if (!droppedIdeaId) {
+      try {
+        const parsed = JSON.parse(e.dataTransfer.getData('text/plain'));
+        if (parsed?.kind === 'idea' && typeof parsed.id === 'string') {
+          droppedIdeaId = parsed.id;
+        }
+      } catch {
+        // ignore plain text parse error
+      }
     }
-    return group.ideas.length > 0;
-  });
+    const targetId = droppedIdeaId || draggingIdeaId;
+    setDraggingIdeaId(null);
+    if (!targetId) return;
+
+    const targetIdea = ideas.find((i) => i.id === targetId);
+    if (!targetIdea) return;
+    scheduleIdeaToDay(targetIdea.id, dayNum, '10:00');
+  };
+
+  const hasActiveFilters =
+    selectedTravelerFilter !== 'all' ||
+    priorityFilter !== 'all' ||
+    categoryFilter !== 'all';
+
+  const resetAllFilters = () => {
+    setSelectedTravelerFilter('all');
+    setPriorityFilter('all');
+    setCategoryFilter('all');
+  };
+
+  // Filter ideas
+  const filteredIdeas = useMemo(() => {
+    return ideas.filter((idea) => {
+      if (selectedTravelerFilter === '__unknown__') {
+        if (travelerIds.has(idea.createdBy)) return false;
+      } else if (
+        selectedTravelerFilter !== 'all' &&
+        idea.createdBy !== selectedTravelerFilter
+      ) {
+        return false;
+      }
+      if (priorityFilter !== 'all' && idea.priority !== priorityFilter) {
+        return false;
+      }
+      if (categoryFilter !== 'all' && idea.category !== categoryFilter) {
+        return false;
+      }
+      return true;
+    });
+  }, [
+    ideas,
+    selectedTravelerFilter,
+    priorityFilter,
+    categoryFilter,
+    travelerIds,
+  ]);
+
+  // Group filtered ideas by traveler + fallback group for unknown creators
+  const groupedByTraveler = useMemo(() => {
+    const groups = trip.travelers
+      .map((traveler) => ({
+        traveler,
+        ideas: filteredIdeas.filter((i) => i.createdBy === traveler.id),
+      }))
+      .filter((group) => group.ideas.length > 0);
+
+    const unknownIdeas = filteredIdeas.filter(
+      (i) => !travelerIds.has(i.createdBy)
+    );
+    if (unknownIdeas.length > 0) {
+      groups.push({
+        traveler: {
+          id: '__unknown__',
+          name: 'Unbekannt / Ehemalig',
+          initials: '?',
+          color: '#94A3B8',
+          role: 'Ersteller nicht mehr in der Reisegruppe',
+        },
+        ideas: unknownIdeas,
+      });
+    }
+
+    return groups;
+  }, [trip.travelers, filteredIdeas, travelerIds]);
 
   const getPriorityBadge = (priority: IdeaPriority) => {
     switch (priority) {
       case 'must_do':
         return (
-          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold px-3 py-1 rounded-full bg-amber-100/90 text-amber-900 border border-amber-300/60 shadow-sm backdrop-blur-md">
-            <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
-            Must-Do / Highlight
+          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold px-3 py-1 rounded-full bg-amber-400/15 text-amber-300 border border-amber-400/30">
+            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+            Must-Do
           </span>
         );
       case 'nice_to_have':
         return (
-          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold px-3 py-1 rounded-full bg-emerald-100/90 text-emerald-900 border border-emerald-300/60 shadow-sm backdrop-blur-md">
-            <Sparkles className="w-3 h-3 text-emerald-600" />
+          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold px-3 py-1 rounded-full bg-emerald-400/15 text-emerald-300 border border-emerald-400/30">
+            <Sparkles className="w-3 h-3 text-emerald-400" />
             Nice to have
           </span>
         );
       case 'chill':
+      default:
         return (
-          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold px-3 py-1 rounded-full bg-purple-100/90 text-purple-900 border border-purple-300/60 shadow-sm backdrop-blur-md">
-            <Coffee className="w-3 h-3 text-purple-600" />
-            Entspannt / Chillig
+          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold px-3 py-1 rounded-full bg-violet-400/15 text-violet-300 border border-violet-400/30">
+            <Coffee className="w-3 h-3 text-violet-400" />
+            Entspannt
           </span>
         );
     }
@@ -180,68 +417,72 @@ export const IdeasPoolView: React.FC = () => {
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'beach':
-        return <Palmtree className="w-4 h-4 text-cyan-600" />;
+        return <Palmtree className="w-4 h-4 text-cyan-400" />;
       case 'food':
-        return <Utensils className="w-4 h-4 text-amber-600" />;
+        return <Utensils className="w-4 h-4 text-amber-400" />;
       case 'culture':
-        return <Compass className="w-4 h-4 text-purple-600" />;
+        return <Compass className="w-4 h-4 text-violet-400" />;
+      case 'transport':
+        return <Car className="w-4 h-4 text-emerald-400" />;
       case 'nightlife':
-        return <PartyPopper className="w-4 h-4 text-pink-600" />;
+        return <PartyPopper className="w-4 h-4 text-pink-400" />;
       default:
-        return <Lightbulb className="w-4 h-4 text-amber-500" />;
+        return <Lightbulb className="w-4 h-4 text-amber-300" />;
     }
   };
 
   return (
     <div className="space-y-6">
-      {/* GLASSY HERO HEADER */}
-      <div className="relative overflow-hidden rounded-[32px] p-6 md:p-8 bg-gradient-to-r from-white/70 via-white/50 to-white/70 backdrop-blur-xl border border-white/80 shadow-[0_10px_35px_rgba(0,0,0,0.04)]">
-        {/* Decorative background glows */}
-        <div className="absolute -top-10 -right-10 w-48 h-48 bg-[#F4DF7B]/40 rounded-full blur-2xl pointer-events-none" />
-        <div className="absolute -bottom-10 right-32 w-48 h-48 bg-[#E8C2E8]/40 rounded-full blur-2xl pointer-events-none" />
+      {/* AURORA HERO HEADER */}
+      <div className="relative overflow-hidden rounded-[28px] p-6 md:p-8 aurora-glass-elevated">
+        <div className="absolute -top-12 -right-12 w-56 h-56 bg-cyan-400/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-12 right-36 w-52 h-52 bg-violet-500/15 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#141416]/5 border border-black/5 text-[#141416] text-xs font-bold mb-2 backdrop-blur-sm">
-              <Lightbulb className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-300 text-xs font-bold mb-2.5">
+              <Lightbulb className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
               <span>Brainstorming & Ideen-Pool</span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-black text-[#141416] tracking-tight">
+            <h1 className="text-2xl md:text-3xl font-black text-slate-100 tracking-tight">
               Vorschläge & Ideen der Gruppe
             </h1>
-            <p className="text-sm text-[#141416]/70 mt-1 max-w-2xl leading-relaxed">
-              Hier sammeln alle Mitreisenden Aktivitäten, Wünsche und Spots – ganz ohne festen Tag oder Uhrzeit.
-              Stimmt für eure Favoriten ab und übernehmt sie mit einem Klick in den Tagesplan!
+            <p className="text-sm text-slate-400 mt-1.5 max-w-2xl leading-relaxed">
+              Sammelt Spots, Aktivitäten & Erlebnisse – stimmt gemeinsam ab und zieht eure
+              Favoriten per Drag & Drop oder Klick direkt in einen Reisetag.
             </p>
           </div>
 
           <button
+            type="button"
             onClick={() => {
               resetIdeaForm();
               setIsAddIdeaOpen(true);
             }}
-            className="self-start md:self-center px-6 py-3.5 rounded-full bg-[#141416] hover:bg-black/85 text-white font-extrabold text-sm shadow-xl flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer whitespace-nowrap"
+            className="self-start md:self-center px-6 py-3 rounded-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-extrabold text-sm shadow-[0_0_24px_rgba(34,211,238,0.28)] flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer whitespace-nowrap"
           >
-            <Plus className="w-4 h-4 text-[#F4DF7B]" />
+            <Plus className="w-4 h-4" />
             <span>Idee vorschlagen</span>
           </button>
         </div>
 
-        {/* TRAVELER FILTER TABS (PERSONEN-AUSWAHL) */}
-        <div className="relative z-10 mt-6 pt-6 border-t border-black/5 flex flex-wrap items-center gap-2">
-          <span className="text-xs font-bold text-[#141416]/60 mr-1 flex items-center gap-1">
-            <Filter className="w-3.5 h-3.5" /> Nach Person:
+        {/* TRAVELER FILTER TABS */}
+        <div className="relative z-10 mt-6 pt-5 border-t border-white/10 flex flex-wrap items-center gap-2">
+          <span className="text-xs font-bold text-slate-400 mr-1 flex items-center gap-1.5">
+            <Filter className="w-3.5 h-3.5 text-cyan-400" /> Nach Person:
           </span>
 
           <button
+            type="button"
             onClick={() => setSelectedTravelerFilter('all')}
-            className={`px-4 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
               selectedTravelerFilter === 'all'
-                ? 'bg-[#141416] text-white shadow-md'
-                : 'bg-white/70 hover:bg-white text-[#141416]/80 border border-black/5'
+                ? 'bg-cyan-400 text-slate-950 shadow-[0_0_16px_rgba(34,211,238,0.3)]'
+                : 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10'
             }`}
           >
-            Alle Personen ({ideas.length})
+            Alle Personen (
+            <span className="font-mono tabular-nums">{ideas.length}</span>)
           </button>
 
           {trip.travelers.map((traveler) => {
@@ -250,23 +491,26 @@ export const IdeasPoolView: React.FC = () => {
             return (
               <button
                 key={traveler.id}
+                type="button"
                 onClick={() => setSelectedTravelerFilter(traveler.id)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
                   isSelected
-                    ? 'bg-[#141416] text-white shadow-md'
-                    : 'bg-white/70 hover:bg-white text-[#141416]/80 border border-black/5'
+                    ? 'bg-cyan-400/20 text-cyan-200 border border-cyan-400/60 shadow-[0_0_16px_rgba(34,211,238,0.2)]'
+                    : 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10'
                 }`}
               >
                 <span
-                  className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-[#141416]"
+                  className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-slate-950 shrink-0"
                   style={{ backgroundColor: traveler.color }}
                 >
                   {traveler.initials}
                 </span>
-                <span>{traveler.name}</span>
+                <span className="truncate max-w-[110px]">{traveler.name}</span>
                 <span
-                  className={`text-[10px] font-black px-1.5 py-0.2 rounded-full ${
-                    isSelected ? 'bg-white/20 text-white' : 'bg-black/5 text-[#141416]/60'
+                  className={`text-[10px] font-mono tabular-nums font-bold px-1.5 py-0.5 rounded-full ${
+                    isSelected
+                      ? 'bg-cyan-400/25 text-cyan-200'
+                      : 'bg-white/10 text-slate-400'
                   }`}
                 >
                   {count}
@@ -274,53 +518,192 @@ export const IdeasPoolView: React.FC = () => {
               </button>
             );
           })}
+
+          {unknownIdeasCount > 0 && (
+            <button
+              type="button"
+              onClick={() => setSelectedTravelerFilter('__unknown__')}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                selectedTravelerFilter === '__unknown__'
+                  ? 'bg-amber-400/20 text-amber-200 border border-amber-400/60'
+                  : 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10'
+              }`}
+            >
+              <span className="w-5 h-5 rounded-full bg-slate-500/50 flex items-center justify-center text-[10px] font-black text-slate-100">
+                ?
+              </span>
+              <span>Unbekannt</span>
+              <span className="text-[10px] font-mono tabular-nums px-1.5 py-0.5 rounded-full bg-white/10 text-slate-300">
+                {unknownIdeasCount}
+              </span>
+            </button>
+          )}
         </div>
       </div>
 
-      {/* FILTER CHIPS (PRIORITÄT) */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-bold text-[#141416]/50 mr-1">Priorität:</span>
-          {[
-            { id: 'all', label: 'Alle' },
-            { id: 'must_do', label: '⭐ Must-Do' },
-            { id: 'nice_to_have', label: '🌴 Nice to have' },
-            { id: 'chill', label: '☕ Entspannt' },
-          ].map((item) => (
+      {/* FILTER BAR: PRIORITY + CATEGORY */}
+      <div className="aurora-glass rounded-[22px] p-4 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-xs font-bold text-slate-400 mr-1">Priorität:</span>
+            {[
+              { id: 'all', label: 'Alle' },
+              { id: 'must_do', label: '⭐ Must-Do' },
+              { id: 'nice_to_have', label: '🌴 Nice to have' },
+              { id: 'chill', label: '☕ Entspannt' },
+            ].map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setPriorityFilter(item.id)}
+                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                  priorityFilter === item.id
+                    ? 'bg-amber-400/20 text-amber-200 border border-amber-400/50'
+                    : 'bg-white/5 text-slate-300 hover:bg-white/10 border border-white/5'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={resetAllFilters}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-white/10 hover:bg-white/15 text-cyan-300 transition-colors cursor-pointer"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>Filter zurücksetzen</span>
+              </button>
+            )}
+            <p className="text-xs font-semibold text-slate-400 font-mono tabular-nums">
+              {filteredIdeas.length}{' '}
+              {filteredIdeas.length === 1 ? 'Vorschlag' : 'Vorschläge'}
+            </p>
+          </div>
+        </div>
+
+        {/* VISIBLE CATEGORY FILTER BAR */}
+        <div className="flex flex-wrap items-center gap-1.5 pt-2.5 border-t border-white/10">
+          <span className="text-xs font-bold text-slate-400 mr-1">Kategorie:</span>
+          {CATEGORY_FILTER_OPTIONS.map((cat) => (
             <button
-              key={item.id}
-              onClick={() => setPriorityFilter(item.id)}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                priorityFilter === item.id
-                  ? 'bg-white text-[#141416] shadow-sm border border-black/10'
-                  : 'text-[#141416]/60 hover:text-[#141416]'
+              key={cat.id}
+              type="button"
+              onClick={() => setCategoryFilter(cat.id)}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                categoryFilter === cat.id
+                  ? 'bg-violet-400/20 text-violet-200 border border-violet-400/50'
+                  : 'bg-white/5 text-slate-300 hover:bg-white/10 border border-white/5'
               }`}
             >
-              {item.label}
+              {cat.id !== 'all' && getCategoryIcon(cat.id)}
+              <span>{cat.label}</span>
             </button>
           ))}
         </div>
-
-        <p className="text-xs font-semibold text-[#141416]/60">
-          {filteredIdeas.length} {filteredIdeas.length === 1 ? 'Vorschlag' : 'Vorschläge'} gefunden
-        </p>
       </div>
+
+      {/* DRAG & DROP DAY PLANNER BAR */}
+      {ideas.length > 0 && (
+        <div
+          className={`rounded-[22px] p-3.5 transition-all border ${
+            draggingIdeaId
+              ? 'bg-cyan-500/15 border-cyan-400/60 shadow-[0_0_25px_rgba(34,211,238,0.2)]'
+              : 'aurora-glass'
+          }`}
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-200">
+              <Calendar className="w-4 h-4 text-cyan-400" />
+              <span>
+                {draggingIdeaId
+                  ? 'Auf einen Reisetag fallen lassen, um um 10:00 Uhr einzuplanen:'
+                  : 'Schnell-Übernahme: Idee hierhin auf einen Reisetag ziehen'}
+              </span>
+            </div>
+            <span className="text-[11px] text-slate-400">
+              Alternativ „In Tagesplan“ auf der Karte nutzen
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+            {Array.from({ length: safeTotalDays }, (_, idx) => idx + 1).map((dayNum) => {
+              const isDropActive = dragOverDay === dayNum;
+              const isCurrentSelected = selectedDay === dayNum;
+              return (
+                <button
+                  key={dayNum}
+                  type="button"
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'copy';
+                    if (dragOverDay !== dayNum) setDragOverDay(dayNum);
+                  }}
+                  onDragLeave={() => {
+                    if (dragOverDay === dayNum) setDragOverDay(null);
+                  }}
+                  onDrop={(e) => handleDropIdeaOnDay(e, dayNum)}
+                  onClick={() => {
+                    setSelectedDay(dayNum);
+                    setActiveTab('schedule');
+                  }}
+                  title={`Idee auf Tag ${dayNum} ziehen oder Tag ${dayNum} im Tagesplan öffnen`}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold font-mono tabular-nums shrink-0 transition-all border cursor-pointer ${
+                    isDropActive
+                      ? 'bg-cyan-400 text-slate-950 border-cyan-300 scale-105 shadow-[0_0_18px_rgba(34,211,238,0.45)]'
+                      : isCurrentSelected
+                      ? 'bg-cyan-500/15 text-cyan-200 border-cyan-400/40 hover:bg-cyan-500/25'
+                      : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'
+                  }`}
+                >
+                  Tag {dayNum}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* IDEAS GROUPED BY PERSON */}
       {groupedByTraveler.length === 0 ? (
-        <div className="rounded-[32px] p-12 text-center bg-white/50 backdrop-blur-lg border border-white/60">
-          <Lightbulb className="w-12 h-12 text-amber-400 mx-auto mb-3 opacity-60" />
-          <h3 className="text-lg font-black text-[#141416]">Noch keine Ideen in dieser Ansicht</h3>
-          <p className="text-sm text-[#141416]/60 mt-1 max-w-md mx-auto">
-            Reiche als Erster eine coole Idee oder einen Ausflugswunsch für euren Urlaub ein!
+        <div className="aurora-glass rounded-[28px] p-12 text-center border-dashed border-white/15">
+          <Lightbulb className="w-12 h-12 text-amber-400 mx-auto mb-3 opacity-80" />
+          <h3 className="text-lg font-black text-slate-100">
+            {hasActiveFilters
+              ? 'Keine Ideen für diese Filterkombination gefunden'
+              : 'Noch keine Ideen im Pool'}
+          </h3>
+          <p className="text-sm text-slate-400 mt-1.5 max-w-md mx-auto">
+            {hasActiveFilters
+              ? 'Passe deine Filter an oder setze alle Filter zurück, um wieder alle Vorschläge zu sehen.'
+              : 'Reiche als Erste/r eine coole Idee, einen Ausflug oder einen Restaurant-Tipp ein!'}
           </p>
-          <button
-            onClick={() => setIsAddIdeaOpen(true)}
-            className="mt-5 px-6 py-2.5 rounded-full bg-[#141416] text-white font-bold text-xs cursor-pointer shadow-md inline-flex items-center gap-2"
-          >
-            <Plus className="w-3.5 h-3.5 text-[#F4DF7B]" />
-            <span>Jetzt Idee einreichen</span>
-          </button>
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={resetAllFilters}
+                className="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/15 text-slate-100 font-bold text-xs cursor-pointer inline-flex items-center gap-2 border border-white/10"
+              >
+                <RotateCcw className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Filter zurücksetzen</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                resetIdeaForm();
+                setIsAddIdeaOpen(true);
+              }}
+              className="px-6 py-2.5 rounded-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-extrabold text-xs cursor-pointer shadow-[0_0_20px_rgba(34,211,238,0.25)] inline-flex items-center gap-2"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Jetzt Idee einreichen</span>
+            </button>
+          </div>
         </div>
       ) : (
         <div className="space-y-8">
@@ -333,31 +716,31 @@ export const IdeasPoolView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => toggleTravelerCollapse(traveler.id)}
-                  className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-[22px] bg-white/60 hover:bg-white/80 backdrop-blur-md border border-black/5 transition-all text-left cursor-pointer"
+                  className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-[22px] aurora-glass hover:bg-white/[0.06] transition-all text-left cursor-pointer"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
                     <div
-                      className="w-9 h-9 rounded-2xl flex items-center justify-center font-black text-sm text-[#141416] shadow-sm border border-black/10"
+                      className="w-9 h-9 rounded-2xl flex items-center justify-center font-black text-sm text-slate-950 shadow-sm shrink-0"
                       style={{ backgroundColor: traveler.color }}
                     >
                       {traveler.initials}
                     </div>
-                    <div>
-                      <h2 className="text-lg font-black text-[#141416] flex items-center gap-2">
-                        <span>Ideen von {traveler.name}</span>
-                        <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-white/80 border border-black/5 text-[#141416]/70">
+                    <div className="min-w-0">
+                      <h2 className="text-base md:text-lg font-black text-slate-100 flex items-center gap-2 flex-wrap">
+                        <span className="truncate">Ideen von {traveler.name}</span>
+                        <span className="text-xs font-mono tabular-nums font-bold px-2 py-0.5 rounded-full bg-white/10 text-cyan-300 border border-white/10">
                           {travelerIdeas.length}
                         </span>
                       </h2>
                       {traveler.role && (
-                        <p className="text-xs text-[#141416]/50">{traveler.role}</p>
+                        <p className="text-xs text-slate-400 truncate">{traveler.role}</p>
                       )}
                     </div>
                   </div>
                   {isCollapsed ? (
-                    <ChevronDown className="w-5 h-5 text-[#141416]/60 shrink-0" />
+                    <ChevronDown className="w-5 h-5 text-slate-400 shrink-0" />
                   ) : (
-                    <ChevronUp className="w-5 h-5 text-[#141416]/60 shrink-0" />
+                    <ChevronUp className="w-5 h-5 text-slate-400 shrink-0" />
                   )}
                 </button>
 
@@ -366,47 +749,73 @@ export const IdeasPoolView: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {travelerIdeas.map((idea) => {
                       const hasVoted = idea.votes.includes(currentUser.id);
-                      const isAssigned = typeof idea.assignedDay === 'number';
+                      const linkedActivity = trip.activities.find(
+                        (a) => a.sourceIdeaId === idea.id
+                      );
+                      const effectiveAssignedDay =
+                        linkedActivity?.dayNumber ?? idea.assignedDay;
+                      const isAssigned = typeof effectiveAssignedDay === 'number';
                       const isConfirmingDelete = confirmDeleteId === idea.id;
+                      const isHighlighted = highlightedId === idea.id;
+                      const mapsUrl = buildGoogleMapsUrl(idea.location);
+                      const canFocusOnMap =
+                        !isGenericLocation(idea.location) ||
+                        (typeof idea.lat === 'number' && typeof idea.lng === 'number');
 
                       return (
                         <div
                           key={idea.id}
-                          className="group relative rounded-[28px] p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white/70 hover:bg-white/85 backdrop-blur-xl border border-white/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)]"
+                          data-search-id={idea.id}
+                          draggable
+                          onDragStart={(e) => handleIdeaDragStart(e, idea)}
+                          onDragEnd={() => {
+                            setDraggingIdeaId(null);
+                            setDragOverDay(null);
+                          }}
+                          className={`group relative rounded-[26px] p-5 flex flex-col justify-between transition-all duration-300 cursor-grab active:cursor-grabbing ${
+                            isHighlighted
+                              ? 'aurora-glass-elevated ring-2 ring-cyan-400 shadow-[0_0_28px_rgba(34,211,238,0.3)]'
+                              : draggingIdeaId === idea.id
+                              ? 'aurora-glass opacity-60 scale-[0.98] border-cyan-400/50'
+                              : 'aurora-glass hover:border-cyan-400/35 hover:-translate-y-0.5'
+                          }`}
                         >
-                          {/* TOP ROW: PRIORITY & CATEGORY */}
+                          {/* TOP ROW: PRIORITY, DRAG HANDLE & ACTIONS */}
                           <div>
                             <div className="flex items-center justify-between gap-2 mb-3">
-                              {getPriorityBadge(idea.priority)}
+                              <div className="flex items-center gap-1.5">
+                                <GripVertical className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                                {getPriorityBadge(idea.priority)}
+                              </div>
                               <div className="flex items-center gap-1">
-                                <span className="p-1.5 rounded-full bg-white/80 border border-black/5 shadow-xs">
+                                <span className="p-1.5 rounded-full bg-white/5 border border-white/10">
                                   {getCategoryIcon(idea.category)}
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => handleStartEditIdea(idea)}
                                   title="Idee bearbeiten"
-                                  className="p-1.5 rounded-full hover:bg-black/5 text-neutral-500 hover:text-[#141416] transition-all cursor-pointer"
+                                  className="p-1.5 rounded-full hover:bg-white/10 text-slate-400 hover:text-cyan-300 transition-all cursor-pointer"
                                 >
                                   <Pencil className="w-3.5 h-3.5" />
                                 </button>
                                 {isConfirmingDelete ? (
-                                  <div className="inline-flex items-center gap-1 bg-red-50 border border-red-200 rounded-full px-2 py-0.5 text-[10px] font-bold">
-                                    <span className="text-red-700">Löschen?</span>
+                                  <div className="inline-flex items-center gap-1 bg-rose-500/15 border border-rose-400/40 rounded-full px-2 py-0.5 text-[10px] font-bold">
+                                    <span className="text-rose-200">Löschen?</span>
                                     <button
                                       type="button"
                                       onClick={() => {
                                         deleteIdea(idea.id);
                                         setConfirmDeleteId(null);
                                       }}
-                                      className="px-1.5 py-0.5 rounded-full bg-red-600 text-white hover:bg-red-700 cursor-pointer"
+                                      className="px-1.5 py-0.5 rounded-full bg-rose-500 text-white hover:bg-rose-400 cursor-pointer"
                                     >
                                       Ja
                                     </button>
                                     <button
                                       type="button"
                                       onClick={() => setConfirmDeleteId(null)}
-                                      className="px-1.5 py-0.5 rounded-full bg-white text-neutral-700 hover:bg-neutral-100 cursor-pointer"
+                                      className="px-1.5 py-0.5 rounded-full bg-white/10 text-slate-200 hover:bg-white/20 cursor-pointer"
                                     >
                                       Nein
                                     </button>
@@ -416,7 +825,7 @@ export const IdeasPoolView: React.FC = () => {
                                     type="button"
                                     onClick={() => setConfirmDeleteId(idea.id)}
                                     title="Idee löschen"
-                                    className="p-1.5 rounded-full hover:bg-red-50 text-neutral-400 hover:text-red-500 transition-all cursor-pointer"
+                                    className="p-1.5 rounded-full hover:bg-rose-500/15 text-slate-400 hover:text-rose-300 transition-all cursor-pointer"
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />
                                   </button>
@@ -425,64 +834,98 @@ export const IdeasPoolView: React.FC = () => {
                             </div>
 
                             {/* TITLE & DESCRIPTION */}
-                            <h3 className="text-base font-black text-[#141416] leading-snug tracking-tight">
+                            <h3 className="text-base font-black text-slate-100 leading-snug tracking-tight">
                               {idea.title}
                             </h3>
 
                             {idea.description && (
-                              <p className="text-xs text-[#141416]/70 mt-2 leading-relaxed line-clamp-3">
+                              <p className="text-xs text-slate-400 mt-2 leading-relaxed line-clamp-3">
                                 {idea.description}
                               </p>
                             )}
 
-                            {/* META PILLS (ORT, MAPS & KOSTEN) */}
-                            <div className="flex flex-wrap items-center gap-2 mt-3 text-[11px] font-bold text-[#141416]/70">
+                            {/* META PILLS (ORT, MAPS, KARTE & KOSTEN) */}
+                            <div className="flex flex-wrap items-center gap-1.5 mt-3.5 text-[11px] font-bold">
                               {idea.location && (
-                                <>
-                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-black/[0.03] border border-black/5">
-                                    <MapPin className="w-3 h-3 text-[#141416]/50" />
-                                    {idea.location}
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-white/5 border border-white/10 text-slate-300 max-w-full">
+                                  <MapPin className="w-3 h-3 text-cyan-400 shrink-0" />
+                                  <span className="truncate">{idea.location}</span>
+                                </span>
+                              )}
+                              {canFocusOnMap && (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    focusOnMap({
+                                      kind: 'idea',
+                                      id: idea.id,
+                                      title: idea.title,
+                                      location: idea.location || trip.destination,
+                                      lat: idea.lat,
+                                      lng: idea.lng,
+                                      dayNumber: effectiveAssignedDay,
+                                    })
+                                  }
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-400/30 transition-colors cursor-pointer"
+                                  title="Standort im Map-Cockpit fokussieren"
+                                >
+                                  <MapIcon className="w-3 h-3" />
+                                  <span>🗺️ Auf Karte</span>
+                                </button>
+                              )}
+                              {mapsUrl && (
+                                <a
+                                  href={mapsUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-white/5 hover:bg-white/15 text-slate-200 border border-white/10 transition-colors"
+                                  title={`In Google Maps öffnen: ${idea.location}`}
+                                >
+                                  <ExternalLink className="w-3 h-3 text-slate-400" />
+                                  <span>Maps</span>
+                                </a>
+                              )}
+                              {typeof idea.estimatedCost === 'number' &&
+                                idea.estimatedCost > 0 && (
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-400/10 border border-amber-400/25 text-amber-300 font-mono tabular-nums">
+                                    ca. {formatCurrency(idea.estimatedCost, currency)} p.P.
                                   </span>
-                                  <a
-                                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(idea.location)}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-white/90 hover:bg-[#C5D1F5]/70 text-[#141416] border border-black/5 transition-colors"
-                                    title={`In Google Maps öffnen: ${idea.location}`}
-                                  >
-                                    <ExternalLink className="w-3 h-3" />
-                                    <span>Maps</span>
-                                  </a>
-                                </>
-                              )}
-                              {typeof idea.estimatedCost === 'number' && idea.estimatedCost > 0 && (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-black/[0.03] border border-black/5">
-                                  <Euro className="w-3 h-3 text-[#141416]/50" />
-                                  ca. {idea.estimatedCost} € p.P.
-                                </span>
-                              )}
+                                )}
                               {isAssigned && (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-100 text-emerald-900 border border-emerald-300/60 font-black">
-                                  <CheckCircle2 className="w-3 h-3 text-emerald-700" />
-                                  Tag {idea.assignedDay} eingeplant
-                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedDay(effectiveAssignedDay!);
+                                    if (linkedActivity) {
+                                      setSelectedActivityId(linkedActivity.id);
+                                    }
+                                    setActiveTab('schedule');
+                                  }}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-400/15 hover:bg-emerald-400/25 text-emerald-300 border border-emerald-400/35 font-extrabold cursor-pointer"
+                                  title="Im Tagesplan anzeigen"
+                                >
+                                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                                  <span>Tag {effectiveAssignedDay} eingeplant</span>
+                                </button>
                               )}
                             </div>
                           </div>
 
                           {/* BOTTOM ROW: VOTERS & ACTIONS */}
-                          <div className="mt-5 pt-4 border-t border-black/5 flex items-center justify-between gap-3">
+                          <div className="mt-5 pt-3.5 border-t border-white/10 flex items-center justify-between gap-2 flex-wrap">
                             {/* VOTER AVATARS */}
                             <div className="flex items-center gap-1.5">
                               <div className="flex -space-x-1.5">
                                 {idea.votes.slice(0, 4).map((voterId) => {
-                                  const voter = trip.travelers.find((t) => t.id === voterId);
+                                  const voter = trip.travelers.find(
+                                    (t) => t.id === voterId
+                                  );
                                   if (!voter) return null;
                                   return (
                                     <span
                                       key={voterId}
                                       title={voter.name}
-                                      className="w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-[9px] font-black text-[#141416] shadow-xs"
+                                      className="w-6 h-6 rounded-full border-2 border-[#131823] flex items-center justify-center text-[9px] font-black text-slate-950 shadow-sm"
                                       style={{ backgroundColor: voter.color }}
                                     >
                                       {voter.initials}
@@ -491,7 +934,7 @@ export const IdeasPoolView: React.FC = () => {
                                 })}
                               </div>
                               {idea.votes.length > 4 && (
-                                <span className="text-[10px] font-bold text-[#141416]/50">
+                                <span className="text-[10px] font-mono tabular-nums font-bold text-slate-400">
                                   +{idea.votes.length - 4}
                                 </span>
                               )}
@@ -502,32 +945,29 @@ export const IdeasPoolView: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => toggleIdeaVote(idea.id)}
-                                className={`px-3 py-1.5 rounded-full text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer ${
+                                className={`px-3 py-1.5 rounded-full text-xs font-extrabold transition-all flex items-center gap-1.5 cursor-pointer ${
                                   hasVoted
-                                    ? 'bg-[#141416] text-white shadow-sm'
-                                    : 'bg-white/80 hover:bg-white text-[#141416] border border-black/10'
+                                    ? 'bg-cyan-400 text-slate-950 shadow-[0_0_14px_rgba(34,211,238,0.3)]'
+                                    : 'bg-white/10 hover:bg-white/15 text-slate-200 border border-white/10'
                                 }`}
-                                title={hasVoted ? 'Deine Stimme zurückziehen' : 'Dafür stimmen'}
+                                title={
+                                  hasVoted ? 'Deine Stimme zurückziehen' : 'Dafür stimmen'
+                                }
                               >
-                                <ThumbsUp
-                                  className={`w-3.5 h-3.5 ${
-                                    hasVoted ? 'fill-[#F4DF7B] text-[#F4DF7B]' : 'text-[#141416]/60'
-                                  }`}
-                                />
-                                <span>{idea.votes.length}</span>
+                                <ThumbsUp className="w-3.5 h-3.5" />
+                                <span className="font-mono tabular-nums">
+                                  {idea.votes.length}
+                                </span>
                               </button>
 
                               <button
                                 type="button"
-                                onClick={() => {
-                                  setSchedulingIdea(idea);
-                                  setScheduleDay(1);
-                                  setScheduleTime('10:00');
-                                }}
-                                className="p-1.5 rounded-full bg-white/80 hover:bg-white border border-black/10 text-[#141416] hover:scale-105 transition-all cursor-pointer shadow-xs"
+                                onClick={() => openScheduleModal(idea)}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-400/15 hover:bg-emerald-400/25 border border-emerald-400/35 text-emerald-200 text-xs font-bold transition-all cursor-pointer"
                                 title="In den Tagesplan übernehmen"
                               >
                                 <CalendarPlus className="w-3.5 h-3.5" />
+                                <span>In Tagesplan</span>
                               </button>
                             </div>
                           </div>
@@ -542,147 +982,216 @@ export const IdeasPoolView: React.FC = () => {
         </div>
       )}
 
-      {/* MODAL: NEUE IDEE VORSCHLAGEN */}
+      {/* MODAL: NEUE IDEE VORSCHLAGEN / BEARBEITEN */}
       {isAddIdeaOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
-          <div className="bg-[#F9F6F0]/95 backdrop-blur-2xl w-full max-w-lg rounded-[34px] p-6 md:p-8 shadow-2xl border border-white/60 space-y-6">
-            <div className="flex items-center justify-between">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fade-in"
+          onClick={closeIdeaModal}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="idea-modal-title"
+            onClick={(e) => e.stopPropagation()}
+            className="aurora-glass-elevated w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-[28px] p-6 md:p-7 space-y-5"
+          >
+            <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-amber-400/20 text-amber-600 flex items-center justify-center">
-                  <Lightbulb className="w-5 h-5 fill-amber-500 text-amber-500" />
+                <div className="w-10 h-10 rounded-2xl bg-amber-400/15 border border-amber-400/30 text-amber-300 flex items-center justify-center shrink-0">
+                  <Lightbulb className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black text-[#141416]">
+                  <h3 id="idea-modal-title" className="text-lg font-black text-slate-100">
                     {editingIdeaId ? 'Idee bearbeiten' : 'Neue Idee einreichen'}
                   </h3>
-                  <p className="text-xs text-[#141416]/60">
-                    {editingIdeaId
-                      ? 'Änderungen speichern – alle bisherigen Votes bleiben erhalten.'
-                      : <>Vorgeschlagen von: <strong className="text-[#141416]">{currentUser.name}</strong></>}
+                  <p className="text-xs text-slate-400">
+                    {editingIdeaId ? (
+                      'Änderungen speichern – alle bisherigen Votes bleiben erhalten.'
+                    ) : (
+                      <>
+                        Vorgeschlagen von:{' '}
+                        <strong className="text-slate-200">{currentUser.name}</strong>
+                      </>
+                    )}
                   </p>
                 </div>
               </div>
               <button
                 type="button"
-                onClick={() => {
-                  resetIdeaForm();
-                  setIsAddIdeaOpen(false);
-                }}
-                className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-[#141416] cursor-pointer"
+                onClick={closeIdeaModal}
+                aria-label="Dialog schließen"
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-200 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
+            {formError && (
+              <div className="rounded-2xl bg-rose-500/15 border border-rose-400/35 px-4 py-2.5 text-xs font-semibold text-rose-200">
+                {formError}
+              </div>
+            )}
+
             <form onSubmit={handleCreateIdea} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-[#141416]/80 mb-1">
+                <label
+                  htmlFor="idea-title-input"
+                  className="block text-xs font-bold text-slate-300 mb-1.5"
+                >
                   Was möchtest du vorschlagen? *
                 </label>
                 <input
+                  id="idea-title-input"
                   type="text"
                   required
                   placeholder="z.B. Bootstour mit Schnorcheln, Tapas kochen, Quadtour..."
                   value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full bg-white rounded-2xl px-4 py-3 text-sm font-semibold text-[#141416] border border-black/10 focus:outline-none focus:border-[#141416]"
+                  onChange={(e) => {
+                    setNewTitle(e.target.value);
+                    if (formError) setFormError(null);
+                  }}
+                  className="w-full aurora-input rounded-2xl px-4 py-3 text-sm font-semibold placeholder:text-slate-500"
                   autoFocus
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-[#141416]/80 mb-1">
+                  <label
+                    htmlFor="idea-priority-select"
+                    className="block text-xs font-bold text-slate-300 mb-1.5"
+                  >
                     Priorität
                   </label>
                   <select
+                    id="idea-priority-select"
                     value={newPriority}
                     onChange={(e) => setNewPriority(e.target.value as IdeaPriority)}
-                    className="w-full bg-white rounded-2xl px-3 py-2.5 text-xs font-bold text-[#141416] border border-black/10 focus:outline-none focus:border-[#141416]"
+                    className="w-full aurora-input rounded-2xl px-3.5 py-2.5 text-xs font-bold [color-scheme:dark]"
                   >
-                    <option value="must_do">⭐ Must-Do (Unbedingt!)</option>
-                    <option value="nice_to_have">🌴 Nice to have</option>
-                    <option value="chill">☕ Entspannt / Chillig</option>
+                    <option value="must_do" className="bg-[#131823] text-slate-100">
+                      ⭐ Must-Do (Unbedingt!)
+                    </option>
+                    <option value="nice_to_have" className="bg-[#131823] text-slate-100">
+                      🌴 Nice to have
+                    </option>
+                    <option value="chill" className="bg-[#131823] text-slate-100">
+                      ☕ Entspannt / Chillig
+                    </option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#141416]/80 mb-1">
+                  <label
+                    htmlFor="idea-category-select"
+                    className="block text-xs font-bold text-slate-300 mb-1.5"
+                  >
                     Kategorie
                   </label>
                   <select
+                    id="idea-category-select"
                     value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value as ActivityCategory | 'food')}
-                    className="w-full bg-white rounded-2xl px-3 py-2.5 text-xs font-bold text-[#141416] border border-black/10 focus:outline-none focus:border-[#141416]"
+                    onChange={(e) =>
+                      setNewCategory(e.target.value as ActivityCategory | 'food')
+                    }
+                    className="w-full aurora-input rounded-2xl px-3.5 py-2.5 text-xs font-bold [color-scheme:dark]"
                   >
-                    <option value="activity">Aktivität / Action</option>
-                    <option value="beach">Strand & Meer</option>
-                    <option value="food">Essen & Kulinarik</option>
-                    <option value="culture">Kultur & Sightseeing</option>
-                    <option value="nightlife">Abend & Feiern</option>
-                    <option value="other">Sonstiges</option>
+                    <option value="activity" className="bg-[#131823] text-slate-100">
+                      Aktivität / Action
+                    </option>
+                    <option value="beach" className="bg-[#131823] text-slate-100">
+                      Strand & Meer
+                    </option>
+                    <option value="food" className="bg-[#131823] text-slate-100">
+                      Essen & Kulinarik
+                    </option>
+                    <option value="culture" className="bg-[#131823] text-slate-100">
+                      Kultur & Sightseeing
+                    </option>
+                    <option value="transport" className="bg-[#131823] text-slate-100">
+                      Transfer & Route
+                    </option>
+                    <option value="nightlife" className="bg-[#131823] text-slate-100">
+                      Abend & Feiern
+                    </option>
+                    <option value="other" className="bg-[#131823] text-slate-100">
+                      Sonstiges
+                    </option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#141416]/80 mb-1">
+                <label
+                  htmlFor="idea-desc-input"
+                  className="block text-xs font-bold text-slate-300 mb-1.5"
+                >
                   Beschreibung / Notiz (optional)
                 </label>
                 <textarea
+                  id="idea-desc-input"
                   rows={3}
                   placeholder="Warum hast du Lust darauf? Gibt es Details oder Tipps?"
                   value={newDesc}
                   onChange={(e) => setNewDesc(e.target.value)}
-                  className="w-full bg-white rounded-2xl p-3 text-xs font-semibold text-[#141416] border border-black/10 focus:outline-none focus:border-[#141416] resize-none"
+                  className="w-full aurora-input rounded-2xl p-3.5 text-xs font-medium placeholder:text-slate-500 resize-none"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-[#141416]/80 mb-1">
+                  <label
+                    htmlFor="idea-location-input"
+                    className="block text-xs font-bold text-slate-300 mb-1.5"
+                  >
                     Ort / Spot (optional)
                   </label>
                   <input
+                    id="idea-location-input"
                     type="text"
                     placeholder="z.B. Cala Varques, Palma..."
                     value={newLocation}
                     onChange={(e) => setNewLocation(e.target.value)}
-                    className="w-full bg-white rounded-2xl px-3.5 py-2.5 text-xs font-semibold text-[#141416] border border-black/10 focus:outline-none focus:border-[#141416]"
+                    className="w-full aurora-input rounded-2xl px-3.5 py-2.5 text-xs font-semibold placeholder:text-slate-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#141416]/80 mb-1">
-                    Kosten p.P. in € (optional)
+                  <label
+                    htmlFor="idea-cost-input"
+                    className="block text-xs font-bold text-slate-300 mb-1.5"
+                  >
+                    Kosten p.P. in {currency} (optional)
                   </label>
                   <input
+                    id="idea-cost-input"
                     type="number"
                     min="0"
-                    placeholder="z.B. 25"
+                    step="0.01"
+                    placeholder="z.B. 25.50"
                     value={newCost}
-                    onChange={(e) => setNewCost(e.target.value)}
-                    className="w-full bg-white rounded-2xl px-3.5 py-2.5 text-xs font-semibold text-[#141416] border border-black/10 focus:outline-none focus:border-[#141416]"
+                    onChange={(e) => {
+                      setNewCost(e.target.value);
+                      if (formError) setFormError(null);
+                    }}
+                    className="w-full aurora-input rounded-2xl px-3.5 py-2.5 text-xs font-mono tabular-nums font-semibold placeholder:text-slate-500"
                   />
                 </div>
               </div>
 
-              <div className="pt-3 flex items-center justify-end gap-3">
+              <div className="pt-3 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
-                  onClick={() => {
-                    resetIdeaForm();
-                    setIsAddIdeaOpen(false);
-                  }}
-                  className="px-5 py-2.5 rounded-full text-xs font-bold text-[#141416]/70 hover:bg-black/5 cursor-pointer"
+                  onClick={closeIdeaModal}
+                  className="px-5 py-2.5 rounded-full text-xs font-bold bg-white/10 hover:bg-white/15 text-slate-200 cursor-pointer"
                 >
                   Abbrechen
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-full bg-[#141416] text-white font-extrabold text-xs shadow-lg hover:bg-black/85 cursor-pointer flex items-center gap-1.5"
+                  className="px-6 py-2.5 rounded-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-extrabold text-xs shadow-[0_0_20px_rgba(34,211,238,0.25)] cursor-pointer flex items-center gap-1.5"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-[#F4DF7B]" />
+                  <Sparkles className="w-3.5 h-3.5" />
                   <span>{editingIdeaId ? 'Änderungen speichern' : 'Idee einreichen'}</span>
                 </button>
               </div>
@@ -693,71 +1202,124 @@ export const IdeasPoolView: React.FC = () => {
 
       {/* MODAL: IN TAGESPLAN ÜBERNEHMEN */}
       {schedulingIdea && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
-          <div className="bg-[#F9F6F0]/95 backdrop-blur-2xl w-full max-w-md rounded-[34px] p-6 md:p-8 shadow-2xl border border-white/60 space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-700 flex items-center justify-center">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fade-in"
+          onClick={closeScheduleModal}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="schedule-idea-modal-title"
+            onClick={(e) => e.stopPropagation()}
+            className="aurora-glass-elevated w-full max-w-md max-h-[90vh] overflow-y-auto rounded-[28px] p-6 md:p-7 space-y-5"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-400/15 border border-emerald-400/30 text-emerald-300 flex items-center justify-center shrink-0">
                   <CalendarPlus className="w-5 h-5" />
                 </div>
-                <div>
-                  <h3 className="text-lg font-black text-[#141416]">In Tagesplan übernehmen</h3>
-                  <p className="text-xs text-[#141416]/60 line-clamp-1">
+                <div className="min-w-0">
+                  <h3
+                    id="schedule-idea-modal-title"
+                    className="text-lg font-black text-slate-100"
+                  >
+                    In Tagesplan übernehmen
+                  </h3>
+                  <p className="text-xs text-slate-400 truncate">
                     „{schedulingIdea.title}“
                   </p>
                 </div>
               </div>
               <button
-                onClick={() => setSchedulingIdea(null)}
-                className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-[#141416] cursor-pointer"
+                type="button"
+                onClick={closeScheduleModal}
+                aria-label="Dialog schließen"
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-200 cursor-pointer shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
+            {scheduleTimeError && (
+              <div className="rounded-2xl bg-rose-500/15 border border-rose-400/35 px-4 py-2.5 text-xs font-semibold text-rose-200">
+                {scheduleTimeError}
+              </div>
+            )}
+
             <form onSubmit={handleConfirmSchedule} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-[#141416]/80 mb-1.5">
+                <label
+                  htmlFor="schedule-idea-day"
+                  className="block text-xs font-bold text-slate-300 mb-1.5"
+                >
                   An welchem Tag soll die Aktivität stattfinden?
                 </label>
                 <select
+                  id="schedule-idea-day"
                   value={scheduleDay}
                   onChange={(e) => setScheduleDay(Number(e.target.value))}
-                  className="w-full bg-white rounded-2xl px-4 py-3 text-sm font-bold text-[#141416] border border-black/10 focus:outline-none focus:border-[#141416]"
+                  className="w-full aurora-input rounded-2xl px-4 py-3 text-sm font-bold [color-scheme:dark]"
                 >
-                  {Array.from({ length: trip.totalDays }, (_, i) => i + 1).map((day) => (
-                    <option key={day} value={day}>
+                  {Array.from({ length: safeTotalDays }, (_, i) => i + 1).map((day) => (
+                    <option key={day} value={day} className="bg-[#131823] text-slate-100">
                       Tag {day}
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-[#141416]/80 mb-1.5">
-                  Uhrzeit / Startzeit
-                </label>
-                <input
-                  type="time"
-                  value={scheduleTime}
-                  onChange={(e) => setScheduleTime(e.target.value)}
-                  className="w-full bg-white rounded-2xl px-4 py-3 text-sm font-bold text-[#141416] border border-black/10 focus:outline-none focus:border-[#141416]"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label
+                    htmlFor="schedule-idea-start"
+                    className="block text-xs font-bold text-slate-300 mb-1.5"
+                  >
+                    Startzeit
+                  </label>
+                  <input
+                    id="schedule-idea-start"
+                    type="time"
+                    value={scheduleTime}
+                    onChange={(e) => {
+                      setScheduleTime(e.target.value);
+                      if (scheduleTimeError) setScheduleTimeError(null);
+                    }}
+                    className="w-full aurora-input rounded-2xl px-3.5 py-2.5 text-sm font-mono tabular-nums font-bold [color-scheme:dark]"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="schedule-idea-end"
+                    className="block text-xs font-bold text-slate-300 mb-1.5"
+                  >
+                    Endzeit (optional)
+                  </label>
+                  <input
+                    id="schedule-idea-end"
+                    type="time"
+                    value={scheduleEndTime}
+                    onChange={(e) => {
+                      setScheduleEndTime(e.target.value);
+                      if (scheduleTimeError) setScheduleTimeError(null);
+                    }}
+                    className="w-full aurora-input rounded-2xl px-3.5 py-2.5 text-sm font-mono tabular-nums font-bold [color-scheme:dark]"
+                  />
+                </div>
               </div>
 
-              <div className="pt-2 flex items-center justify-end gap-3">
+              <div className="pt-2 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
-                  onClick={() => setSchedulingIdea(null)}
-                  className="px-5 py-2.5 rounded-full text-xs font-bold text-[#141416]/70 hover:bg-black/5 cursor-pointer"
+                  onClick={closeScheduleModal}
+                  className="px-5 py-2.5 rounded-full text-xs font-bold bg-white/10 hover:bg-white/15 text-slate-200 cursor-pointer"
                 >
                   Abbrechen
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-full bg-[#141416] text-white font-extrabold text-xs shadow-lg hover:bg-black/85 cursor-pointer flex items-center gap-1.5"
+                  className="px-6 py-2.5 rounded-full bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-extrabold text-xs shadow-[0_0_20px_rgba(52,211,153,0.28)] cursor-pointer flex items-center gap-1.5"
                 >
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#F4DF7B]" />
+                  <CheckCircle2 className="w-3.5 h-3.5" />
                   <span>Jetzt fest einplanen</span>
                 </button>
               </div>
@@ -768,3 +1330,5 @@ export const IdeasPoolView: React.FC = () => {
     </div>
   );
 };
+
+export default IdeasPoolView;

@@ -1,34 +1,64 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
+  AlertTriangle,
+  ArrowRightLeft,
   CalendarDays,
+  Car,
   ChevronLeft,
   ChevronRight,
   Clock,
   Compass,
-  Utensils,
-  Sun,
-  Landmark,
-  Car,
-  Music,
-  Sparkles,
-  ThumbsUp,
-  Plus,
-  MapPin,
   ExternalLink,
+  GripVertical,
+  Landmark,
+  MapPin,
+  Music,
+  Navigation,
+  Plus,
+  Sparkles,
+  Sun,
+  ThumbsUp,
+  Utensils,
+  X,
 } from 'lucide-react';
 import { useVacation } from '../context/VacationContext';
-import { ActivityCategory, MealType } from '../types/vacation';
+import { ActivityCategory, DayActivity, MealType } from '../types/vacation';
+import {
+  buildGoogleMapsUrl,
+  compareTimeSlots,
+  detectDayConflicts,
+  formatCurrency,
+  formatTripDayDate,
+} from '../utils/vacationHelpers';
 
 const CATEGORY_META: Record<
   ActivityCategory,
-  { bg: string; icon: React.ReactNode }
+  { badgeClass: string; icon: React.ReactNode }
 > = {
-  beach: { bg: 'bg-[#F4DF7B]', icon: <Sun className="w-3.5 h-3.5 text-[#141416]" /> },
-  activity: { bg: 'bg-[#C5D1F5]', icon: <Compass className="w-3.5 h-3.5 text-[#141416]" /> },
-  culture: { bg: 'bg-[#E8C2E8]', icon: <Landmark className="w-3.5 h-3.5 text-[#141416]" /> },
-  transport: { bg: 'bg-[#A9B882]', icon: <Car className="w-3.5 h-3.5 text-[#141416]" /> },
-  nightlife: { bg: 'bg-[#F7C59F]', icon: <Music className="w-3.5 h-3.5 text-[#141416]" /> },
-  other: { bg: 'bg-[#EFECE6]', icon: <Sparkles className="w-3.5 h-3.5 text-[#141416]" /> },
+  beach: {
+    badgeClass: 'bg-amber-400/15 text-amber-300 border border-amber-400/30',
+    icon: <Sun className="w-3.5 h-3.5" />,
+  },
+  activity: {
+    badgeClass: 'bg-cyan-400/15 text-cyan-300 border border-cyan-400/30',
+    icon: <Compass className="w-3.5 h-3.5" />,
+  },
+  culture: {
+    badgeClass: 'bg-violet-400/15 text-violet-300 border border-violet-400/30',
+    icon: <Landmark className="w-3.5 h-3.5" />,
+  },
+  transport: {
+    badgeClass: 'bg-emerald-400/15 text-emerald-300 border border-emerald-400/30',
+    icon: <Car className="w-3.5 h-3.5" />,
+  },
+  nightlife: {
+    badgeClass: 'bg-rose-400/15 text-rose-300 border border-rose-400/30',
+    icon: <Music className="w-3.5 h-3.5" />,
+  },
+  other: {
+    badgeClass: 'bg-white/10 text-slate-300 border border-white/15',
+    icon: <Sparkles className="w-3.5 h-3.5" />,
+  },
 };
 
 const MEAL_LABELS: Record<MealType, string> = {
@@ -38,17 +68,23 @@ const MEAL_LABELS: Record<MealType, string> = {
   snack: 'Snack',
 };
 
-function getDayDateStr(startDateStr: string, dayNumber: number): string {
-  const base = new Date(`${startDateStr || '2026-07-15'}T12:00:00`);
-  if (Number.isNaN(base.getTime())) return `Tag ${dayNumber}`;
-  const d = new Date(base);
-  d.setDate(d.getDate() + (dayNumber - 1));
-  return d.toLocaleDateString('de-DE', {
-    weekday: 'short',
-    day: '2-digit',
-    month: 'short',
-  });
-}
+const ACTIVITY_STATUS_META: Record<
+  DayActivity['status'],
+  { label: string; badgeClass: string }
+> = {
+  confirmed: {
+    label: 'Bestätigt',
+    badgeClass: 'bg-emerald-400/15 text-emerald-300 border border-emerald-400/35',
+  },
+  planned: {
+    label: 'Geplant',
+    badgeClass: 'bg-cyan-400/15 text-cyan-300 border border-cyan-400/35',
+  },
+  idea: {
+    label: 'Idee',
+    badgeClass: 'bg-amber-400/15 text-amber-300 border border-amber-400/35',
+  },
+};
 
 export const WeekOverviewView: React.FC = () => {
   const {
@@ -60,46 +96,94 @@ export const WeekOverviewView: React.FC = () => {
     setActiveTab,
     setIsQuickAddOpen,
     toggleActivityVote,
+    updateActivity,
     toggleMealVote,
+    focusOnMap,
+    setSearchTarget,
+    showToast,
+    scheduleIdeaToDay,
   } = useVacation();
 
   const [spanMode, setSpanMode] = useState<'3' | '7' | 'all'>('7');
   const [typeFilter, setTypeFilter] = useState<'all' | 'activities' | 'meals'>('all');
   const [pageOffset, setPageOffset] = useState(0);
+  const [draggingActivityId, setDraggingActivityId] = useState<string | null>(null);
+  const [dragOverDay, setDragOverDay] = useState<number | null>(null);
+  const [movingActivityId, setMovingActivityId] = useState<string | null>(null);
+
+  const safeTotalDays = Math.max(1, Math.round(trip.totalDays || 1));
+  const pageSize = spanMode === '3' ? 3 : 7;
+  const maxPages =
+    spanMode === 'all' ? 1 : Math.max(1, Math.ceil(safeTotalDays / pageSize));
+
+  // Sync pagination cleanly whenever selectedDay, trip, totalDays, or spanMode changes externally
+  useEffect(() => {
+    if (spanMode === 'all') {
+      setPageOffset(0);
+      return;
+    }
+    const clampedSelected = Math.max(1, Math.min(selectedDay, safeTotalDays));
+    const targetPage = Math.floor((clampedSelected - 1) / pageSize);
+    setPageOffset(Math.min(targetPage, maxPages - 1));
+  }, [selectedDay, trip.id, safeTotalDays, spanMode, pageSize, maxPages]);
 
   const visibleDays = useMemo(() => {
-    const allDays = Array.from({ length: trip.totalDays }, (_, i) => i + 1);
+    const allDays = Array.from({ length: safeTotalDays }, (_, i) => i + 1);
     if (spanMode === 'all') return allDays;
-    const size = spanMode === '3' ? 3 : 7;
-    const startIdx = Math.min(pageOffset * size, Math.max(0, allDays.length - size));
-    return allDays.slice(startIdx, startIdx + size);
-  }, [trip.totalDays, spanMode, pageOffset]);
+    const clampedPage = Math.max(0, Math.min(pageOffset, maxPages - 1));
+    const startIdx = clampedPage * pageSize;
+    return allDays.slice(startIdx, startIdx + pageSize);
+  }, [safeTotalDays, spanMode, pageOffset, pageSize, maxPages]);
 
-  const maxPages =
-    spanMode === 'all'
-      ? 1
-      : Math.ceil(trip.totalDays / (spanMode === '3' ? 3 : 7));
+  const dayRangeLabel = useMemo(() => {
+    if (visibleDays.length === 0) return '';
+    const first = visibleDays[0];
+    const last = visibleDays[visibleDays.length - 1];
+    return first === last ? `Tag ${first}` : `Tag ${first}–${last}`;
+  }, [visibleDays]);
+
+  const handleMoveActivityToDay = (activityId: string, targetDay: number) => {
+    const act = trip.activities.find((a) => a.id === activityId);
+    if (!act) return;
+    if (act.dayNumber === targetDay) {
+      setMovingActivityId(null);
+      return;
+    }
+    updateActivity(activityId, { dayNumber: targetDay });
+    setSelectedDay(targetDay);
+    setSelectedActivityId(activityId);
+    setMovingActivityId(null);
+    showToast(`„${act.title}“ auf Tag ${targetDay} verschoben`, 'success');
+  };
 
   return (
-    <div className="space-y-5">
-      {/* Header */}
-      <div className="bg-white/70 backdrop-blur-xl rounded-[28px] p-5 border border-white/80 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#C5D1F5]/70 text-[#141416] mb-1.5">
+    <div className="space-y-5 min-w-0 w-full">
+      {/* Midnight Aurora Header */}
+      <div className="aurora-glass rounded-[28px] p-4 sm:p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4 min-w-0">
+        <div className="min-w-0">
+          <div className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-cyan-400/15 text-cyan-300 border border-cyan-400/30 mb-1.5">
             <CalendarDays className="w-3.5 h-3.5" />
-            <span>Wochen- & Mehrtages-Kalender</span>
+            <span>Wochen- &amp; Mehrtages-Kalender</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-black text-[#141416] tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-black text-slate-100 tracking-tight break-words">
             Alle Termine im Überblick
           </h1>
-          <p className="text-xs font-medium text-[#141416]/60 mt-0.5">
-            {trip.destination} • {trip.totalDays} Reisetage nebeneinander
+          <p className="text-xs font-medium text-slate-400 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="truncate text-slate-300">{trip.destination}</span>
+            <span className="text-slate-600">•</span>
+            <span className="font-mono tabular-nums text-cyan-300 font-bold">
+              {dayRangeLabel} von {safeTotalDays}
+            </span>
+            <span className="text-slate-600 hidden sm:inline">•</span>
+            <span className="hidden sm:inline text-slate-400">
+              Aktivitäten per Drag &amp; Drop zwischen Tagen verschieben
+            </span>
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 min-w-0">
           {/* Span Selector */}
-          <div className="inline-flex items-center bg-[#EFECE6] p-1 rounded-full border border-black/5">
+          <div className="inline-flex items-center bg-[#0B0E14]/80 p-1 rounded-full border border-white/10">
             {[
               { id: '3', label: '3 Tage' },
               { id: '7', label: 'Woche (7T)' },
@@ -107,14 +191,14 @@ export const WeekOverviewView: React.FC = () => {
             ].map((opt) => (
               <button
                 key={opt.id}
+                type="button"
                 onClick={() => {
                   setSpanMode(opt.id as '3' | '7' | 'all');
-                  setPageOffset(0);
                 }}
                 className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                   spanMode === opt.id
-                    ? 'bg-[#141416] text-white shadow-xs'
-                    : 'text-[#141416]/70 hover:text-[#141416]'
+                    ? 'bg-cyan-400 text-[#0B0E14] shadow-[0_0_12px_rgba(34,211,238,0.35)]'
+                    : 'text-slate-300 hover:text-white'
                 }`}
               >
                 {opt.label}
@@ -123,7 +207,7 @@ export const WeekOverviewView: React.FC = () => {
           </div>
 
           {/* Type Filter */}
-          <div className="inline-flex items-center bg-[#EFECE6] p-1 rounded-full border border-black/5">
+          <div className="inline-flex items-center bg-[#0B0E14]/80 p-1 rounded-full border border-white/10">
             {[
               { id: 'all', label: 'Alles' },
               { id: 'activities', label: 'Aktivitäten' },
@@ -131,13 +215,14 @@ export const WeekOverviewView: React.FC = () => {
             ].map((opt) => (
               <button
                 key={opt.id}
+                type="button"
                 onClick={() =>
                   setTypeFilter(opt.id as 'all' | 'activities' | 'meals')
                 }
                 className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                   typeFilter === opt.id
-                    ? 'bg-white text-[#141416] shadow-xs'
-                    : 'text-[#141416]/65 hover:text-[#141416]'
+                    ? 'bg-white/15 text-slate-100 border border-white/15'
+                    : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
                 {opt.label}
@@ -145,21 +230,28 @@ export const WeekOverviewView: React.FC = () => {
             ))}
           </div>
 
-          {/* Pagination if needed */}
+          {/* Pagination with Day-Range Indicator */}
           {maxPages > 1 && (
-            <div className="flex items-center gap-1 ml-1">
+            <div className="inline-flex items-center gap-1.5 bg-[#0B0E14]/70 px-2 py-1 rounded-full border border-white/10">
               <button
+                type="button"
                 onClick={() => setPageOffset((p) => Math.max(0, p - 1))}
                 disabled={pageOffset === 0}
-                className="w-8 h-8 rounded-full bg-white border border-black/10 flex items-center justify-center disabled:opacity-40 cursor-pointer"
+                aria-label="Vorherige Tage"
+                className="w-7 h-7 rounded-full bg-white/5 hover:bg-cyan-400/20 text-slate-200 flex items-center justify-center disabled:opacity-35 cursor-pointer"
                 title="Vorherige Tage"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
+              <span className="text-[11px] font-bold text-cyan-300 font-mono tabular-nums px-1.5 whitespace-nowrap">
+                {dayRangeLabel}
+              </span>
               <button
+                type="button"
                 onClick={() => setPageOffset((p) => Math.min(maxPages - 1, p + 1))}
                 disabled={pageOffset >= maxPages - 1}
-                className="w-8 h-8 rounded-full bg-white border border-black/10 flex items-center justify-center disabled:opacity-40 cursor-pointer"
+                aria-label="Nächste Tage"
+                className="w-7 h-7 rounded-full bg-white/5 hover:bg-cyan-400/20 text-slate-200 flex items-center justify-center disabled:opacity-35 cursor-pointer"
                 title="Nächste Tage"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -169,16 +261,27 @@ export const WeekOverviewView: React.FC = () => {
         </div>
       </div>
 
-      {/* Multi-Day Columns Grid */}
+      {/* Multi-Day Columns Grid (responsive without crushing on lg: 1024px or overflowing 390px) */}
       <div
-        className={`grid gap-4 ${
+        className={`grid gap-4 min-w-0 w-full ${
           spanMode === '3'
-            ? 'grid-cols-1 md:grid-cols-3'
-            : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+            ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3'
+            : 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4'
         }`}
       >
         {visibleDays.map((day) => {
           const isSelectedDay = day === selectedDay;
+          const isDropTarget = dragOverDay === day;
+
+          const dayConflicts = detectDayConflicts(
+            trip.activities,
+            trip.meals,
+            day
+          );
+          const conflictCount = Object.keys(dayConflicts).filter(
+            (id) => dayConflicts[id].length > 0
+          ).length;
+
           const acts =
             typeFilter === 'meals'
               ? []
@@ -195,6 +298,8 @@ export const WeekOverviewView: React.FC = () => {
                     category: a.category,
                     status: a.status,
                     votes: a.votes,
+                    lat: a.lat,
+                    lng: a.lng,
                   }));
 
           const meals =
@@ -212,167 +317,414 @@ export const WeekOverviewView: React.FC = () => {
                     mealType: m.mealType,
                     style: m.style,
                     votes: m.votes,
+                    lat: m.lat,
+                    lng: m.lng,
                   }));
 
           const items = [...acts, ...meals].sort((a, b) =>
-            a.time.localeCompare(b.time)
+            compareTimeSlots(a.time, b.time)
           );
 
           return (
             <div
               key={day}
-              className={`rounded-[26px] p-4 flex flex-col justify-between gap-3 transition-all border backdrop-blur-xl ${
-                isSelectedDay
-                  ? 'bg-gradient-to-b from-[#E8C2E8]/45 to-white/80 border-[#141416]/25 shadow-md'
-                  : 'bg-white/65 border-white/80 shadow-xs hover:bg-white/80'
+              onDragOver={(e) => {
+                e.preventDefault();
+                if (e.dataTransfer) {
+                  e.dataTransfer.dropEffect = 'move';
+                }
+                if (dragOverDay !== day) setDragOverDay(day);
+              }}
+              onDragLeave={(e) => {
+                if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+                  setDragOverDay((curr) => (curr === day ? null : curr));
+                }
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                setDragOverDay(null);
+                let ideaId =
+                  e.dataTransfer?.getData('application/x-vacayly-idea') ||
+                  e.dataTransfer?.getData('application/x-idea-id') ||
+                  '';
+                let actId =
+                  e.dataTransfer?.getData('application/x-vacayly-activity') ||
+                  e.dataTransfer?.getData('application/x-activity-id') ||
+                  '';
+
+                if (!ideaId && !actId) {
+                  const plain = e.dataTransfer?.getData('text/plain') || '';
+                  if (plain) {
+                    try {
+                      const parsed = JSON.parse(plain) as {
+                        kind?: string;
+                        id?: string;
+                      };
+                      if (parsed?.kind === 'idea' && typeof parsed.id === 'string') {
+                        ideaId = parsed.id;
+                      } else if (
+                        parsed?.kind === 'activity' &&
+                        typeof parsed.id === 'string'
+                      ) {
+                        actId = parsed.id;
+                      }
+                    } catch {
+                      // fallback: raw ID string if dragging local activity
+                    }
+                  }
+                }
+
+                if (ideaId) {
+                  scheduleIdeaToDay(ideaId, day, '10:00');
+                  setDraggingActivityId(null);
+                  return;
+                }
+                const targetActId = actId || draggingActivityId;
+                setDraggingActivityId(null);
+                if (targetActId) {
+                  handleMoveActivityToDay(targetActId, day);
+                }
+              }}
+              className={`rounded-[24px] p-3.5 sm:p-4 flex flex-col justify-between gap-3 transition-all border min-w-0 break-words ${
+                isDropTarget
+                  ? 'aurora-glass-elevated border-cyan-400 ring-2 ring-cyan-400/35 shadow-[0_0_24px_rgba(34,211,238,0.22)]'
+                  : isSelectedDay
+                  ? 'aurora-glass-elevated border-cyan-400/45 shadow-[0_0_24px_rgba(34,211,238,0.12)]'
+                  : 'aurora-glass hover:border-white/20'
               }`}
             >
-              <div>
+              <div className="min-w-0">
                 {/* Day Column Header */}
-                <div className="flex items-center justify-between gap-2 pb-3 mb-3 border-b border-black/5">
+                <div className="flex items-start justify-between gap-2 pb-3 mb-3 border-b border-white/10 min-w-0">
                   <button
+                    type="button"
                     onClick={() => setSelectedDay(day)}
-                    className="text-left group cursor-pointer"
+                    className="text-left group cursor-pointer min-w-0 flex-1"
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap min-w-0">
                       <span
-                        className={`text-xs font-black px-2.5 py-0.5 rounded-full ${
+                        className={`text-xs font-black px-2.5 py-0.5 rounded-full font-mono tabular-nums shrink-0 ${
                           isSelectedDay
-                            ? 'bg-[#141416] text-[#F4DF7B]'
-                            : 'bg-[#F4DF7B] text-[#141416]'
+                            ? 'bg-cyan-400 text-[#0B0E14]'
+                            : 'bg-cyan-400/15 text-cyan-300 border border-cyan-400/30'
                         }`}
                       >
                         Tag {day}
                       </span>
-                      <span className="text-xs font-bold text-[#141416]/75 group-hover:text-[#141416]">
-                        {getDayDateStr(trip.startDate, day)}
+                      <span className="text-xs font-bold text-slate-300 group-hover:text-cyan-200 transition-colors truncate">
+                        {formatTripDayDate(trip.startDate, day)}
                       </span>
                     </div>
                   </button>
 
-                  <span className="text-[11px] font-bold text-[#141416]/50">
-                    {items.length} {items.length === 1 ? 'Termin' : 'Termine'}
-                  </span>
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <span className="text-[11px] font-bold text-slate-400 font-mono tabular-nums">
+                      {items.length} {items.length === 1 ? 'Termin' : 'Termine'}
+                    </span>
+                    {conflictCount > 0 && (
+                      <span
+                        title="Zeitkonflikte an diesem Tag"
+                        className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400/15 text-amber-300 border border-amber-400/35 font-mono tabular-nums"
+                      >
+                        <AlertTriangle className="w-2.5 h-2.5" />
+                        {conflictCount} Konflikt
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Day Appointments List */}
-                <div className="space-y-2.5">
+                <div className="space-y-2.5 min-w-0">
                   {items.length === 0 ? (
-                    <div className="rounded-2xl p-4 text-center border border-dashed border-black/10 bg-white/40">
-                      <Clock className="w-4 h-4 text-[#141416]/35 mx-auto mb-1" />
-                      <p className="text-[11px] font-semibold text-[#141416]/50">
-                        Noch frei
+                    <div className="rounded-2xl p-5 text-center border border-dashed border-white/10 bg-[#0B0E14]/45">
+                      <Clock className="w-4 h-4 text-slate-500 mx-auto mb-1.5" />
+                      <p className="text-[11px] font-semibold text-slate-400">
+                        {isDropTarget ? 'Hier ablegen' : 'Noch frei'}
                       </p>
                     </div>
                   ) : (
                     items.map((item) => {
                       const hasVoted = item.votes.includes(currentUser.id);
+                      const hasConflict = (dayConflicts[item.id] || []).length > 0;
+                      const isDragging =
+                        item.kind === 'activity' && draggingActivityId === item.id;
+                      const isMoveMenuOpen =
+                        item.kind === 'activity' && movingActivityId === item.id;
+                      const mapsUrl = buildGoogleMapsUrl(item.location);
+
                       const meta =
                         item.kind === 'activity'
                           ? CATEGORY_META[item.category] || CATEGORY_META.other
                           : {
-                              bg: 'bg-[#F7C59F]',
-                              icon: <Utensils className="w-3.5 h-3.5 text-[#141416]" />,
+                              badgeClass:
+                                'bg-amber-400/15 text-amber-300 border border-amber-400/30',
+                              icon: <Utensils className="w-3.5 h-3.5" />,
                             };
+
+                      const statusBadge =
+                        item.kind === 'meal'
+                          ? {
+                              label: MEAL_LABELS[item.mealType],
+                              badgeClass:
+                                'bg-amber-400/15 text-amber-200 border border-amber-400/30',
+                            }
+                          : ACTIVITY_STATUS_META[item.status] ||
+                            ACTIVITY_STATUS_META.planned;
 
                       return (
                         <div
                           key={`${item.kind}-${item.id}`}
-                          onClick={() => {
-                            setSelectedDay(day);
-                            if (item.kind === 'activity') {
-                              setSelectedActivityId(item.id);
+                          draggable={item.kind === 'activity'}
+                          onDragStart={(e) => {
+                            if (item.kind !== 'activity') return;
+                            setDraggingActivityId(item.id);
+                            if (e.dataTransfer) {
+                              e.dataTransfer.effectAllowed = 'move';
+                              e.dataTransfer.setData(
+                                'application/x-vacayly-activity',
+                                item.id
+                              );
+                              e.dataTransfer.setData(
+                                'application/x-activity-id',
+                                item.id
+                              );
+                              e.dataTransfer.setData(
+                                'text/plain',
+                                JSON.stringify({ kind: 'activity', id: item.id })
+                              );
                             }
                           }}
-                          className="rounded-2xl p-3 bg-white/85 hover:bg-white border border-black/5 shadow-2xs transition-all cursor-pointer space-y-1.5"
+                          onDragEnd={() => {
+                            setDraggingActivityId(null);
+                            setDragOverDay(null);
+                          }}
+                          className={`rounded-2xl p-3 bg-[#0B0E14]/70 hover:bg-[#131823]/95 border transition-all space-y-2 min-w-0 break-words ${
+                            isDragging
+                              ? 'opacity-45 border-cyan-400/60 scale-[0.98]'
+                              : hasConflict
+                              ? 'border-amber-400/40'
+                              : 'border-white/10 hover:border-white/20'
+                          }`}
                         >
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-1.5">
+                          {/* Top Row: Time + Drag Grip + Status Badge */}
+                          <div className="flex items-center justify-between gap-2 min-w-0">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              {item.kind === 'activity' && (
+                                <GripVertical
+                                  className="w-3.5 h-3.5 text-slate-500 shrink-0 cursor-grab active:cursor-grabbing"
+                                  aria-hidden="true"
+                                />
+                              )}
                               <span
-                                className={`w-6 h-6 rounded-lg ${meta.bg} flex items-center justify-center shrink-0`}
+                                className={`w-6 h-6 rounded-lg ${meta.badgeClass} flex items-center justify-center shrink-0`}
                               >
                                 {meta.icon}
                               </span>
-                              <span className="text-[11px] font-extrabold text-[#141416]">
+                              <span className="text-[11px] font-extrabold text-cyan-300 font-mono tabular-nums truncate">
                                 {item.time}
                                 {item.kind === 'activity' && item.endTime
                                   ? `–${item.endTime}`
-                                  : ''}{' '}
-                                Uhr
+                                  : ''}
                               </span>
                             </div>
 
-                            <span
-                              className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                                item.kind === 'meal'
-                                  ? 'bg-[#F7C59F]/50 text-[#141416]'
-                                  : item.status === 'confirmed'
-                                  ? 'bg-[#A9B882]/40 text-[#141416]'
-                                  : 'bg-[#EFECE6] text-[#141416]/70'
-                              }`}
-                            >
-                              {item.kind === 'meal'
-                                ? MEAL_LABELS[item.mealType]
-                                : item.status === 'confirmed'
-                                ? 'Fix'
-                                : 'Idee'}
-                            </span>
+                            <div className="flex items-center gap-1 shrink-0">
+                              {hasConflict && (
+                                <span
+                                  title="Zeitkonflikt mit anderem Termin"
+                                  className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/35"
+                                >
+                                  <AlertTriangle className="w-3 h-3" />
+                                </span>
+                              )}
+                              <span
+                                className={`text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${statusBadge.badgeClass}`}
+                              >
+                                {statusBadge.label}
+                              </span>
+                            </div>
                           </div>
 
-                          <h4 className="text-xs font-extrabold text-[#141416] leading-snug line-clamp-2">
-                            {item.title}
-                          </h4>
+                          {/* Selectable Title Button (no nested buttons inside!) */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedDay(day);
+                              if (item.kind === 'activity') {
+                                setSelectedActivityId(item.id);
+                                setActiveTab('schedule');
+                                setSearchTarget({
+                                  tab: 'schedule',
+                                  kind: 'activity',
+                                  id: item.id,
+                                  dayNumber: day,
+                                });
+                              } else {
+                                setActiveTab('meals');
+                                setSearchTarget({
+                                  tab: 'meals',
+                                  kind: 'meal',
+                                  id: item.id,
+                                  dayNumber: day,
+                                });
+                              }
+                            }}
+                            className="w-full text-left cursor-pointer group min-w-0 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+                          >
+                            <h4 className="text-xs font-extrabold text-slate-100 group-hover:text-cyan-200 transition-colors leading-snug break-words">
+                              {item.title}
+                            </h4>
+                          </button>
 
-                          {item.location && (
-                            <div className="flex items-center justify-between gap-1 text-[10px] text-[#141416]/60">
-                              <span className="inline-flex items-center gap-1 truncate">
-                                <MapPin className="w-3 h-3 shrink-0" />
-                                <span className="truncate">{item.location}</span>
+                          {/* Location Row with Focus on Map + Safe Google Maps URL */}
+                          {(item.location ||
+                            (typeof item.lat === 'number' &&
+                              typeof item.lng === 'number')) && (
+                            <div className="flex items-center justify-between gap-1.5 text-[11px] text-slate-400 min-w-0">
+                              <span className="inline-flex items-center gap-1 min-w-0 flex-1">
+                                <MapPin className="w-3 h-3 text-cyan-400/80 shrink-0" />
+                                <span className="truncate break-words">
+                                  {item.location || trip.destination}
+                                </span>
                               </span>
-                              {(item.kind === 'activity' ||
-                                item.style === 'restaurant' ||
-                                item.style === 'bakery') && (
-                                <a
-                                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                                    item.location
-                                  )}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="inline-flex items-center gap-0.5 text-[10px] font-bold text-[#141416]/70 hover:text-[#141416] shrink-0"
-                                  title="In Google Maps öffnen"
+
+                              <div className="flex items-center gap-1 shrink-0">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    focusOnMap({
+                                      kind: item.kind,
+                                      id: item.id,
+                                      title: item.title,
+                                      location: item.location || trip.destination,
+                                      lat: item.lat,
+                                      lng: item.lng,
+                                      dayNumber: day,
+                                      time: item.time,
+                                    })
+                                  }
+                                  title="Auf Karte zeigen"
+                                  aria-label={`${item.title} auf Karte zeigen`}
+                                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-cyan-400/15 hover:bg-cyan-400/25 text-cyan-300 border border-cyan-400/30 text-[10px] font-bold transition-colors cursor-pointer"
                                 >
-                                  <ExternalLink className="w-2.5 h-2.5" />
-                                </a>
-                              )}
+                                  <Navigation className="w-2.5 h-2.5" />
+                                  <span>Karte</span>
+                                </button>
+
+                                {mapsUrl &&
+                                  (item.kind === 'activity' ||
+                                    item.style === 'restaurant' ||
+                                    item.style === 'bakery') && (
+                                    <a
+                                      href={mapsUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center justify-center w-5 h-5 rounded-md bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 transition-colors"
+                                      title="In Google Maps öffnen"
+                                      aria-label={`${item.title} in Google Maps öffnen`}
+                                    >
+                                      <ExternalLink className="w-2.5 h-2.5" />
+                                    </a>
+                                  )}
+                              </div>
                             </div>
                           )}
 
-                          <div className="flex items-center justify-between pt-1">
-                            <span className="text-[10px] font-bold text-[#141416]/55">
-                              {item.cost > 0 ? `~${item.cost} €` : 'Kostenlos'}
+                          {/* Bottom Row: Cost + Touch Move Selector + Vote */}
+                          <div className="flex items-center justify-between gap-2 pt-1 min-w-0">
+                            <span className="text-[11px] font-bold text-emerald-300/90 font-mono tabular-nums truncate">
+                              {item.cost > 0
+                                ? `~${formatCurrency(item.cost, trip.currency)}`
+                                : 'Kostenlos'}
                             </span>
 
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (item.kind === 'activity') {
-                                  toggleActivityVote(item.id);
-                                } else {
-                                  toggleMealVote(item.id);
-                                }
-                              }}
-                              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer ${
-                                hasVoted
-                                  ? 'bg-[#141416] text-[#F4DF7B]'
-                                  : 'bg-[#EFECE6] hover:bg-[#E8C2E8] text-[#141416]'
-                              }`}
-                            >
-                              <ThumbsUp className="w-2.5 h-2.5" />
-                              <span>{item.votes.length}</span>
-                            </button>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              {item.kind === 'activity' && safeTotalDays > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setMovingActivityId((curr) =>
+                                      curr === item.id ? null : item.id
+                                    )
+                                  }
+                                  aria-expanded={isMoveMenuOpen}
+                                  title="Auf anderen Tag verschieben"
+                                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold transition-colors cursor-pointer border ${
+                                    isMoveMenuOpen
+                                      ? 'bg-cyan-400/20 text-cyan-200 border-cyan-400/45'
+                                      : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
+                                  }`}
+                                >
+                                  <ArrowRightLeft className="w-2.5 h-2.5" />
+                                  <span>Verschieben</span>
+                                </button>
+                              )}
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (item.kind === 'activity') {
+                                    toggleActivityVote(item.id);
+                                  } else {
+                                    toggleMealVote(item.id);
+                                  }
+                                }}
+                                aria-label={`Stimmen für ${item.title} (${item.votes.length})`}
+                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer font-mono tabular-nums border ${
+                                  hasVoted
+                                    ? 'bg-cyan-400/20 text-cyan-200 border-cyan-400/45'
+                                    : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
+                                }`}
+                              >
+                                <ThumbsUp className="w-2.5 h-2.5" />
+                                <span>{item.votes.length}</span>
+                              </button>
+                            </div>
                           </div>
+
+                          {/* Touch / Mobile Day Move Picker Drawer */}
+                          {isMoveMenuOpen && item.kind === 'activity' && (
+                            <div className="pt-2 mt-1 border-t border-white/10 space-y-1.5 animate-fade-in">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-[10px] font-bold text-cyan-300 uppercase tracking-wider">
+                                  Auf Tag verschieben:
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setMovingActivityId(null)}
+                                  aria-label="Verschieben-Auswahl schließen"
+                                  className="text-slate-400 hover:text-slate-200 cursor-pointer"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </div>
+                              <div className="flex flex-wrap gap-1">
+                                {Array.from(
+                                  { length: safeTotalDays },
+                                  (_, idx) => idx + 1
+                                ).map((targetDay) => {
+                                  const isCurrent = targetDay === day;
+                                  return (
+                                    <button
+                                      key={targetDay}
+                                      type="button"
+                                      disabled={isCurrent}
+                                      onClick={() =>
+                                        handleMoveActivityToDay(item.id, targetDay)
+                                      }
+                                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold font-mono tabular-nums transition-colors ${
+                                        isCurrent
+                                          ? 'bg-cyan-400/20 text-cyan-200 border border-cyan-400/40 cursor-default'
+                                          : 'bg-white/10 hover:bg-cyan-400 hover:text-[#0B0E14] text-slate-200 cursor-pointer'
+                                      }`}
+                                    >
+                                      T{targetDay}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       );
                     })
@@ -380,25 +732,32 @@ export const WeekOverviewView: React.FC = () => {
                 </div>
               </div>
 
-              {/* Footer: Quick Add + Jump to Day */}
-              <div className="pt-2 flex items-center justify-between gap-2 border-t border-black/5">
+              {/* Footer: Quick Add + Contextual Details Jump */}
+              <div className="pt-2.5 flex items-center justify-between gap-2 border-t border-white/10">
                 <button
+                  type="button"
                   onClick={() => {
                     setSelectedDay(day);
                     setIsQuickAddOpen(true);
                   }}
-                  className="inline-flex items-center gap-1 text-[11px] font-bold text-[#141416]/70 hover:text-[#141416] cursor-pointer"
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-300 hover:text-cyan-300 transition-colors cursor-pointer"
                 >
-                  <Plus className="w-3.5 h-3.5" />
+                  <Plus className="w-3.5 h-3.5 text-cyan-400" />
                   <span>Termin</span>
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => {
                     setSelectedDay(day);
-                    setActiveTab('schedule');
+                    setActiveTab(typeFilter === 'meals' ? 'meals' : 'schedule');
                   }}
-                  className="text-[11px] font-bold text-[#141416]/60 hover:text-[#141416] cursor-pointer"
+                  title={
+                    typeFilter === 'meals'
+                      ? 'Essensplan für diesen Tag öffnen'
+                      : 'Tagesplan für diesen Tag öffnen'
+                  }
+                  className="text-[11px] font-bold text-cyan-300 hover:text-cyan-200 transition-colors cursor-pointer"
                 >
                   Details →
                 </button>
