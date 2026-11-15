@@ -17,6 +17,7 @@ import {
   WifiOff,
   Sparkles,
   ArrowUpRight,
+  Plus,
 } from 'lucide-react';
 import { useVacation } from '../context/VacationContext';
 import {
@@ -112,10 +113,12 @@ export const MapCockpitPanel: React.FC = () => {
     mapFocusTarget,
     setMapFocusTarget,
     setSearchTarget,
+    setIsQuickAddOpen,
   } = useVacation();
 
   const [filter, setFilter] = useState<MapFilter>('all');
   const [dayScope, setDayScope] = useState<'day' | 'all'>('day');
+  const [mobileView, setMobileView] = useState<'map' | 'list'>('map');
   const [selectedPinKey, setSelectedPinKey] = useState<string | null>(null);
   const [resolvedCoords, setResolvedCoords] = useState<
     Record<string, { lat: number; lng: number } | null>
@@ -156,6 +159,7 @@ export const MapCockpitPanel: React.FC = () => {
 
     const focusKey = `${mapFocusTarget.kind}-${mapFocusTarget.id}`;
     setSelectedPinKey(focusKey);
+    setMobileView('map');
 
     if (mapFocusTarget.kind === 'activity') {
       setSelectedActivityId(mapFocusTarget.id);
@@ -450,6 +454,15 @@ export const MapCockpitPanel: React.FC = () => {
     };
   }, []);
 
+  // Re-measure Leaflet canvas when switching back from mobile list to map view
+  useEffect(() => {
+    if (mobileView !== 'map') return;
+    const timer = window.setTimeout(() => {
+      mapInstanceRef.current?.invalidateSize({ animate: false });
+    }, 60);
+    return () => window.clearTimeout(timer);
+  }, [mobileView]);
+
   // Manage tile layer & automatic fallback (Esri Street -> OSM -> Offline Spatial)
   useEffect(() => {
     const map = mapInstanceRef.current;
@@ -669,14 +682,20 @@ export const MapCockpitPanel: React.FC = () => {
       setSelectedActivityId(pin.sourceId);
     }
 
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setMobileView('map');
+    }
+
     const coords = getCoordsForPin(pin);
     const map = mapInstanceRef.current;
     if (coords && map) {
-      map.flyTo([coords.lat, coords.lng], 14, { duration: 0.45 });
-      const marker = markerMapRef.current.get(pin.pinKey);
-      if (marker) {
-        window.setTimeout(() => marker.openPopup(), 220);
-      }
+      window.setTimeout(() => {
+        map.flyTo([coords.lat, coords.lng], 14, { duration: 0.45 });
+        const marker = markerMapRef.current.get(pin.pinKey);
+        if (marker) {
+          window.setTimeout(() => marker.openPopup(), 220);
+        }
+      }, 40);
     }
   };
 
@@ -744,33 +763,70 @@ export const MapCockpitPanel: React.FC = () => {
   };
 
   const totalDays = Math.max(1, trip.totalDays || 1);
+  const peekPin =
+    allPins.find((p) => p.pinKey === selectedPinKey) || allPins[0] || null;
+  const peekMapsUrl = peekPin ? buildGoogleMapsUrl(peekPin.location) : null;
 
   return (
     <aside
       aria-label="Karten-Cockpit"
-      className="surface-glass-elevated rounded-[28px] flex flex-col h-full w-full overflow-hidden border border-[#DDD2C3] shadow-xl"
+      className="surface-glass-elevated rounded-none sm:rounded-[28px] flex flex-col h-full w-full overflow-hidden border-0 sm:border sm:border-[#DDD2C3] shadow-xl"
     >
       {/* Top Cockpit Header */}
-      <div className="px-4 py-3.5 border-b border-[#E6DDD1] flex items-center justify-between gap-2 bg-[#FAF7F2]">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-[#2A7B88]/12 border border-[#2A7B88]/30 text-[#1F5E68] flex items-center justify-center shrink-0">
+      <div className="px-3 sm:px-4 py-2 sm:py-3 border-b border-[#E6DDD1] flex items-center justify-between gap-2 bg-[#FAF7F2] shrink-0">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="w-8 h-8 rounded-xl bg-[#2A7B88]/12 border border-[#2A7B88]/30 text-[#1F5E68] hidden min-[400px]:flex items-center justify-center shrink-0">
             <MapIcon className="w-4 h-4" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
               <h2 className="text-sm font-extrabold text-[#1F1B18] truncate">
-                Map-Cockpit
+                Karte
               </h2>
               <span className="font-mono tabular-nums text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#2A7B88]/12 text-[#1F5E68] border border-[#2A7B88]/25 shrink-0">
                 {plottedPins.length} Pins
               </span>
             </div>
-            <p className="text-[11px] text-[#6B6259] truncate">
+            <p className="hidden sm:block text-[11px] text-[#6B6259] truncate">
               {dayScope === 'day'
                 ? `Tag ${selectedDay} · ${formatTripDayDate(trip.startDate, selectedDay)}`
                 : `Alle ${totalDays} Tage · ${trip.destination}`}
             </p>
           </div>
+        </div>
+
+        {/* Mobile/Tablet (<lg) Segmented Toggle: Karte | Liste */}
+        <div
+          role="tablist"
+          aria-label="Kartenansicht umschalten"
+          className="lg:hidden inline-flex items-center rounded-full bg-[#F3ECE1] p-0.5 border border-[#DDD2C3] shrink-0"
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mobileView === 'map'}
+            onClick={() => setMobileView('map')}
+            className={`min-h-[40px] px-3 rounded-full text-xs font-extrabold transition-colors cursor-pointer ${
+              mobileView === 'map'
+                ? 'bg-[#C85A38] text-white shadow-sm'
+                : 'text-[#6B6259] hover:text-[#1F1B18]'
+            }`}
+          >
+            Karte
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mobileView === 'list'}
+            onClick={() => setMobileView('list')}
+            className={`min-h-[40px] px-3 rounded-full text-xs font-extrabold transition-colors cursor-pointer ${
+              mobileView === 'list'
+                ? 'bg-[#C85A38] text-white shadow-sm'
+                : 'text-[#6B6259] hover:text-[#1F1B18]'
+            }`}
+          >
+            Liste
+          </button>
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
@@ -779,9 +835,10 @@ export const MapCockpitPanel: React.FC = () => {
             onClick={handleFitAllPins}
             disabled={plottedPins.length === 0}
             title="Auf alle Pins zoomen"
-            className="w-8 h-8 rounded-full bg-white hover:bg-[#F3ECE1] disabled:opacity-35 border border-[#DDD2C3] text-[#6B6259] hover:text-[#2A7B88] flex items-center justify-center transition-colors cursor-pointer"
+            aria-label="Auf alle Pins zoomen"
+            className="w-11 h-11 lg:w-8 lg:h-8 rounded-full bg-white hover:bg-[#F3ECE1] disabled:opacity-35 border border-[#DDD2C3] text-[#6B6259] hover:text-[#2A7B88] flex items-center justify-center transition-colors cursor-pointer"
           >
-            <Crosshair className="w-3.5 h-3.5" />
+            <Crosshair className="w-4 h-4 lg:w-3.5 lg:h-3.5" />
           </button>
           <button
             type="button"
@@ -791,7 +848,7 @@ export const MapCockpitPanel: React.FC = () => {
             }}
             title="Karte schließen"
             aria-label="Karte schließen"
-            className="w-8 h-8 rounded-full bg-white hover:bg-rose-500/12 border border-[#DDD2C3] hover:border-rose-500/35 text-[#6B6259] hover:text-rose-700 flex items-center justify-center transition-colors cursor-pointer"
+            className="w-11 h-11 lg:w-8 lg:h-8 rounded-full bg-white hover:bg-rose-500/12 border border-[#DDD2C3] hover:border-rose-500/35 text-[#6B6259] hover:text-rose-700 flex items-center justify-center transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -799,13 +856,13 @@ export const MapCockpitPanel: React.FC = () => {
       </div>
 
       {/* Controls: Day Scope + Day Switcher + Filter Pills */}
-      <div className="px-4 py-2.5 border-b border-[#E6DDD1] space-y-2 bg-white/75">
+      <div className="px-3 sm:px-4 py-2 border-b border-[#E6DDD1] space-y-1.5 sm:space-y-2 bg-white/80 shrink-0">
         <div className="flex items-center justify-between gap-2">
           <div className="inline-flex items-center rounded-full bg-[#F3ECE1] p-0.5 border border-[#DDD2C3]">
             <button
               type="button"
               onClick={() => setDayScope('day')}
-              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors cursor-pointer ${
+              className={`min-h-[40px] lg:min-h-0 px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-full text-xs lg:text-[11px] font-bold transition-colors cursor-pointer ${
                 dayScope === 'day'
                   ? 'bg-[#C85A38] text-white'
                   : 'text-[#6B6259] hover:text-[#1F1B18]'
@@ -816,7 +873,7 @@ export const MapCockpitPanel: React.FC = () => {
             <button
               type="button"
               onClick={() => setDayScope('all')}
-              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors cursor-pointer ${
+              className={`min-h-[40px] lg:min-h-0 px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-full text-xs lg:text-[11px] font-bold transition-colors cursor-pointer ${
                 dayScope === 'all'
                   ? 'bg-[#C85A38] text-white'
                   : 'text-[#6B6259] hover:text-[#1F1B18]'
@@ -833,9 +890,9 @@ export const MapCockpitPanel: React.FC = () => {
                 onClick={() => setSelectedDay(Math.max(1, selectedDay - 1))}
                 disabled={selectedDay <= 1}
                 aria-label="Vorheriger Tag"
-                className="w-7 h-7 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] disabled:opacity-30 border border-[#DDD2C3] text-[#1F1B18] flex items-center justify-center transition-colors cursor-pointer"
+                className="w-11 h-11 lg:w-7 lg:h-7 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] disabled:opacity-30 border border-[#DDD2C3] text-[#1F1B18] flex items-center justify-center transition-colors cursor-pointer"
               >
-                <ChevronLeft className="w-3.5 h-3.5" />
+                <ChevronLeft className="w-4 h-4 lg:w-3.5 lg:h-3.5" />
               </button>
               <span className="font-mono tabular-nums text-xs font-bold text-[#1F1B18] px-1.5">
                 {selectedDay}/{totalDays}
@@ -845,9 +902,9 @@ export const MapCockpitPanel: React.FC = () => {
                 onClick={() => setSelectedDay(Math.min(totalDays, selectedDay + 1))}
                 disabled={selectedDay >= totalDays}
                 aria-label="Nächster Tag"
-                className="w-7 h-7 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] disabled:opacity-30 border border-[#DDD2C3] text-[#1F1B18] flex items-center justify-center transition-colors cursor-pointer"
+                className="w-11 h-11 lg:w-7 lg:h-7 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] disabled:opacity-30 border border-[#DDD2C3] text-[#1F1B18] flex items-center justify-center transition-colors cursor-pointer"
               >
-                <ChevronRight className="w-3.5 h-3.5" />
+                <ChevronRight className="w-4 h-4 lg:w-3.5 lg:h-3.5" />
               </button>
             </div>
           )}
@@ -862,7 +919,7 @@ export const MapCockpitPanel: React.FC = () => {
                 key={opt.id}
                 type="button"
                 onClick={() => setFilter(opt.id)}
-                className={`px-2.5 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer border ${
+                className={`min-h-[44px] lg:min-h-0 px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-full text-xs lg:text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer border ${
                   active
                     ? 'bg-[#C85A38]/12 text-[#9E3F22] border-[#C85A38]/35'
                     : 'bg-[#FAF7F2] text-[#6B6259] border-[#E6DDD1] hover:text-[#1F1B18] hover:bg-[#F3ECE1]'
@@ -875,8 +932,14 @@ export const MapCockpitPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* Leaflet Interactive Map Canvas */}
-      <div className="relative w-full h-[270px] sm:h-[300px] lg:h-[320px] shrink-0 bg-[#F3ECE1] overflow-hidden border-b border-[#E6DDD1]">
+      {/* Leaflet Interactive Map Canvas (Full height on <lg when mobileView === 'map', docked 320px on lg+) */}
+      <div
+        className={
+          mobileView === 'map'
+            ? 'relative flex-1 min-h-[160px] lg:flex-none lg:h-[320px] lg:shrink-0 bg-[#F3ECE1] overflow-hidden border-b border-[#E6DDD1]'
+            : 'hidden lg:block lg:relative lg:h-[320px] lg:shrink-0 bg-[#F3ECE1] overflow-hidden border-b border-[#E6DDD1]'
+        }
+      >
         {/* Subtle Warm Spatial Grid behind/under tiles */}
         <div
           className="absolute inset-0 pointer-events-none opacity-60"
@@ -929,7 +992,7 @@ export const MapCockpitPanel: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setFilter('all')}
-                className="mt-3 px-3.5 py-1.5 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-white text-[11px] font-bold transition-colors cursor-pointer"
+                className="mt-3 min-h-[44px] lg:min-h-0 px-4 lg:px-3.5 py-2 lg:py-1.5 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-white text-xs lg:text-[11px] font-bold transition-colors cursor-pointer"
               >
                 Alle Kategorien anzeigen
               </button>
@@ -938,28 +1001,111 @@ export const MapCockpitPanel: React.FC = () => {
         )}
       </div>
 
+      {/* Mobile/Tablet (<lg) Compact Bottom Stop-Peek Card & "+ Aktivität" CTA */}
+      {mobileView === 'map' && (
+        <div className="lg:hidden shrink-0 border-t border-[#E6DDD1] bg-white/[0.97] backdrop-blur-xl px-3 py-2 flex items-center justify-between gap-2">
+          {peekPin ? (
+            <button
+              type="button"
+              onClick={() => setMobileView('list')}
+              className="flex items-center gap-2.5 min-w-0 flex-1 min-h-[44px] text-left cursor-pointer"
+            >
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-mono tabular-nums text-xs font-extrabold border bg-[#FAF7F2]"
+                style={{
+                  borderColor: KIND_STYLE[peekPin.kind].color,
+                  color: KIND_STYLE[peekPin.kind].color,
+                }}
+              >
+                {peekPin.routeNumber !== undefined
+                  ? peekPin.routeNumber
+                  : peekPin.kind === 'accommodation'
+                  ? '⌂'
+                  : '★'}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-extrabold text-[#1F1B18] truncate">
+                  {peekPin.title}
+                </p>
+                <p className="text-[11px] text-[#6B6259] truncate">
+                  {peekPin.time ? `${peekPin.time} · ` : ''}
+                  {peekPin.location || trip.destination}
+                </p>
+              </div>
+            </button>
+          ) : (
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-bold text-[#6B6259] truncate">
+                {dayScope === 'day'
+                  ? `Tag ${selectedDay} · Keine Stationen`
+                  : 'Keine Stationen'}
+              </p>
+            </div>
+          )}
+
+          <div className="flex items-center gap-1.5 shrink-0">
+            {peekMapsUrl && (
+              <a
+                href={peekMapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="In Google Maps öffnen"
+                aria-label="In Google Maps öffnen"
+                className="w-11 h-11 rounded-full bg-[#FAF7F2] hover:bg-[#6E7F5E]/15 border border-[#DDD2C3] text-[#4E5F40] flex items-center justify-center transition-colors"
+              >
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            )}
+            <button
+              type="button"
+              onClick={() => setIsQuickAddOpen(true)}
+              className="min-h-[44px] inline-flex items-center gap-1.5 px-3.5 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-white text-xs font-extrabold transition-colors cursor-pointer shadow-sm"
+            >
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Aktivität</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Waypoint List + 1-Click Day Route Action */}
-      <div className="flex-1 min-h-0 flex flex-col bg-[#FAF7F2]/80">
-        <div className="px-4 py-2.5 border-b border-[#E6DDD1] flex items-center justify-between gap-2">
+      <div
+        className={
+          mobileView === 'list'
+            ? 'flex-1 min-h-0 flex flex-col bg-[#FAF7F2]/80'
+            : 'hidden lg:flex lg:flex-1 lg:min-h-0 lg:flex-col lg:bg-[#FAF7F2]/80'
+        }
+      >
+        <div className="px-3 sm:px-4 py-2 border-b border-[#E6DDD1] flex items-center justify-between gap-2 shrink-0">
           <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#6B6259]">
             Stationen ({allPins.length})
           </span>
-          {dayRouteUrl ? (
-            <a
-              href={dayRouteUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#6E7F5E]/14 hover:bg-[#6E7F5E]/22 border border-[#6E7F5E]/30 text-[#4E5F40] text-[11px] font-extrabold transition-colors"
+          <div className="flex items-center gap-1.5">
+            {dayRouteUrl ? (
+              <a
+                href={dayRouteUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="min-h-[44px] lg:min-h-0 inline-flex items-center gap-1.5 px-3 py-1.5 lg:py-1 rounded-full bg-[#6E7F5E]/14 hover:bg-[#6E7F5E]/22 border border-[#6E7F5E]/30 text-[#4E5F40] text-xs lg:text-[11px] font-extrabold transition-colors"
+              >
+                <Navigation className="w-3.5 h-3.5 lg:w-3 lg:h-3" />
+                <span>Tagesroute</span>
+                <ExternalLink className="w-3 h-3 lg:w-2.5 lg:h-2.5" />
+              </a>
+            ) : (
+              <span className="text-[11px] text-[#8C8277]">
+                Route ab 1 Ort
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={() => setIsQuickAddOpen(true)}
+              className="lg:hidden min-h-[44px] inline-flex items-center gap-1 px-3 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-white text-xs font-extrabold transition-colors cursor-pointer"
             >
-              <Navigation className="w-3 h-3" />
-              <span>1-Klick Tagesroute</span>
-              <ExternalLink className="w-2.5 h-2.5" />
-            </a>
-          ) : (
-            <span className="text-[11px] text-[#8C8277]">
-              Route ab 1 konkretem Ort
-            </span>
-          )}
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Aktivität</span>
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-3 space-y-2">
@@ -983,11 +1129,11 @@ export const MapCockpitPanel: React.FC = () => {
                       : 'bg-white/75 hover:bg-white border-[#E6DDD1]'
                   }`}
                 >
-                  <div className="flex items-start gap-2.5">
+                  <div className="flex items-start gap-2">
                     <button
                       type="button"
                       onClick={() => handleSelectWaypoint(pin)}
-                      className="flex items-start gap-2.5 flex-1 min-w-0 text-left cursor-pointer"
+                      className="flex items-start gap-2.5 flex-1 min-w-0 min-h-[44px] text-left cursor-pointer"
                     >
                       <div
                         className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 font-mono tabular-nums text-[11px] font-extrabold border mt-0.5 bg-[#FAF7F2]"
@@ -1040,9 +1186,10 @@ export const MapCockpitPanel: React.FC = () => {
                           target="_blank"
                           rel="noopener noreferrer"
                           title="In Google Maps öffnen"
-                          className="w-7 h-7 rounded-full bg-[#FAF7F2] hover:bg-[#6E7F5E]/15 border border-[#DDD2C3] text-[#6B6259] hover:text-[#4E5F40] flex items-center justify-center transition-colors"
+                          aria-label="In Google Maps öffnen"
+                          className="w-11 h-11 lg:w-7 lg:h-7 rounded-full bg-[#FAF7F2] hover:bg-[#6E7F5E]/15 border border-[#DDD2C3] text-[#6B6259] hover:text-[#4E5F40] flex items-center justify-center transition-colors"
                         >
-                          <ExternalLink className="w-3 h-3" />
+                          <ExternalLink className="w-4 h-4 lg:w-3 lg:h-3" />
                         </a>
                       )}
                       {!pin.isFocusOnly && pin.kind !== 'accommodation' && (
@@ -1050,9 +1197,10 @@ export const MapCockpitPanel: React.FC = () => {
                           type="button"
                           onClick={() => handleOpenInTab(pin)}
                           title="In Planungsansicht öffnen"
-                          className="w-7 h-7 rounded-full bg-[#FAF7F2] hover:bg-[#2A7B88]/15 border border-[#DDD2C3] hover:border-[#2A7B88]/40 text-[#6B6259] hover:text-[#1F5E68] flex items-center justify-center transition-colors cursor-pointer"
+                          aria-label="In Planungsansicht öffnen"
+                          className="w-11 h-11 lg:w-7 lg:h-7 rounded-full bg-[#FAF7F2] hover:bg-[#2A7B88]/15 border border-[#DDD2C3] hover:border-[#2A7B88]/40 text-[#6B6259] hover:text-[#1F5E68] flex items-center justify-center transition-colors cursor-pointer"
                         >
-                          <ArrowUpRight className="w-3.5 h-3.5" />
+                          <ArrowUpRight className="w-4 h-4 lg:w-3.5 lg:h-3.5" />
                         </button>
                       )}
                     </div>

@@ -21,6 +21,8 @@ import {
   Utensils,
   Pencil,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ChevronUp,
   ExternalLink,
   AlertTriangle,
@@ -247,7 +249,7 @@ export const QuickAddModal: React.FC = () => {
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-[#1F1B18]/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
+      className="fixed inset-0 z-50 bg-[#1F1B18]/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-fade-in"
       onClick={handleClose}
     >
       <div
@@ -255,10 +257,10 @@ export const QuickAddModal: React.FC = () => {
         aria-modal="true"
         aria-labelledby="quick-add-modal-title"
         onClick={(e) => e.stopPropagation()}
-        className="surface-glass-elevated rounded-[28px] max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 space-y-4"
+        className="surface-glass-elevated rounded-t-3xl sm:rounded-3xl max-w-lg w-full max-h-[92dvh] overflow-y-auto p-5 sm:p-6 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] sm:pb-6 space-y-4 mobile-sheet"
       >
         <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-10 h-10 rounded-2xl bg-[#C85A38]/12 border border-[#C85A38]/30 text-[#A34224] flex items-center justify-center shrink-0">
               {mode === 'activity' ? (
                 <Sparkles className="w-5 h-5" />
@@ -266,14 +268,14 @@ export const QuickAddModal: React.FC = () => {
                 <Utensils className="w-5 h-5" />
               )}
             </div>
-            <div>
+            <div className="min-w-0">
               <h3
                 id="quick-add-modal-title"
-                className="text-lg font-black text-[#1F1B18]"
+                className="text-lg font-black text-[#1F1B18] truncate"
               >
                 Neuen Vorschlag einreichen
               </h3>
-              <p className="text-xs text-[#6B6259]">
+              <p className="text-xs text-[#6B6259] truncate">
                 Du schlägst gerade vor als{' '}
                 <strong className="text-[#1F1B18]">{currentUser.name}</strong>
               </p>
@@ -284,7 +286,7 @@ export const QuickAddModal: React.FC = () => {
             type="button"
             onClick={handleClose}
             aria-label="Dialog schließen"
-            className="w-8 h-8 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] border border-[#E6DDD1] text-[#6B6259] flex items-center justify-center cursor-pointer"
+            className="w-11 h-11 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] border border-[#E6DDD1] text-[#6B6259] flex items-center justify-center cursor-pointer shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
@@ -298,14 +300,14 @@ export const QuickAddModal: React.FC = () => {
               setMode('activity');
               setTimeError(null);
             }}
-            className={`py-2 rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`min-h-[44px] py-2 px-3 rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               mode === 'activity'
                 ? 'bg-[#C85A38] text-white shadow-sm'
                 : 'text-[#6B6259] hover:text-[#1F1B18]'
             }`}
           >
-            <Compass className="w-3.5 h-3.5" />
-            Aktivität / Ausflug
+            <Compass className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Aktivität / Ausflug</span>
           </button>
           <button
             type="button"
@@ -313,14 +315,14 @@ export const QuickAddModal: React.FC = () => {
               setMode('meal');
               setTimeError(null);
             }}
-            className={`py-2 rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`min-h-[44px] py-2 px-3 rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               mode === 'meal'
                 ? 'bg-[#C85A38] text-white shadow-sm'
                 : 'text-[#6B6259] hover:text-[#1F1B18]'
             }`}
           >
-            <Utensils className="w-3.5 h-3.5" />
-            Essens-Vorschlag
+            <Utensils className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Essens-Vorschlag</span>
           </button>
         </div>
 
@@ -355,7 +357,7 @@ export const QuickAddModal: React.FC = () => {
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
             <div>
               <label
                 htmlFor="quickadd-day"
@@ -367,7 +369,7 @@ export const QuickAddModal: React.FC = () => {
                 id="quickadd-day"
                 value={dayNumber}
                 onChange={(e) => setDayNumber(Number(e.target.value))}
-                className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-bold [color-scheme:light]"
+                className="w-full surface-input rounded-2xl px-3 py-2.5 text-xs font-bold [color-scheme:light]"
               >
                 {Array.from({ length: safeTotalDays }, (_, i) => i + 1).map((d) => (
                   <option key={d} value={d} className="bg-white text-[#1F1B18]">
@@ -377,73 +379,75 @@ export const QuickAddModal: React.FC = () => {
               </select>
             </div>
 
-            <div>
-              <label
-                htmlFor="quickadd-start"
-                className="text-xs font-bold text-[#1F1B18] block mb-1.5"
-              >
-                Startzeit
-              </label>
-              <input
-                id="quickadd-start"
-                type="time"
-                value={timeSlot}
-                onChange={(e) => {
-                  setTimeSlot(e.target.value);
-                  if (timeError) setTimeError(null);
-                }}
-                className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-mono tabular-nums font-bold [color-scheme:light]"
-              />
-            </div>
-
-            {mode === 'activity' ? (
+            <div className="grid grid-cols-2 sm:col-span-2 gap-2.5">
               <div>
                 <label
-                  htmlFor="quickadd-end"
+                  htmlFor="quickadd-start"
                   className="text-xs font-bold text-[#1F1B18] block mb-1.5"
                 >
-                  Endzeit
+                  Startzeit
                 </label>
                 <input
-                  id="quickadd-end"
+                  id="quickadd-start"
                   type="time"
-                  value={endTime}
+                  value={timeSlot}
                   onChange={(e) => {
-                    setEndTime(e.target.value);
+                    setTimeSlot(e.target.value);
                     if (timeError) setTimeError(null);
                   }}
-                  className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-mono tabular-nums font-bold [color-scheme:light]"
+                  className="w-full surface-input rounded-2xl px-3 py-2.5 text-xs font-mono tabular-nums font-bold [color-scheme:light]"
                 />
               </div>
-            ) : (
-              <div>
-                <label
-                  htmlFor="quickadd-meal-type"
-                  className="text-xs font-bold text-[#1F1B18] block mb-1.5"
-                >
-                  Mahlzeit
-                </label>
-                <select
-                  id="quickadd-meal-type"
-                  value={mealType}
-                  onChange={(e) => setMealType(e.target.value as MealType)}
-                  className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-bold [color-scheme:light]"
-                >
-                  <option value="breakfast" className="bg-white text-[#1F1B18]">
-                    Frühstück
-                  </option>
-                  <option value="lunch" className="bg-white text-[#1F1B18]">
-                    Mittagessen
-                  </option>
-                  <option value="dinner" className="bg-white text-[#1F1B18]">
-                    Abendessen
-                  </option>
-                  <option value="snack" className="bg-white text-[#1F1B18]">
-                    Snacks & Drinks
-                  </option>
-                </select>
-              </div>
-            )}
+
+              {mode === 'activity' ? (
+                <div>
+                  <label
+                    htmlFor="quickadd-end"
+                    className="text-xs font-bold text-[#1F1B18] block mb-1.5"
+                  >
+                    Endzeit
+                  </label>
+                  <input
+                    id="quickadd-end"
+                    type="time"
+                    value={endTime}
+                    onChange={(e) => {
+                      setEndTime(e.target.value);
+                      if (timeError) setTimeError(null);
+                    }}
+                    className="w-full surface-input rounded-2xl px-3 py-2.5 text-xs font-mono tabular-nums font-bold [color-scheme:light]"
+                  />
+                </div>
+              ) : (
+                <div>
+                  <label
+                    htmlFor="quickadd-meal-type"
+                    className="text-xs font-bold text-[#1F1B18] block mb-1.5"
+                  >
+                    Mahlzeit
+                  </label>
+                  <select
+                    id="quickadd-meal-type"
+                    value={mealType}
+                    onChange={(e) => setMealType(e.target.value as MealType)}
+                    className="w-full surface-input rounded-2xl px-3 py-2.5 text-xs font-bold [color-scheme:light]"
+                  >
+                    <option value="breakfast" className="bg-white text-[#1F1B18]">
+                      Frühstück
+                    </option>
+                    <option value="lunch" className="bg-white text-[#1F1B18]">
+                      Mittagessen
+                    </option>
+                    <option value="dinner" className="bg-white text-[#1F1B18]">
+                      Abendessen
+                    </option>
+                    <option value="snack" className="bg-white text-[#1F1B18]">
+                      Snacks & Drinks
+                    </option>
+                  </select>
+                </div>
+              )}
+            </div>
           </div>
 
           {mode === 'activity' ? (
@@ -538,8 +542,8 @@ export const QuickAddModal: React.FC = () => {
             </div>
           )}
 
-          <div className="grid grid-cols-3 gap-2.5">
-            <div className="col-span-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div className="sm:col-span-2">
               <label
                 htmlFor="quickadd-loc"
                 className="text-xs font-bold text-[#1F1B18] block mb-1.5"
@@ -556,7 +560,7 @@ export const QuickAddModal: React.FC = () => {
                 }
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="w-full surface-input rounded-2xl px-3.5 py-2 text-xs font-semibold placeholder:text-[#8C8277]"
+                className="w-full surface-input rounded-2xl px-3.5 py-2.5 text-xs font-semibold placeholder:text-[#8C8277]"
               />
             </div>
 
@@ -574,7 +578,7 @@ export const QuickAddModal: React.FC = () => {
                 step="0.01"
                 value={estimatedCost}
                 onChange={(e) => setEstimatedCost(e.target.value)}
-                className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-mono tabular-nums font-semibold"
+                className="w-full surface-input rounded-2xl px-3 py-2.5 text-xs font-mono tabular-nums font-semibold"
               />
             </div>
           </div>
@@ -619,13 +623,13 @@ export const QuickAddModal: React.FC = () => {
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2.5 rounded-full text-xs font-bold bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#6B6259] border border-[#E6DDD1] cursor-pointer"
+              className="min-h-[44px] px-4 py-2.5 rounded-full text-xs font-bold bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#6B6259] border border-[#E6DDD1] cursor-pointer"
             >
               Abbrechen
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-full text-xs font-extrabold bg-[#C85A38] hover:bg-[#B54B2B] text-white shadow-sm cursor-pointer"
+              className="min-h-[44px] px-5 py-2.5 rounded-full text-xs font-extrabold bg-[#C85A38] hover:bg-[#B54B2B] text-white shadow-sm cursor-pointer"
             >
               Vorschlag speichern
             </button>
@@ -684,10 +688,25 @@ export const ScheduleView: React.FC = () => {
   const [formError, setFormError] = useState<string | null>(null);
 
   const formRef = useRef<HTMLFormElement | null>(null);
+  const dayBarRef = useRef<HTMLDivElement | null>(null);
   const highlightTimerRef = useRef<number | null>(null);
 
   const safeTotalDays = Math.max(1, trip.totalDays || 1);
   const currency = trip.currency || 'EUR';
+
+  // Auto-scroll selected day pill into center of snap-scroll bar
+  useEffect(() => {
+    if (viewAllDays) return;
+    const container = dayBarRef.current;
+    if (!container) return;
+    const pill = container.querySelector<HTMLButtonElement>(
+      `[data-schedule-day="${selectedDay}"]`
+    );
+    if (!pill) return;
+    const targetLeft =
+      pill.offsetLeft - container.clientWidth / 2 + pill.clientWidth / 2;
+    container.scrollTo({ left: Math.max(0, targetLeft), behavior: 'smooth' });
+  }, [selectedDay, viewAllDays, safeTotalDays]);
 
   // Only sync formDay with selectedDay when NOT editing and NOT creating
   useEffect(() => {
@@ -1035,7 +1054,7 @@ export const ScheduleView: React.FC = () => {
           setDraggingActivityId(null);
           setDragOverDay(null);
         }}
-        className={`rounded-[24px] p-5 flex flex-col justify-between gap-4 transition-all cursor-grab active:cursor-grabbing ${
+        className={`rounded-[24px] p-5 flex flex-col justify-between gap-4 transition-all lg:cursor-grab lg:active:cursor-grabbing ${
           isHighlighted
             ? 'surface-glass-elevated ring-2 ring-[#C85A38] shadow-md'
             : isDragging
@@ -1048,8 +1067,8 @@ export const ScheduleView: React.FC = () => {
         <div>
           {/* Top Meta Row */}
           <div className="flex items-start justify-between gap-2 mb-3">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <GripVertical className="w-3.5 h-3.5 text-[#8C8277] shrink-0" />
+            <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+              <GripVertical className="hidden lg:block w-3.5 h-3.5 text-[#8C8277] shrink-0" />
               {(viewAllDays ||
                 act.dayNumber < 1 ||
                 act.dayNumber > safeTotalDays) && (
@@ -1076,42 +1095,44 @@ export const ScheduleView: React.FC = () => {
                 onClick={() =>
                   setMovingActivityId((prev) => (prev === act.id ? null : act.id))
                 }
-                className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors cursor-pointer ${
+                className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors cursor-pointer ${
                   isMoving
                     ? 'bg-[#C85A38] text-white'
                     : 'hover:bg-[#F3ECE1] text-[#6B6259] hover:text-[#A34224]'
                 }`}
                 title="Auf anderen Tag verschieben"
+                aria-label="Auf anderen Tag verschieben"
               >
-                <ArrowRightLeft className="w-3.5 h-3.5" />
+                <ArrowRightLeft className="w-4 h-4" />
               </button>
 
               <button
                 type="button"
                 onClick={() => handleStartEdit(act)}
-                className="w-7 h-7 rounded-full hover:bg-[#F3ECE1] text-[#6B6259] hover:text-[#A34224] flex items-center justify-center transition-colors cursor-pointer"
+                className="w-11 h-11 rounded-full hover:bg-[#F3ECE1] text-[#6B6259] hover:text-[#A34224] flex items-center justify-center transition-colors cursor-pointer"
                 title="Aktivität bearbeiten"
+                aria-label="Aktivität bearbeiten"
               >
-                <Pencil className="w-3.5 h-3.5" />
+                <Pencil className="w-4 h-4" />
               </button>
 
               {isConfirmingDelete ? (
-                <div className="inline-flex items-center gap-1 bg-rose-600/12 border border-rose-500/30 rounded-full px-2 py-0.5 text-[10px] font-bold">
-                  <span className="text-rose-800">Löschen?</span>
+                <div className="inline-flex items-center gap-1 bg-rose-600/12 border border-rose-500/30 rounded-full px-2 py-1 text-[11px] font-bold">
+                  <span className="text-rose-800 pl-1">Löschen?</span>
                   <button
                     type="button"
                     onClick={() => {
                       deleteActivity(act.id);
                       setConfirmDeleteId(null);
                     }}
-                    className="px-1.5 py-0.5 rounded-full bg-rose-600 text-white hover:bg-rose-500 cursor-pointer"
+                    className="min-h-[44px] px-3 rounded-full bg-rose-600 text-white hover:bg-rose-500 cursor-pointer"
                   >
                     Ja
                   </button>
                   <button
                     type="button"
                     onClick={() => setConfirmDeleteId(null)}
-                    className="px-1.5 py-0.5 rounded-full bg-white text-[#1F1B18] border border-[#E6DDD1] hover:bg-[#FAF7F2] cursor-pointer"
+                    className="min-h-[44px] px-3 rounded-full bg-white text-[#1F1B18] border border-[#E6DDD1] hover:bg-[#FAF7F2] cursor-pointer"
                   >
                     Nein
                   </button>
@@ -1120,35 +1141,37 @@ export const ScheduleView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setConfirmDeleteId(act.id)}
-                  className="w-7 h-7 rounded-full hover:bg-rose-600/12 text-[#6B6259] hover:text-rose-700 flex items-center justify-center transition-colors cursor-pointer"
+                  className="w-11 h-11 rounded-full hover:bg-rose-600/12 text-[#6B6259] hover:text-rose-700 flex items-center justify-center transition-colors cursor-pointer"
                   title="Vorschlag löschen"
+                  aria-label="Vorschlag löschen"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <Trash2 className="w-4 h-4" />
                 </button>
               )}
             </div>
           </div>
 
-          {/* Touch-friendly Day Move Selector */}
+          {/* Touch-friendly Day Move Selector (compact horizontal scroll row) */}
           {isMoving && (
-            <div className="mb-3 p-2.5 rounded-2xl bg-[#FAF7F2] border border-[#C85A38]/30 space-y-2 animate-fade-in">
+            <div className="mb-3 p-3 rounded-2xl bg-[#FAF7F2] border border-[#C85A38]/30 space-y-2 animate-fade-in">
               <div className="flex items-center justify-between text-[11px] font-bold text-[#A34224]">
                 <span>Auf welchen Tag verschieben?</span>
                 <button
                   type="button"
                   onClick={() => setMovingActivityId(null)}
-                  className="text-[#8C8277] hover:text-[#1F1B18] cursor-pointer"
+                  aria-label="Verschieben abbrechen"
+                  className="w-11 h-11 rounded-full hover:bg-[#F3ECE1] text-[#8C8277] hover:text-[#1F1B18] flex items-center justify-center cursor-pointer"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex items-center gap-1.5 flex-nowrap overflow-x-auto no-scrollbar pb-1 snap-x">
                 {Array.from({ length: safeTotalDays }, (_, i) => i + 1).map((d) => (
                   <button
                     key={d}
                     type="button"
                     onClick={() => handleMoveActivityToDay(act, d)}
-                    className={`px-2.5 py-1 rounded-lg text-[11px] font-mono tabular-nums font-bold transition-all cursor-pointer border ${
+                    className={`min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-mono tabular-nums font-bold transition-all cursor-pointer border shrink-0 snap-start ${
                       act.dayNumber === d
                         ? 'bg-[#C85A38] text-white border-[#C85A38]'
                         : 'bg-white hover:bg-[#C85A38]/12 text-[#1F1B18] border-[#E6DDD1]'
@@ -1204,10 +1227,10 @@ export const ScheduleView: React.FC = () => {
                     time: act.timeSlot,
                   })
                 }
-                className="inline-flex items-center gap-1 text-[11px] font-bold text-[#1F5E68] bg-[#2A7B88]/12 hover:bg-[#2A7B88]/20 px-2.5 py-1 rounded-full border border-[#2A7B88]/30 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 min-h-[44px] text-[11px] font-bold text-[#1F5E68] bg-[#2A7B88]/12 hover:bg-[#2A7B88]/20 px-3 py-2 rounded-full border border-[#2A7B88]/30 transition-colors cursor-pointer"
                 title="Auf Karte anzeigen"
               >
-                <MapIcon className="w-3 h-3" />
+                <MapIcon className="w-3.5 h-3.5" />
                 <span>Auf Karte</span>
               </button>
             )}
@@ -1217,10 +1240,10 @@ export const ScheduleView: React.FC = () => {
                 href={mapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[11px] font-bold text-[#1F1B18] bg-[#FAF7F2] hover:bg-[#F3ECE1] px-2.5 py-1 rounded-full border border-[#E6DDD1] transition-colors"
+                className="inline-flex items-center gap-1.5 min-h-[44px] text-[11px] font-bold text-[#1F1B18] bg-[#FAF7F2] hover:bg-[#F3ECE1] px-3 py-2 rounded-full border border-[#E6DDD1] transition-colors"
                 title={`In Google Maps öffnen: ${act.location}`}
               >
-                <ExternalLink className="w-3 h-3 text-[#6B6259]" />
+                <ExternalLink className="w-3.5 h-3.5 text-[#6B6259]" />
                 <span>Maps</span>
               </a>
             )}
@@ -1245,7 +1268,7 @@ export const ScheduleView: React.FC = () => {
 
         {/* Footer: Status Switcher & Interactive Voting */}
         <div className="pt-3.5 border-t border-[#E6DDD1] flex flex-wrap items-center justify-between gap-2.5">
-          <div className="flex items-center gap-1 bg-[#FAF7F2] border border-[#E6DDD1] p-1 rounded-full">
+          <div className="flex items-center gap-1 bg-[#FAF7F2] border border-[#E6DDD1] p-1 rounded-full flex-wrap">
             {STATUS_OPTIONS.map((st) => {
               const active = act.status === st.value;
               return (
@@ -1253,7 +1276,7 @@ export const ScheduleView: React.FC = () => {
                   key={st.value}
                   type="button"
                   onClick={() => updateActivityStatus(act.id, st.value)}
-                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                  className={`inline-flex items-center gap-1 min-h-[44px] px-3 py-1.5 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
                     active
                       ? st.pillClass
                       : 'text-[#6B6259] hover:text-[#1F1B18]'
@@ -1287,7 +1310,7 @@ export const ScheduleView: React.FC = () => {
             <button
               type="button"
               onClick={() => toggleActivityVote(act.id)}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-extrabold transition-all cursor-pointer border ${
+              className={`inline-flex items-center gap-1.5 min-h-[44px] px-4 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer border ${
                 hasVoted
                   ? 'bg-[#C85A38] text-white border-[#C85A38] shadow-sm'
                   : 'bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#1F1B18] border-[#E6DDD1]'
@@ -1329,7 +1352,7 @@ export const ScheduleView: React.FC = () => {
                 href={selectedDayRouteUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-xs font-bold bg-[#6E7F5E]/14 hover:bg-[#6E7F5E]/22 text-[#4B593E] border border-[#6E7F5E]/30 transition-colors"
+                className="inline-flex items-center gap-1.5 min-h-[44px] rounded-full px-4 py-2.5 text-xs font-bold bg-[#6E7F5E]/14 hover:bg-[#6E7F5E]/22 text-[#4B593E] border border-[#6E7F5E]/30 transition-colors"
                 title={`Route für Tag ${selectedDay} in Google Maps öffnen`}
               >
                 <Route className="w-3.5 h-3.5 text-[#6E7F5E]" />
@@ -1349,7 +1372,7 @@ export const ScheduleView: React.FC = () => {
                   scrollToForm();
                 }
               }}
-              className="bg-[#C85A38] hover:bg-[#B54B2B] text-white rounded-full px-5 py-2.5 text-xs font-extrabold flex items-center gap-2 shadow-sm transition-all cursor-pointer shrink-0"
+              className="min-h-[44px] bg-[#C85A38] hover:bg-[#B54B2B] text-white rounded-full px-5 py-2.5 text-xs font-extrabold flex items-center gap-2 shadow-sm transition-all cursor-pointer shrink-0"
             >
               <Plus className="w-4 h-4" />
               <span>
@@ -1360,7 +1383,7 @@ export const ScheduleView: React.FC = () => {
         </div>
       </div>
 
-      {/* Horizontal Day Selector Bar (Drop Targets for Activities & Ideas) */}
+      {/* Horizontal Snap-Scroll Day Selector Bar (Drop Targets + Prev/Next Arrows) */}
       <div className="space-y-2">
         {(draggingActivityId || draggingIdeaId) && (
           <div className="text-xs font-bold text-[#A34224] flex items-center gap-2 px-1 animate-fade-in">
@@ -1373,78 +1396,112 @@ export const ScheduleView: React.FC = () => {
           </div>
         )}
 
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+        <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => setViewAllDays(true)}
-            className={`px-4 py-3 rounded-[20px] text-left transition-all shrink-0 border cursor-pointer ${
-              viewAllDays
-                ? 'bg-[#C85A38] text-white border-[#C85A38] shadow-sm'
-                : 'surface-glass text-[#1F1B18] hover:bg-white/90'
-            }`}
+            onClick={() => {
+              setViewAllDays(false);
+              setSelectedDay(Math.max(1, selectedDay - 1));
+            }}
+            disabled={!viewAllDays && selectedDay <= 1}
+            aria-label="Vorheriger Tag"
+            title="Vorheriger Tag"
+            className="w-11 h-11 rounded-full surface-glass hover:border-[#C85A38]/40 disabled:opacity-35 flex items-center justify-center text-[#1F1B18] shrink-0 cursor-pointer transition-all"
           >
-            <div className="text-xs font-extrabold">Alle Tage</div>
-            <div
-              className={`text-[11px] font-mono tabular-nums ${
-                viewAllDays ? 'text-white/90 font-bold' : 'text-[#6B6259]'
-              }`}
-            >
-              {trip.activities.length} Vorschläge
-            </div>
+            <ChevronLeft className="w-4 h-4" />
           </button>
 
-          {Array.from({ length: safeTotalDays }, (_, i) => i + 1).map((dayNum) => {
-            const isSelected = !viewAllDays && selectedDay === dayNum;
-            const actCount = trip.activities.filter((a) => a.dayNumber === dayNum).length;
-            const mealCount = trip.meals.filter((m) => m.dayNumber === dayNum).length;
-            const dayHasConflict = Object.keys(conflictsByDay[dayNum] || {}).length > 0;
-            const isDropTarget = dragOverDay === dayNum;
-
-            return (
-              <button
-                key={dayNum}
-                type="button"
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  e.dataTransfer.dropEffect = 'move';
-                  if (dragOverDay !== dayNum) setDragOverDay(dayNum);
-                }}
-                onDragLeave={() => {
-                  if (dragOverDay === dayNum) setDragOverDay(null);
-                }}
-                onDrop={(e) => handleDayPillDrop(e, dayNum)}
-                onClick={() => {
-                  setViewAllDays(false);
-                  setSelectedDay(dayNum);
-                }}
-                className={`px-4 py-3 rounded-[20px] text-left transition-all shrink-0 border cursor-pointer ${
-                  isDropTarget
-                    ? 'bg-[#6E7F5E]/20 text-[#4B593E] border-[#6E7F5E] scale-[1.03] shadow-sm'
-                    : isSelected
-                    ? 'bg-[#C85A38]/12 text-[#A34224] border-[#C85A38]/45 shadow-sm'
-                    : 'surface-glass text-[#1F1B18] hover:bg-white/90'
+          <div
+            ref={dayBarRef}
+            className="flex-1 flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar snap-x snap-mandatory min-w-0"
+          >
+            <button
+              type="button"
+              onClick={() => setViewAllDays(true)}
+              className={`min-h-[44px] px-4 py-2.5 rounded-[20px] text-left transition-all shrink-0 snap-start border cursor-pointer ${
+                viewAllDays
+                  ? 'bg-[#C85A38] text-white border-[#C85A38] shadow-sm'
+                  : 'surface-glass text-[#1F1B18] hover:bg-white/90'
+              }`}
+            >
+              <div className="text-xs font-extrabold">Alle Tage</div>
+              <div
+                className={`text-[11px] font-mono tabular-nums ${
+                  viewAllDays ? 'text-white/90 font-bold' : 'text-[#6B6259]'
                 }`}
               >
-                <div className="flex items-center justify-between gap-2.5">
-                  <span className="text-xs font-extrabold font-mono tabular-nums flex items-center gap-1">
-                    Tag {dayNum}
-                    {dayHasConflict && (
-                      <AlertTriangle
-                        className="w-3 h-3 text-[#D9822B]"
-                        aria-label="Zeitkonflikt an diesem Tag"
-                      />
-                    )}
-                  </span>
-                  <span className="text-[10px] font-semibold text-[#6B6259]">
-                    {getDayDateLabel(dayNum)}
-                  </span>
-                </div>
-                <div className="text-[11px] font-mono tabular-nums text-[#6B6259] mt-0.5 font-medium">
-                  {actCount} Akt. • {mealCount} Essen
-                </div>
-              </button>
-            );
-          })}
+                {trip.activities.length} Vorschläge
+              </div>
+            </button>
+
+            {Array.from({ length: safeTotalDays }, (_, i) => i + 1).map((dayNum) => {
+              const isSelected = !viewAllDays && selectedDay === dayNum;
+              const actCount = trip.activities.filter((a) => a.dayNumber === dayNum).length;
+              const mealCount = trip.meals.filter((m) => m.dayNumber === dayNum).length;
+              const dayHasConflict = Object.keys(conflictsByDay[dayNum] || {}).length > 0;
+              const isDropTarget = dragOverDay === dayNum;
+
+              return (
+                <button
+                  key={dayNum}
+                  type="button"
+                  data-schedule-day={dayNum}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    if (dragOverDay !== dayNum) setDragOverDay(dayNum);
+                  }}
+                  onDragLeave={() => {
+                    if (dragOverDay === dayNum) setDragOverDay(null);
+                  }}
+                  onDrop={(e) => handleDayPillDrop(e, dayNum)}
+                  onClick={() => {
+                    setViewAllDays(false);
+                    setSelectedDay(dayNum);
+                  }}
+                  className={`min-h-[44px] px-4 py-2.5 rounded-[20px] text-left transition-all shrink-0 snap-start border cursor-pointer ${
+                    isDropTarget
+                      ? 'bg-[#6E7F5E]/20 text-[#4B593E] border-[#6E7F5E] scale-[1.03] shadow-sm'
+                      : isSelected
+                      ? 'bg-[#C85A38]/12 text-[#A34224] border-[#C85A38]/45 shadow-sm'
+                      : 'surface-glass text-[#1F1B18] hover:bg-white/90'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2.5">
+                    <span className="text-xs font-extrabold font-mono tabular-nums flex items-center gap-1">
+                      Tag {dayNum}
+                      {dayHasConflict && (
+                        <AlertTriangle
+                          className="w-3 h-3 text-[#D9822B]"
+                          aria-label="Zeitkonflikt an diesem Tag"
+                        />
+                      )}
+                    </span>
+                    <span className="text-[10px] font-semibold text-[#6B6259]">
+                      {getDayDateLabel(dayNum)}
+                    </span>
+                  </div>
+                  <div className="text-[11px] font-mono tabular-nums text-[#6B6259] mt-0.5 font-medium">
+                    {actCount} Akt. • {mealCount} Essen
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setViewAllDays(false);
+              setSelectedDay(Math.min(safeTotalDays, selectedDay + 1));
+            }}
+            disabled={!viewAllDays && selectedDay >= safeTotalDays}
+            aria-label="Nächster Tag"
+            title="Nächster Tag"
+            className="w-11 h-11 rounded-full surface-glass hover:border-[#C85A38]/40 disabled:opacity-35 flex items-center justify-center text-[#1F1B18] shrink-0 cursor-pointer transition-all"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
         </div>
       </div>
 
@@ -1454,7 +1511,7 @@ export const ScheduleView: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowIdeaTray((prev) => !prev)}
-            className="w-full flex items-center justify-between gap-2 text-left cursor-pointer"
+            className="w-full min-h-[44px] flex items-center justify-between gap-2 text-left cursor-pointer"
           >
             <div className="flex items-center gap-2 text-xs font-bold text-[#1F1B18]">
               <Lightbulb className="w-4 h-4 text-[#D9822B]" />
@@ -1466,8 +1523,8 @@ export const ScheduleView: React.FC = () => {
                 )
               </span>
             </div>
-            <span className="inline-flex items-center gap-1 text-[11px] text-[#A34224] font-bold">
-              <span>{showIdeaTray ? 'Ausblenden' : 'Zum Reinziehen öffnen'}</span>
+            <span className="inline-flex items-center gap-1 text-[11px] text-[#A34224] font-bold shrink-0">
+              <span>{showIdeaTray ? 'Ausblenden' : 'Öffnen'}</span>
               {showIdeaTray ? (
                 <ChevronUp className="w-4 h-4" />
               ) : (
@@ -1495,16 +1552,16 @@ export const ScheduleView: React.FC = () => {
                     setDraggingIdeaId(null);
                     setDragOverDay(null);
                   }}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#D9822B]/14 border border-[#D9822B]/30 text-xs font-bold text-[#9E5A14] cursor-grab active:cursor-grabbing hover:bg-[#D9822B]/20 transition-colors"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#D9822B]/14 border border-[#D9822B]/30 text-xs font-bold text-[#9E5A14] lg:cursor-grab lg:active:cursor-grabbing hover:bg-[#D9822B]/20 transition-colors"
                   title="Auf einen Tag oben ziehen oder per Klick für aktuellen Tag einplanen"
                 >
-                  <GripVertical className="w-3 h-3 text-[#D9822B]" />
+                  <GripVertical className="hidden lg:block w-3 h-3 text-[#D9822B]" />
                   <span className="truncate max-w-[200px]">{idea.title}</span>
                   {!viewAllDays && (
                     <button
                       type="button"
                       onClick={() => scheduleIdeaToDay(idea.id, selectedDay, '10:00')}
-                      className="px-2 py-0.5 rounded-full bg-[#C85A38] text-white text-[10px] font-extrabold hover:bg-[#B54B2B] cursor-pointer"
+                      className="min-h-[44px] px-3 py-1.5 rounded-full bg-[#C85A38] text-white text-[11px] font-extrabold hover:bg-[#B54B2B] cursor-pointer"
                     >
                       + Tag {selectedDay}
                     </button>
@@ -1521,7 +1578,7 @@ export const ScheduleView: React.FC = () => {
         <form
           ref={formRef}
           onSubmit={handleCreateActivity}
-          className="surface-glass-elevated rounded-[26px] p-6 border-[#C85A38]/35 space-y-4 animate-fade-in"
+          className="surface-glass-elevated rounded-[26px] p-5 sm:p-6 border-[#C85A38]/35 space-y-4 animate-fade-in"
         >
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -1548,7 +1605,8 @@ export const ScheduleView: React.FC = () => {
                 resetForm();
                 setShowAddForm(false);
               }}
-              className="w-8 h-8 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] border border-[#E6DDD1] text-[#6B6259] flex items-center justify-center cursor-pointer"
+              aria-label="Formular schließen"
+              className="w-11 h-11 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] border border-[#E6DDD1] text-[#6B6259] flex items-center justify-center cursor-pointer shrink-0"
             >
               <X className="w-4 h-4" />
             </button>
@@ -1639,7 +1697,7 @@ export const ScheduleView: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
             <div>
               <label
                 htmlFor="sched-start"
@@ -1655,7 +1713,7 @@ export const ScheduleView: React.FC = () => {
                   setTimeSlot(e.target.value);
                   if (formError) setFormError(null);
                 }}
-                className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-mono tabular-nums font-bold [color-scheme:light]"
+                className="w-full surface-input rounded-2xl px-3 py-2.5 text-xs font-mono tabular-nums font-bold [color-scheme:light]"
               />
             </div>
 
@@ -1674,11 +1732,11 @@ export const ScheduleView: React.FC = () => {
                   setEndTime(e.target.value);
                   if (formError) setFormError(null);
                 }}
-                className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-mono tabular-nums font-bold [color-scheme:light]"
+                className="w-full surface-input rounded-2xl px-3 py-2.5 text-xs font-mono tabular-nums font-bold [color-scheme:light]"
               />
             </div>
 
-            <div className="col-span-2 md:col-span-1">
+            <div className="sm:col-span-2 xl:col-span-1">
               <label
                 htmlFor="sched-loc"
                 className="text-xs font-bold text-[#1F1B18] block mb-1.5"
@@ -1691,7 +1749,7 @@ export const ScheduleView: React.FC = () => {
                 placeholder="z.B. Cala Llombards"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-semibold placeholder:text-[#8C8277]"
+                className="w-full surface-input rounded-2xl px-3 py-2.5 text-xs font-semibold placeholder:text-[#8C8277]"
               />
             </div>
 
@@ -1709,7 +1767,7 @@ export const ScheduleView: React.FC = () => {
                 step="0.01"
                 value={estimatedCost}
                 onChange={(e) => setEstimatedCost(e.target.value)}
-                className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-mono tabular-nums font-semibold"
+                className="w-full surface-input rounded-2xl px-3 py-2.5 text-xs font-mono tabular-nums font-semibold"
               />
             </div>
 
@@ -1724,7 +1782,7 @@ export const ScheduleView: React.FC = () => {
                 id="sched-status"
                 value={status}
                 onChange={(e) => setStatus(e.target.value as DayActivity['status'])}
-                className="w-full surface-input rounded-2xl px-3 py-2 text-xs font-bold [color-scheme:light]"
+                className="w-full surface-input rounded-2xl px-3 py-2.5 text-xs font-bold [color-scheme:light]"
               >
                 <option value="idea" className="bg-white text-[#1F1B18]">
                   Idee
@@ -1763,13 +1821,13 @@ export const ScheduleView: React.FC = () => {
                 resetForm();
                 setShowAddForm(false);
               }}
-              className="px-4 py-2 rounded-full text-xs font-bold bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#6B6259] border border-[#E6DDD1] cursor-pointer"
+              className="min-h-[44px] px-4 py-2.5 rounded-full text-xs font-bold bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#6B6259] border border-[#E6DDD1] cursor-pointer"
             >
               Abbrechen
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-full text-xs font-extrabold bg-[#C85A38] hover:bg-[#B54B2B] text-white shadow-sm cursor-pointer"
+              className="min-h-[44px] px-5 py-2.5 rounded-full text-xs font-extrabold bg-[#C85A38] hover:bg-[#B54B2B] text-white shadow-sm cursor-pointer"
             >
               {editingActivityId ? 'Änderungen speichern' : 'Aktivität speichern'}
             </button>
@@ -1779,8 +1837,8 @@ export const ScheduleView: React.FC = () => {
 
       {/* Filter & Sort Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-xs font-bold text-[#6B6259] flex items-center gap-1 mr-1">
+        <div className="flex items-center gap-1.5 flex-nowrap overflow-x-auto no-scrollbar sm:flex-wrap max-w-full">
+          <span className="text-xs font-bold text-[#6B6259] flex items-center gap-1 mr-1 shrink-0">
             <Filter className="w-3.5 h-3.5 text-[#C85A38]" /> Filter:
           </span>
           {(
@@ -1798,7 +1856,7 @@ export const ScheduleView: React.FC = () => {
               key={cat.id}
               type="button"
               onClick={() => setCategoryFilter(cat.id)}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+              className={`min-h-[44px] px-3.5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer shrink-0 ${
                 categoryFilter === cat.id
                   ? 'bg-[#C85A38] text-white shadow-sm'
                   : 'surface-glass text-[#6B6259] hover:text-[#1F1B18]'
@@ -1812,7 +1870,7 @@ export const ScheduleView: React.FC = () => {
         <button
           type="button"
           onClick={() => setSortBy((prev) => (prev === 'time' ? 'votes' : 'time'))}
-          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold surface-glass hover:bg-white/90 text-[#1F1B18] transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1.5 min-h-[44px] px-4 py-2 rounded-full text-xs font-bold surface-glass hover:bg-white/90 text-[#1F1B18] transition-colors cursor-pointer"
         >
           <ArrowUpDown className="w-3.5 h-3.5 text-[#C85A38]" />
           <span>
@@ -1841,7 +1899,7 @@ export const ScheduleView: React.FC = () => {
               setShowAddForm(true);
               scrollToForm();
             }}
-            className="bg-[#C85A38] hover:bg-[#B54B2B] text-white rounded-full px-5 py-2.5 text-xs font-extrabold cursor-pointer shadow-sm"
+            className="min-h-[44px] bg-[#C85A38] hover:bg-[#B54B2B] text-white rounded-full px-5 py-2.5 text-xs font-extrabold cursor-pointer shadow-sm"
           >
             + Jetzt Vorschlag erstellen
           </button>
@@ -1870,7 +1928,7 @@ export const ScheduleView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => toggleDayCollapse(dayNum)}
-                    className="flex-1 flex items-center justify-between gap-3 text-left cursor-pointer min-w-0"
+                    className="flex-1 min-h-[44px] flex items-center justify-between gap-3 text-left cursor-pointer min-w-0"
                   >
                     <div className="flex items-center gap-2.5 flex-wrap min-w-0">
                       <span className="px-2.5 py-1 rounded-full text-xs font-mono tabular-nums font-extrabold bg-[#C85A38] text-white">
@@ -1897,17 +1955,17 @@ export const ScheduleView: React.FC = () => {
                       href={dayRouteUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-bold bg-[#6E7F5E]/14 hover:bg-[#6E7F5E]/22 text-[#4B593E] border border-[#6E7F5E]/30 shrink-0 transition-colors"
+                      className="inline-flex items-center gap-1 min-h-[44px] px-3.5 py-2 rounded-full text-[11px] font-bold bg-[#6E7F5E]/14 hover:bg-[#6E7F5E]/22 text-[#4B593E] border border-[#6E7F5E]/30 shrink-0 transition-colors"
                       title={`Route Tag ${dayNum} in Google Maps`}
                     >
-                      <Route className="w-3 h-3" />
+                      <Route className="w-3.5 h-3.5" />
                       <span className="hidden sm:inline">Route</span>
                     </a>
                   )}
                 </div>
 
                 {!isCollapsed && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 cq-cols-1-narrow gap-4">
                     {dayActs.map(renderActivityCard)}
                   </div>
                 )}
@@ -1916,7 +1974,7 @@ export const ScheduleView: React.FC = () => {
           })}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 cq-cols-1-narrow gap-4">
           {inRangeFilteredActivities.map(renderActivityCard)}
         </div>
       )}
@@ -1927,7 +1985,7 @@ export const ScheduleView: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowOutOfRange((prev) => !prev)}
-            className="w-full px-5 py-3.5 flex items-center justify-between gap-3 text-left hover:bg-[#FAF7F2] transition-colors cursor-pointer"
+            className="w-full min-h-[48px] px-5 py-3.5 flex items-center justify-between gap-3 text-left hover:bg-[#FAF7F2] transition-colors cursor-pointer"
           >
             <div className="flex items-center gap-2.5 flex-wrap">
               <AlertTriangle className="w-4 h-4 text-[#D9822B] shrink-0" />
@@ -1951,7 +2009,7 @@ export const ScheduleView: React.FC = () => {
                 Diese Einträge liegen außerhalb der aktuell eingestellten {safeTotalDays} Reisetage
                 und können hier auf einen gültigen Tag verschoben oder gelöscht werden.
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 cq-cols-1-narrow gap-4">
                 {outOfRangeActivities.map(renderActivityCard)}
               </div>
             </div>

@@ -15,6 +15,7 @@ import {
   Sun,
   ThumbsUp,
   Utensils,
+  X,
 } from 'lucide-react';
 import { useVacation } from '../context/VacationContext';
 import { ActivityCategory, MealType } from '../types/vacation';
@@ -103,11 +104,13 @@ const MONTH_SHORT = [
 interface RightCalendarPanelProps {
   collapsed?: boolean;
   onToggleCollapse?: () => void;
+  onCloseSheet?: () => void;
 }
 
 export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
   collapsed = false,
   onToggleCollapse,
+  onCloseSheet,
 }) => {
   const {
     trip,
@@ -339,7 +342,7 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
     [trip.activities, trip.meals, selectedDay]
   );
 
-  if (collapsed) {
+  if (collapsed && !onCloseSheet) {
     return (
       <aside className="surface-glass rounded-[26px] p-2.5 flex flex-row lg:flex-col items-center justify-between gap-2 w-full max-w-full min-w-0 lg:h-full select-none overflow-hidden">
         <div className="flex flex-row lg:flex-col items-center gap-2 lg:gap-3 lg:pt-1">
@@ -388,13 +391,22 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
   }
 
   return (
-    <aside className="surface-glass rounded-[28px] p-3.5 sm:p-4 lg:p-5 flex flex-col gap-4 w-full max-w-full min-w-0 lg:h-full overflow-hidden">
+    <aside
+      className={
+        onCloseSheet
+          ? 'p-3.5 sm:p-5 flex flex-col gap-3.5 sm:gap-4 w-full max-w-full min-w-0 flex-1 overflow-y-auto'
+          : 'surface-glass rounded-[28px] p-3.5 sm:p-4 lg:p-5 flex flex-col gap-4 w-full max-w-full min-w-0 lg:h-full overflow-hidden'
+      }
+    >
       {/* Calendar Header & Month Grid */}
-      <div className="surface-glass-elevated rounded-[24px] p-3.5 sm:p-4 w-full min-w-0 overflow-hidden">
+      <div className="surface-glass-elevated rounded-[24px] p-3.5 sm:p-4 w-full min-w-0 overflow-hidden shrink-0">
         <div className="flex items-start justify-between mb-3 gap-2 min-w-0">
           <button
             type="button"
-            onClick={() => setActiveTab('week')}
+            onClick={() => {
+              setActiveTab('week');
+              onCloseSheet?.();
+            }}
             title="Zur Wochen- & Mehrtagesübersicht"
             className="text-left group cursor-pointer rounded-xl px-1.5 py-1 -ml-1.5 hover:bg-[#FAF7F2] transition-colors min-w-0 flex-1"
           >
@@ -416,7 +428,7 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
               onClick={() => setSelectedDay(Math.max(1, selectedDay - 1))}
               disabled={safeTotalDays <= 0 || selectedDay <= 1}
               aria-label="Vorheriger Tag"
-              className="w-7 h-7 rounded-full bg-[#FAF7F2] hover:bg-[#C85A38]/12 border border-[#E6DDD1] disabled:opacity-35 text-[#1F1B18] flex items-center justify-center transition-colors cursor-pointer"
+              className="w-10 h-10 lg:w-7 lg:h-7 rounded-full bg-[#FAF7F2] hover:bg-[#C85A38]/12 border border-[#E6DDD1] disabled:opacity-35 text-[#1F1B18] flex items-center justify-center transition-colors cursor-pointer"
               title="Vorheriger Tag"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -428,21 +440,33 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
               }
               disabled={safeTotalDays <= 0 || selectedDay >= safeTotalDays}
               aria-label="Nächster Tag"
-              className="w-7 h-7 rounded-full bg-[#FAF7F2] hover:bg-[#C85A38]/12 border border-[#E6DDD1] disabled:opacity-35 text-[#1F1B18] flex items-center justify-center transition-colors cursor-pointer"
+              className="w-10 h-10 lg:w-7 lg:h-7 rounded-full bg-[#FAF7F2] hover:bg-[#C85A38]/12 border border-[#E6DDD1] disabled:opacity-35 text-[#1F1B18] flex items-center justify-center transition-colors cursor-pointer"
               title="Nächster Tag"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
-            {onToggleCollapse && (
+            {onCloseSheet ? (
               <button
                 type="button"
-                onClick={onToggleCollapse}
-                title="Kalender einklappen"
-                aria-label="Kalender einklappen"
-                className="w-7 h-7 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] border border-[#E6DDD1] text-[#6B6259] hover:text-[#1F1B18] flex items-center justify-center transition-colors cursor-pointer ml-0.5"
+                onClick={onCloseSheet}
+                title="Kalender schließen"
+                aria-label="Kalender schließen"
+                className="w-11 h-11 sm:w-9 sm:h-9 rounded-full bg-[#F3ECE1] hover:bg-[#E6DDD1] border border-[#DDD2C3] text-[#1F1B18] flex items-center justify-center transition-colors cursor-pointer ml-0.5"
               >
-                <ChevronRight className="w-4 h-4" />
+                <X className="w-4 h-4" />
               </button>
+            ) : (
+              onToggleCollapse && (
+                <button
+                  type="button"
+                  onClick={onToggleCollapse}
+                  title="Kalender einklappen"
+                  aria-label="Kalender einklappen"
+                  className="hidden lg:flex w-7 h-7 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] border border-[#E6DDD1] text-[#6B6259] hover:text-[#1F1B18] items-center justify-center transition-colors cursor-pointer ml-0.5"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              )
             )}
           </div>
         </div>
@@ -480,77 +504,80 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
                 const statusInfo =
                   cell.tripDay !== null ? dayStatusMap.get(cell.tripDay) : undefined;
 
-                return (
-                  <button
-                    key={idx}
-                    type="button"
-                    data-grid-day={cell.tripDay ?? undefined}
-                    disabled={!isTripDay}
-                    onClick={() => {
-                      if (cell.tripDay) setSelectedDay(cell.tripDay);
-                    }}
-                    className={`relative h-9 sm:h-10 rounded-xl flex flex-col items-center justify-center text-xs transition-all font-mono tabular-nums min-w-0 overflow-hidden ${
-                      isSelected
-                        ? 'bg-[#C85A38] text-white font-black shadow-sm'
-                        : isTripDay
-                        ? 'bg-[#FAF7F2] hover:bg-[#C85A38]/12 text-[#1F1B18] hover:text-[#A34224] border border-[#E6DDD1] font-bold cursor-pointer'
-                        : cell.isStartMonth
-                        ? 'text-[#8C8277]/70 cursor-default'
-                        : 'text-[#8C8277]/45 cursor-default'
-                    }`}
-                    title={
-                      isTripDay
-                        ? `Tag ${cell.tripDay} (${cell.dayOfMonth}. ${
-                            MONTH_SHORT[cell.monthIndex]
-                          })`
-                        : undefined
-                    }
-                  >
-                    <span
-                      className={`leading-none ${
-                        cell.showMonthTag ? 'text-[9px] sm:text-[11px] whitespace-nowrap' : ''
-                      }`}
-                    >
-                      {cell.showMonthTag
-                        ? `${cell.dayOfMonth}. ${MONTH_SHORT[cell.monthIndex]}`
-                        : cell.dayOfMonth}
-                    </span>
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        data-grid-day={cell.tripDay ?? undefined}
+                        disabled={!isTripDay}
+                        onClick={() => {
+                          if (cell.tripDay) setSelectedDay(cell.tripDay);
+                        }}
+                        aria-label={
+                          isTripDay
+                            ? `Tag ${cell.tripDay} (${cell.dayOfMonth}. ${
+                                MONTH_SHORT[cell.monthIndex]
+                              })`
+                            : undefined
+                        }
+                        className={`relative min-h-[42px] sm:min-h-[44px] py-1 rounded-xl flex flex-col items-center justify-center text-xs transition-all font-mono tabular-nums min-w-0 overflow-hidden ${
+                          isSelected
+                            ? 'bg-[#C85A38] text-white font-black shadow-sm'
+                            : isTripDay
+                            ? `bg-[#FAF7F2] hover:bg-[#C85A38]/12 text-[#1F1B18] hover:text-[#A34224] border border-[#E6DDD1] font-bold cursor-pointer ${
+                                cell.showMonthTag ? 'ring-1 ring-inset ring-[#2A7B88]/30' : ''
+                              }`
+                            : cell.isStartMonth
+                            ? 'text-[#8C8277]/70 cursor-default'
+                            : 'text-[#8C8277]/45 cursor-default'
+                        }`}
+                        title={
+                          isTripDay
+                            ? `Tag ${cell.tripDay} (${cell.dayOfMonth}. ${
+                                MONTH_SHORT[cell.monthIndex]
+                              })`
+                            : undefined
+                        }
+                      >
+                        <span className="leading-none">{cell.dayOfMonth}</span>
 
-                    {/* Colored status dots for days with scheduled items */}
-                    {isTripDay && statusInfo && (
-                      <span className="flex items-center gap-0.5 mt-1 h-1">
-                        {statusInfo.hasConfirmed && (
-                          <span
-                            className={`w-1 h-1 rounded-full ${
-                              isSelected ? 'bg-white' : 'bg-[#6E7F5E]'
-                            }`}
-                          />
-                        )}
-                        {(statusInfo.hasPlanned || statusInfo.hasIdea) && (
-                          <span
-                            className={`w-1 h-1 rounded-full ${
-                              isSelected ? 'bg-white/80' : 'bg-[#2A7B88]'
-                            }`}
-                          />
-                        )}
-                        {statusInfo.hasMeal && (
-                          <span
-                            className={`w-1 h-1 rounded-full ${
-                              isSelected ? 'bg-white/65' : 'bg-[#D9822B]'
-                            }`}
-                          />
-                        )}
-                      </span>
-                    )}
-                  </button>
-                );
+                        {/* Colored status dots for days with scheduled items */}
+                        <span className="flex items-center justify-center gap-0.5 mt-1 h-1.5">
+                          {isTripDay && statusInfo && (
+                            <>
+                              {statusInfo.hasConfirmed && (
+                                <span
+                                  className={`w-1.5 h-1.5 rounded-full ${
+                                    isSelected ? 'bg-white' : 'bg-[#6E7F5E]'
+                                  }`}
+                                />
+                              )}
+                              {(statusInfo.hasPlanned || statusInfo.hasIdea) && (
+                                <span
+                                  className={`w-1.5 h-1.5 rounded-full ${
+                                    isSelected ? 'bg-white/85' : 'bg-[#2A7B88]'
+                                  }`}
+                                />
+                              )}
+                              {statusInfo.hasMeal && (
+                                <span
+                                  className={`w-1.5 h-1.5 rounded-full ${
+                                    isSelected ? 'bg-white/70' : 'bg-[#D9822B]'
+                                  }`}
+                                />
+                              )}
+                            </>
+                          )}
+                        </span>
+                      </button>
+                    );
               })}
             </div>
 
-            {/* Tag 1 .. Tag N Scrollable Pill Selector with auto-scroll */}
+            {/* Tag 1 .. Tag N Scrollable Snap Pill Selector with auto-scroll */}
             <div
               ref={dayPillsRef}
-              className="mt-3 pt-3 border-t border-[#E6DDD1] flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar w-full max-w-full min-w-0"
+              className="mt-3 pt-3 border-t border-[#E6DDD1] flex items-center gap-1.5 overflow-x-auto snap-x snap-mandatory scroll-pl-1 pb-1 no-scrollbar w-full max-w-full min-w-0"
             >
               {Array.from({ length: safeTotalDays }, (_, i) => i + 1).map(
                 (dayNum) => {
@@ -561,7 +588,7 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
                       type="button"
                       data-pill-day={dayNum}
                       onClick={() => setSelectedDay(dayNum)}
-                      className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 font-mono tabular-nums ${
+                      className={`snap-start min-h-[40px] lg:min-h-[30px] px-3.5 lg:px-3 py-1.5 lg:py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 font-mono tabular-nums ${
                         active
                           ? 'bg-[#C85A38] text-white shadow-sm'
                           : 'bg-[#FAF7F2] text-[#6B6259] hover:bg-[#F3ECE1] border border-[#E6DDD1]'
@@ -580,8 +607,11 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
       {/* Quick Add Button */}
       <button
         type="button"
-        onClick={() => setIsQuickAddOpen(true)}
-        className="w-full bg-[#C85A38] hover:bg-[#B54B2B] text-white rounded-full py-2.5 px-4 text-xs font-extrabold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer shrink-0"
+        onClick={() => {
+          onCloseSheet?.();
+          setIsQuickAddOpen(true);
+        }}
+        className="w-full min-h-[44px] bg-[#C85A38] hover:bg-[#B54B2B] text-white rounded-full py-2.5 px-4 text-xs font-extrabold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer shrink-0"
       >
         <Plus className="w-4 h-4 stroke-[2.5]" />
         <span>+ Vorschlag / Event</span>
@@ -604,7 +634,7 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
           </span>
         </div>
 
-        <div className="space-y-2 overflow-y-auto pr-0.5 flex-1 min-w-0">
+        <div className={onCloseSheet ? 'space-y-2 pb-1' : 'space-y-2 overflow-y-auto pr-0.5 flex-1 min-w-0'}>
           {timelineItems.length === 0 ? (
             <div className="bg-[#FAF7F2] rounded-[20px] p-6 text-center border border-dashed border-[#E6DDD1]">
               <Clock className="w-5 h-5 text-[#8C8277] mx-auto mb-2" />
@@ -663,8 +693,9 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
                           dayNumber: selectedDay,
                         });
                       }
+                      onCloseSheet?.();
                     }}
-                    className="flex-1 flex items-center gap-2.5 min-w-0 text-left cursor-pointer rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C85A38]"
+                    className="flex-1 flex items-center gap-2.5 min-w-0 min-h-[44px] text-left cursor-pointer rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C85A38]"
                   >
                     <div
                       className={`w-9 h-9 rounded-xl ${catMeta.badgeClass} flex items-center justify-center shrink-0`}
@@ -706,7 +737,7 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
                       }
                     }}
                     aria-label={`Stimmen für ${item.title} (${item.votes.length})`}
-                    className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[11px] font-bold shrink-0 transition-all cursor-pointer font-mono tabular-nums border ${
+                    className={`inline-flex items-center justify-center gap-1 min-h-[40px] lg:min-h-0 px-3 lg:px-2.5 py-1.5 rounded-full text-[11px] font-bold shrink-0 transition-all cursor-pointer font-mono tabular-nums border ${
                       hasVoted
                         ? 'bg-[#C85A38]/12 text-[#A34224] border-[#C85A38]/35'
                         : 'bg-white/90 hover:bg-[#F3ECE1] text-[#6B6259] border-[#E6DDD1]'

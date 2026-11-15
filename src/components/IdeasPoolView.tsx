@@ -456,7 +456,7 @@ export const IdeasPoolView: React.FC = () => {
               resetIdeaForm();
               setIsAddIdeaOpen(true);
             }}
-            className="self-start md:self-center px-6 py-3 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-white font-extrabold text-sm shadow-sm flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer whitespace-nowrap"
+            className="self-start md:self-center min-h-[44px] px-6 py-3 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-white font-extrabold text-sm shadow-sm flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer whitespace-nowrap"
           >
             <Plus className="w-4 h-4" />
             <span>Idee vorschlagen</span>
@@ -464,15 +464,15 @@ export const IdeasPoolView: React.FC = () => {
         </div>
 
         {/* TRAVELER FILTER TABS */}
-        <div className="relative z-10 mt-6 pt-5 border-t border-[#E6DDD1] flex flex-wrap items-center gap-2">
-          <span className="text-xs font-bold text-[#6B6259] mr-1 flex items-center gap-1.5">
+        <div className="relative z-10 mt-6 pt-5 border-t border-[#E6DDD1] flex flex-nowrap overflow-x-auto no-scrollbar sm:flex-wrap items-center gap-2">
+          <span className="text-xs font-bold text-[#6B6259] mr-1 flex items-center gap-1.5 shrink-0">
             <Filter className="w-3.5 h-3.5 text-[#C85A38]" /> Nach Person:
           </span>
 
           <button
             type="button"
             onClick={() => setSelectedTravelerFilter('all')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+            className={`min-h-[44px] px-3.5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer shrink-0 ${
               selectedTravelerFilter === 'all'
                 ? 'bg-[#C85A38] text-white shadow-sm'
                 : 'bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#6B6259] border border-[#E6DDD1]'
@@ -490,7 +490,7 @@ export const IdeasPoolView: React.FC = () => {
                 key={traveler.id}
                 type="button"
                 onClick={() => setSelectedTravelerFilter(traveler.id)}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
+                className={`min-h-[44px] px-3 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border shrink-0 ${
                   isSelected
                     ? 'bg-[#C85A38]/12 text-[#A34224] border-[#C85A38]/40'
                     : 'bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#1F1B18] border-[#E6DDD1]'
@@ -520,7 +520,7 @@ export const IdeasPoolView: React.FC = () => {
             <button
               type="button"
               onClick={() => setSelectedTravelerFilter('__unknown__')}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
+              className={`min-h-[44px] px-3 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border shrink-0 ${
                 selectedTravelerFilter === '__unknown__'
                   ? 'bg-[#D9822B]/14 text-[#9E5A14] border-[#D9822B]/40'
                   : 'bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#6B6259] border-[#E6DDD1]'
@@ -541,8 +541,8 @@ export const IdeasPoolView: React.FC = () => {
       {/* FILTER BAR: PRIORITY + CATEGORY */}
       <div className="surface-glass rounded-[22px] p-4 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-xs font-bold text-[#6B6259] mr-1">Priorität:</span>
+          <div className="flex flex-nowrap overflow-x-auto no-scrollbar sm:flex-wrap items-center gap-1.5 max-w-full">
+            <span className="text-xs font-bold text-[#6B6259] mr-1 shrink-0">Priorität:</span>
             {[
               { id: 'all', label: 'Alle' },
               { id: 'must_do', label: '⭐ Must-Do' },
@@ -553,7 +553,7 @@ export const IdeasPoolView: React.FC = () => {
                 key={item.id}
                 type="button"
                 onClick={() => setPriorityFilter(item.id)}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
+                className={`min-h-[44px] px-3.5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer border shrink-0 ${
                   priorityFilter === item.id
                     ? 'bg-[#D9822B]/14 text-[#9E5A14] border-[#D9822B]/40'
                     : 'bg-[#FAF7F2] text-[#6B6259] hover:bg-[#F3ECE1] border-[#E6DDD1]'
@@ -569,9 +569,9 @@ export const IdeasPoolView: React.FC = () => {
               <button
                 type="button"
                 onClick={resetAllFilters}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#A34224] border border-[#E6DDD1] transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 min-h-[44px] px-3 py-2 rounded-full text-[11px] font-bold bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#A34224] border border-[#E6DDD1] transition-colors cursor-pointer"
               >
-                <RotateCcw className="w-3 h-3" />
+                <RotateCcw className="w-3.5 h-3.5" />
                 <span>Filter zurücksetzen</span>
               </button>
             )}
@@ -583,14 +583,14 @@ export const IdeasPoolView: React.FC = () => {
         </div>
 
         {/* VISIBLE CATEGORY FILTER BAR */}
-        <div className="flex flex-wrap items-center gap-1.5 pt-2.5 border-t border-[#E6DDD1]">
-          <span className="text-xs font-bold text-[#6B6259] mr-1">Kategorie:</span>
+        <div className="flex flex-nowrap overflow-x-auto no-scrollbar sm:flex-wrap items-center gap-1.5 pt-2.5 border-t border-[#E6DDD1]">
+          <span className="text-xs font-bold text-[#6B6259] mr-1 shrink-0">Kategorie:</span>
           {CATEGORY_FILTER_OPTIONS.map((cat) => (
             <button
               key={cat.id}
               type="button"
               onClick={() => setCategoryFilter(cat.id)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
+              className={`inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer border shrink-0 ${
                 categoryFilter === cat.id
                   ? 'bg-[#C85A38]/12 text-[#A34224] border-[#C85A38]/35'
                   : 'bg-[#FAF7F2] text-[#6B6259] hover:bg-[#F3ECE1] border-[#E6DDD1]'
@@ -603,10 +603,10 @@ export const IdeasPoolView: React.FC = () => {
         </div>
       </div>
 
-      {/* DRAG & DROP DAY PLANNER BAR */}
+      {/* DRAG & DROP DAY PLANNER BAR (Desktop lg+ only, touch uses bottom sheet & quick button) */}
       {ideas.length > 0 && (
         <div
-          className={`rounded-[22px] p-3.5 transition-all border ${
+          className={`hidden lg:block rounded-[22px] p-3.5 transition-all border ${
             draggingIdeaId
               ? 'bg-[#C85A38]/10 border-[#C85A38]/50 shadow-sm'
               : 'surface-glass'
@@ -683,7 +683,7 @@ export const IdeasPoolView: React.FC = () => {
               <button
                 type="button"
                 onClick={resetAllFilters}
-                className="px-5 py-2.5 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#1F1B18] font-bold text-xs cursor-pointer inline-flex items-center gap-2 border border-[#E6DDD1]"
+                className="min-h-[44px] px-5 py-2.5 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#1F1B18] font-bold text-xs cursor-pointer inline-flex items-center gap-2 border border-[#E6DDD1]"
               >
                 <RotateCcw className="w-3.5 h-3.5 text-[#C85A38]" />
                 <span>Filter zurücksetzen</span>
@@ -695,7 +695,7 @@ export const IdeasPoolView: React.FC = () => {
                 resetIdeaForm();
                 setIsAddIdeaOpen(true);
               }}
-              className="px-6 py-2.5 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-white font-extrabold text-xs cursor-pointer shadow-sm inline-flex items-center gap-2"
+              className="min-h-[44px] px-6 py-2.5 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-white font-extrabold text-xs cursor-pointer shadow-sm inline-flex items-center gap-2"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Jetzt Idee einreichen</span>
@@ -713,7 +713,7 @@ export const IdeasPoolView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => toggleTravelerCollapse(traveler.id)}
-                  className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-[22px] surface-glass hover:bg-white/90 transition-all text-left cursor-pointer"
+                  className="w-full min-h-[48px] flex items-center justify-between gap-3 px-4 py-3 rounded-[22px] surface-glass hover:bg-white/90 transition-all text-left cursor-pointer"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div
@@ -743,7 +743,7 @@ export const IdeasPoolView: React.FC = () => {
 
                 {/* IDEAS CARDS GRID */}
                 {!isCollapsed && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 cq-cols-1-narrow gap-4">
                     {travelerIdeas.map((idea) => {
                       const hasVoted = idea.votes.includes(currentUser.id);
                       const linkedActivity = trip.activities.find(
@@ -769,7 +769,7 @@ export const IdeasPoolView: React.FC = () => {
                             setDraggingIdeaId(null);
                             setDragOverDay(null);
                           }}
-                          className={`group relative rounded-[26px] p-5 flex flex-col justify-between transition-all duration-300 cursor-grab active:cursor-grabbing ${
+                          className={`group relative rounded-[26px] p-5 flex flex-col justify-between transition-all duration-300 lg:cursor-grab lg:active:cursor-grabbing ${
                             isHighlighted
                               ? 'surface-glass-elevated ring-2 ring-[#C85A38] shadow-md'
                               : draggingIdeaId === idea.id
@@ -780,39 +780,40 @@ export const IdeasPoolView: React.FC = () => {
                           {/* TOP ROW: PRIORITY, DRAG HANDLE & ACTIONS */}
                           <div>
                             <div className="flex items-center justify-between gap-2 mb-3">
-                              <div className="flex items-center gap-1.5">
-                                <GripVertical className="w-3.5 h-3.5 text-[#8C8277] shrink-0" />
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                <GripVertical className="hidden lg:block w-3.5 h-3.5 text-[#8C8277] shrink-0" />
                                 {getPriorityBadge(idea.priority)}
                               </div>
-                              <div className="flex items-center gap-1">
-                                <span className="p-1.5 rounded-full bg-[#FAF7F2] border border-[#E6DDD1]">
+                              <div className="flex items-center gap-1 shrink-0">
+                                <span className="w-9 h-9 rounded-full bg-[#FAF7F2] border border-[#E6DDD1] flex items-center justify-center shrink-0">
                                   {getCategoryIcon(idea.category)}
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => handleStartEditIdea(idea)}
                                   title="Idee bearbeiten"
-                                  className="p-1.5 rounded-full hover:bg-[#F3ECE1] text-[#6B6259] hover:text-[#A34224] transition-all cursor-pointer"
+                                  aria-label="Idee bearbeiten"
+                                  className="w-11 h-11 rounded-full hover:bg-[#F3ECE1] text-[#6B6259] hover:text-[#A34224] flex items-center justify-center transition-all cursor-pointer"
                                 >
-                                  <Pencil className="w-3.5 h-3.5" />
+                                  <Pencil className="w-4 h-4" />
                                 </button>
                                 {isConfirmingDelete ? (
-                                  <div className="inline-flex items-center gap-1 bg-rose-600/12 border border-rose-500/30 rounded-full px-2 py-0.5 text-[10px] font-bold">
-                                    <span className="text-rose-800">Löschen?</span>
+                                  <div className="inline-flex items-center gap-1 bg-rose-600/12 border border-rose-500/30 rounded-full px-2 py-1 text-[11px] font-bold">
+                                    <span className="text-rose-800 pl-1">Löschen?</span>
                                     <button
                                       type="button"
                                       onClick={() => {
                                         deleteIdea(idea.id);
                                         setConfirmDeleteId(null);
                                       }}
-                                      className="px-1.5 py-0.5 rounded-full bg-rose-600 text-white hover:bg-rose-500 cursor-pointer"
+                                      className="min-h-[44px] px-3 rounded-full bg-rose-600 text-white hover:bg-rose-500 cursor-pointer"
                                     >
                                       Ja
                                     </button>
                                     <button
                                       type="button"
                                       onClick={() => setConfirmDeleteId(null)}
-                                      className="px-1.5 py-0.5 rounded-full bg-white text-[#1F1B18] border border-[#E6DDD1] hover:bg-[#FAF7F2] cursor-pointer"
+                                      className="min-h-[44px] px-3 rounded-full bg-white text-[#1F1B18] border border-[#E6DDD1] hover:bg-[#FAF7F2] cursor-pointer"
                                     >
                                       Nein
                                     </button>
@@ -822,9 +823,10 @@ export const IdeasPoolView: React.FC = () => {
                                     type="button"
                                     onClick={() => setConfirmDeleteId(idea.id)}
                                     title="Idee löschen"
-                                    className="p-1.5 rounded-full hover:bg-rose-600/12 text-[#6B6259] hover:text-rose-700 transition-all cursor-pointer"
+                                    aria-label="Idee löschen"
+                                    className="w-11 h-11 rounded-full hover:bg-rose-600/12 text-[#6B6259] hover:text-rose-700 flex items-center justify-center transition-all cursor-pointer"
                                   >
-                                    <Trash2 className="w-3.5 h-3.5" />
+                                    <Trash2 className="w-4 h-4" />
                                   </button>
                                 )}
                               </div>
@@ -844,7 +846,7 @@ export const IdeasPoolView: React.FC = () => {
                             {/* META PILLS (ORT, MAPS, KARTE & KOSTEN) */}
                             <div className="flex flex-wrap items-center gap-1.5 mt-3.5 text-[11px] font-bold">
                               {idea.location && (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#FAF7F2] border border-[#E6DDD1] text-[#1F1B18] max-w-full">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#FAF7F2] border border-[#E6DDD1] text-[#1F1B18] max-w-full">
                                   <MapPin className="w-3 h-3 text-[#2A7B88] shrink-0" />
                                   <span className="truncate">{idea.location}</span>
                                 </span>
@@ -863,10 +865,10 @@ export const IdeasPoolView: React.FC = () => {
                                       dayNumber: effectiveAssignedDay,
                                     })
                                   }
-                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#2A7B88]/12 hover:bg-[#2A7B88]/20 text-[#1F5E68] border border-[#2A7B88]/30 transition-colors cursor-pointer"
+                                  className="inline-flex items-center gap-1.5 min-h-[44px] px-3 py-2 rounded-xl bg-[#2A7B88]/12 hover:bg-[#2A7B88]/20 text-[#1F5E68] border border-[#2A7B88]/30 transition-colors cursor-pointer"
                                   title="Standort auf Karte fokussieren"
                                 >
-                                  <MapIcon className="w-3 h-3" />
+                                  <MapIcon className="w-3.5 h-3.5" />
                                   <span>🗺️ Auf Karte</span>
                                 </button>
                               )}
@@ -875,16 +877,16 @@ export const IdeasPoolView: React.FC = () => {
                                   href={mapsUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#1F1B18] border border-[#E6DDD1] transition-colors"
+                                  className="inline-flex items-center gap-1.5 min-h-[44px] px-3 py-2 rounded-xl bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#1F1B18] border border-[#E6DDD1] transition-colors"
                                   title={`In Google Maps öffnen: ${idea.location}`}
                                 >
-                                  <ExternalLink className="w-3 h-3 text-[#6B6259]" />
+                                  <ExternalLink className="w-3.5 h-3.5 text-[#6B6259]" />
                                   <span>Maps</span>
                                 </a>
                               )}
                               {typeof idea.estimatedCost === 'number' &&
                                 idea.estimatedCost > 0 && (
-                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#D9822B]/14 border border-[#D9822B]/30 text-[#9E5A14] font-mono tabular-nums">
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#D9822B]/14 border border-[#D9822B]/30 text-[#9E5A14] font-mono tabular-nums">
                                     ca. {formatCurrency(idea.estimatedCost, currency)} p.P.
                                   </span>
                                 )}
@@ -898,10 +900,10 @@ export const IdeasPoolView: React.FC = () => {
                                     }
                                     setActiveTab('schedule');
                                   }}
-                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#6E7F5E]/14 hover:bg-[#6E7F5E]/22 text-[#4B593E] border border-[#6E7F5E]/30 font-extrabold cursor-pointer"
+                                  className="inline-flex items-center gap-1.5 min-h-[44px] px-3 py-2 rounded-xl bg-[#6E7F5E]/14 hover:bg-[#6E7F5E]/22 text-[#4B593E] border border-[#6E7F5E]/30 font-extrabold cursor-pointer"
                                   title="Im Tagesplan anzeigen"
                                 >
-                                  <CheckCircle2 className="w-3 h-3 text-[#6E7F5E]" />
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-[#6E7F5E]" />
                                   <span>Tag {effectiveAssignedDay} eingeplant</span>
                                 </button>
                               )}
@@ -937,12 +939,12 @@ export const IdeasPoolView: React.FC = () => {
                               )}
                             </div>
 
-                            {/* BUTTONS: VOTE & SCHEDULE */}
-                            <div className="flex items-center gap-1.5">
+                            {/* BUTTONS: VOTE, QUICK + TAG X & SCHEDULE */}
+                            <div className="flex flex-wrap items-center gap-1.5">
                               <button
                                 type="button"
                                 onClick={() => toggleIdeaVote(idea.id)}
-                                className={`px-3 py-1.5 rounded-full text-xs font-extrabold transition-all flex items-center gap-1.5 cursor-pointer border ${
+                                className={`min-h-[44px] px-3.5 py-2 rounded-full text-xs font-extrabold transition-all flex items-center gap-1.5 cursor-pointer border ${
                                   hasVoted
                                     ? 'bg-[#C85A38] text-white border-[#C85A38] shadow-sm'
                                     : 'bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#1F1B18] border-[#E6DDD1]'
@@ -957,10 +959,23 @@ export const IdeasPoolView: React.FC = () => {
                                 </span>
                               </button>
 
+                              {effectiveAssignedDay !== selectedDay && (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    scheduleIdeaToDay(idea.id, selectedDay, '10:00')
+                                  }
+                                  className="inline-flex items-center gap-1 min-h-[44px] px-3 py-2 rounded-full bg-[#C85A38]/12 hover:bg-[#C85A38]/20 border border-[#C85A38]/30 text-[#A34224] text-xs font-extrabold transition-all cursor-pointer font-mono tabular-nums"
+                                  title={`Direkt für Tag ${selectedDay} (10:00 Uhr) einplanen`}
+                                >
+                                  <span>+ Tag {selectedDay}</span>
+                                </button>
+                              )}
+
                               <button
                                 type="button"
                                 onClick={() => openScheduleModal(idea)}
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#6E7F5E]/14 hover:bg-[#6E7F5E]/22 border border-[#6E7F5E]/30 text-[#4B593E] text-xs font-bold transition-all cursor-pointer"
+                                className="inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 rounded-full bg-[#6E7F5E]/14 hover:bg-[#6E7F5E]/22 border border-[#6E7F5E]/30 text-[#4B593E] text-xs font-bold transition-all cursor-pointer"
                                 title="In den Tagesplan übernehmen"
                               >
                                 <CalendarPlus className="w-3.5 h-3.5" />
@@ -982,7 +997,7 @@ export const IdeasPoolView: React.FC = () => {
       {/* MODAL: NEUE IDEE VORSCHLAGEN / BEARBEITEN */}
       {isAddIdeaOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1F1B18]/40 backdrop-blur-sm animate-fade-in"
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-[#1F1B18]/40 backdrop-blur-sm animate-fade-in"
           onClick={closeIdeaModal}
         >
           <div
@@ -990,7 +1005,7 @@ export const IdeasPoolView: React.FC = () => {
             aria-modal="true"
             aria-labelledby="idea-modal-title"
             onClick={(e) => e.stopPropagation()}
-            className="surface-glass-elevated w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-[28px] p-6 md:p-7 space-y-5"
+            className="surface-glass-elevated w-full max-w-lg max-h-[92dvh] overflow-y-auto rounded-t-3xl sm:rounded-3xl p-5 sm:p-7 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] sm:pb-7 space-y-5 mobile-sheet"
           >
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
@@ -1017,7 +1032,7 @@ export const IdeasPoolView: React.FC = () => {
                 type="button"
                 onClick={closeIdeaModal}
                 aria-label="Dialog schließen"
-                className="w-8 h-8 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] border border-[#E6DDD1] flex items-center justify-center text-[#6B6259] cursor-pointer"
+                className="w-11 h-11 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] border border-[#E6DDD1] flex items-center justify-center text-[#6B6259] cursor-pointer shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1180,13 +1195,13 @@ export const IdeasPoolView: React.FC = () => {
                 <button
                   type="button"
                   onClick={closeIdeaModal}
-                  className="px-5 py-2.5 rounded-full text-xs font-bold bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#6B6259] border border-[#E6DDD1] cursor-pointer"
+                  className="min-h-[44px] px-5 py-2.5 rounded-full text-xs font-bold bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#6B6259] border border-[#E6DDD1] cursor-pointer"
                 >
                   Abbrechen
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-white font-extrabold text-xs shadow-sm cursor-pointer flex items-center gap-1.5"
+                  className="min-h-[44px] px-6 py-2.5 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-white font-extrabold text-xs shadow-sm cursor-pointer flex items-center gap-1.5"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>{editingIdeaId ? 'Änderungen speichern' : 'Idee einreichen'}</span>
@@ -1200,7 +1215,7 @@ export const IdeasPoolView: React.FC = () => {
       {/* MODAL: IN TAGESPLAN ÜBERNEHMEN */}
       {schedulingIdea && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1F1B18]/40 backdrop-blur-sm animate-fade-in"
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-[#1F1B18]/40 backdrop-blur-sm animate-fade-in"
           onClick={closeScheduleModal}
         >
           <div
@@ -1208,7 +1223,7 @@ export const IdeasPoolView: React.FC = () => {
             aria-modal="true"
             aria-labelledby="schedule-idea-modal-title"
             onClick={(e) => e.stopPropagation()}
-            className="surface-glass-elevated w-full max-w-md max-h-[90vh] overflow-y-auto rounded-[28px] p-6 md:p-7 space-y-5"
+            className="surface-glass-elevated w-full max-w-md max-h-[92dvh] overflow-y-auto rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] sm:pb-6 space-y-5 mobile-sheet"
           >
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
@@ -1231,7 +1246,7 @@ export const IdeasPoolView: React.FC = () => {
                 type="button"
                 onClick={closeScheduleModal}
                 aria-label="Dialog schließen"
-                className="w-8 h-8 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] border border-[#E6DDD1] flex items-center justify-center text-[#6B6259] cursor-pointer shrink-0"
+                className="w-11 h-11 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] border border-[#E6DDD1] flex items-center justify-center text-[#6B6259] cursor-pointer shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1308,13 +1323,13 @@ export const IdeasPoolView: React.FC = () => {
                 <button
                   type="button"
                   onClick={closeScheduleModal}
-                  className="px-5 py-2.5 rounded-full text-xs font-bold bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#6B6259] border border-[#E6DDD1] cursor-pointer"
+                  className="min-h-[44px] px-5 py-2.5 rounded-full text-xs font-bold bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#6B6259] border border-[#E6DDD1] cursor-pointer"
                 >
                   Abbrechen
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-full bg-[#6E7F5E] hover:bg-[#5B6B4D] text-white font-extrabold text-xs shadow-sm cursor-pointer flex items-center gap-1.5"
+                  className="min-h-[44px] px-6 py-2.5 rounded-full bg-[#6E7F5E] hover:bg-[#5B6B4D] text-white font-extrabold text-xs shadow-sm cursor-pointer flex items-center gap-1.5"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   <span>Jetzt fest einplanen</span>

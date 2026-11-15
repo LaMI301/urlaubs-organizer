@@ -9,11 +9,11 @@ import {
   Map as MapIcon,
   Shield,
   KeyRound,
-  Eye,
-  EyeOff,
   Cloud,
   HardDrive,
   Link2,
+  CalendarDays,
+  ChevronDown,
 } from 'lucide-react';
 import { useVacation } from '../context/VacationContext';
 import { formatCurrency } from '../utils/vacationHelpers';
@@ -21,15 +21,18 @@ import { formatCurrency } from '../utils/vacationHelpers';
 interface TopBarProps {
   spotlightTrigger?: number;
   escapeTrigger?: number;
+  onOpenMobileCalendar?: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
   spotlightTrigger = 0,
   escapeTrigger = 0,
+  onOpenMobileCalendar,
 }) => {
   const {
     trip,
     currentUser,
+    selectedDay,
     setCurrentUserById,
     addTraveler,
     setActiveTab,
@@ -39,7 +42,6 @@ export const TopBar: React.FC<TopBarProps> = ({
     setSearchTarget,
     mapOpen,
     setMapOpen,
-    accessKey,
     setAccessKey,
     lockApp,
     getInviteUrl,
@@ -50,12 +52,13 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [isTravelerSheetOpen, setIsTravelerSheetOpen] = useState(false);
   const [isAddingTraveler, setIsAddingTraveler] = useState(false);
   const [newTravelerName, setNewTravelerName] = useState('');
   const [copiedLink, setCopiedLink] = useState(false);
   const [isSecurityOpen, setIsSecurityOpen] = useState(false);
   const [newAccessKeyInput, setNewAccessKeyInput] = useState('');
-  const [showCurrentKey, setShowCurrentKey] = useState(false);
 
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -73,8 +76,10 @@ export const TopBar: React.FC<TopBarProps> = ({
   // Respond to Cmd/Ctrl+K trigger from App shell
   useEffect(() => {
     if (spotlightTrigger === 0) return;
+    setIsMobileSearchOpen(true);
     setIsSearchOpen(true);
     setIsSecurityOpen(false);
+    setIsTravelerSheetOpen(false);
     window.setTimeout(() => {
       searchInputRef.current?.focus();
       searchInputRef.current?.select();
@@ -85,7 +90,9 @@ export const TopBar: React.FC<TopBarProps> = ({
   useEffect(() => {
     if (escapeTrigger === 0) return;
     setIsSearchOpen(false);
+    setIsMobileSearchOpen(false);
     setIsSecurityOpen(false);
+    setIsTravelerSheetOpen(false);
     setIsAddingTraveler(false);
   }, [escapeTrigger]);
 
@@ -169,6 +176,7 @@ export const TopBar: React.FC<TopBarProps> = ({
     setAccessKey(cleaned);
     setNewAccessKeyInput('');
     setIsSecurityOpen(false);
+    setIsTravelerSheetOpen(false);
   };
 
   const clampDay = (day?: number): number => {
@@ -258,20 +266,111 @@ export const TopBar: React.FC<TopBarProps> = ({
   const closeSearch = () => {
     setSearchQuery('');
     setIsSearchOpen(false);
+    setIsMobileSearchOpen(false);
     searchInputRef.current?.blur();
   };
 
   return (
-    <header className="mb-1 flex flex-col gap-3 min-w-0">
-      {/* Row 1: Centered Spotlight Search + Primary Cockpit & Security Actions */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-2.5 min-w-0">
+    <header className="mb-1 flex flex-col gap-2.5 sm:gap-3 min-w-0">
+      {/* PHONE (< sm): Single Compact ~52-56px Header Bar */}
+      <div className="sm:hidden flex items-center justify-between gap-2 min-h-[52px] bg-[#FAF7F2]/90 border border-[#E6DDD1] rounded-2xl px-2.5 py-1 shadow-sm">
+        <button
+          type="button"
+          onClick={() => setIsWelcomeOpen(true)}
+          title="Urlaub wechseln"
+          className="flex items-center gap-2 min-w-0 flex-1 min-h-[44px] text-left cursor-pointer rounded-xl px-1 active:bg-[#F3ECE1] transition-colors"
+        >
+          <span className="w-8 h-8 rounded-xl bg-[#C85A38] text-white flex items-center justify-center font-black text-xs tracking-tight shrink-0 shadow-sm">
+            VO
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-xs font-extrabold text-[#1F1B18] truncate leading-tight">
+              {trip.title}
+            </span>
+            <span className="flex items-center gap-1 text-[10px] text-[#6B6259] truncate">
+              <span className="font-mono tabular-nums font-bold text-[#C85A38]">
+                Tag {selectedDay}/{trip.totalDays}
+              </span>
+              <span className="text-[#DDD2C3]">·</span>
+              <span className="truncate">{trip.destination}</span>
+              {isSyncing && (
+                <Cloud className="w-3 h-3 text-[#2A7B88] animate-pulse shrink-0 ml-0.5" />
+              )}
+            </span>
+          </span>
+        </button>
+
+        <div className="flex items-center gap-1 shrink-0">
+          {/* 1. Spotlight Search Toggle (>=44px) */}
+          <button
+            type="button"
+            onClick={() => {
+              const next = !isMobileSearchOpen;
+              setIsMobileSearchOpen(next);
+              setIsSearchOpen(next);
+              if (next) {
+                window.setTimeout(() => {
+                  searchInputRef.current?.focus();
+                }, 20);
+              }
+            }}
+            aria-label={isMobileSearchOpen ? 'Suche schließen' : 'Suche öffnen'}
+            aria-expanded={isMobileSearchOpen}
+            className={`w-11 h-11 rounded-full border flex items-center justify-center transition-colors cursor-pointer ${
+              isMobileSearchOpen
+                ? 'bg-[#C85A38] text-white border-[#C85A38] shadow-sm'
+                : 'bg-white hover:bg-[#F3ECE1] border-[#DDD2C3] text-[#1F1B18]'
+            }`}
+          >
+            {isMobileSearchOpen ? (
+              <X className="w-4 h-4" />
+            ) : (
+              <Search className="w-4 h-4 text-[#C85A38]" />
+            )}
+          </button>
+
+          {/* 2. Calendar Sheet Button (>=44px) */}
+          <button
+            type="button"
+            onClick={() => onOpenMobileCalendar?.()}
+            aria-label="Kalender & Ablauf öffnen"
+            className="w-11 h-11 rounded-full bg-white hover:bg-[#F3ECE1] border border-[#DDD2C3] text-[#1F1B18] flex items-center justify-center transition-colors cursor-pointer"
+          >
+            <CalendarDays className="w-4 h-4 text-[#2A7B88]" />
+          </button>
+
+          {/* 3. Active Traveler Chip (>=44px, opens viewport-clamped sheet) */}
+          <button
+            type="button"
+            onClick={() => setIsTravelerSheetOpen(true)}
+            aria-label={`Aktiver Reisender: ${currentUser.name}. Profil & Sicherheit öffnen`}
+            aria-expanded={isTravelerSheetOpen}
+            className="min-w-[44px] min-h-[44px] pl-1.5 pr-2 rounded-full bg-white hover:bg-[#F3ECE1] border border-[#DDD2C3] flex items-center justify-center gap-1 transition-colors cursor-pointer"
+          >
+            <span
+              className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black text-[#1F1B18] border border-black/10 shrink-0"
+              style={{ backgroundColor: currentUser.color }}
+            >
+              {currentUser.initials}
+            </span>
+            <ChevronDown className="w-3.5 h-3.5 text-[#6B6259] shrink-0" />
+          </button>
+        </div>
+      </div>
+
+      {/* Row 1: Spotlight Search (always shown on sm+, expandable on <sm) + Desktop/Tablet Controls */}
+      <div
+        className={`${
+          isMobileSearchOpen ? 'flex' : 'hidden sm:flex'
+        } flex-col md:flex-row md:items-center justify-between gap-2.5 min-w-0`}
+      >
         {/* Centered Spotlight Search Bar */}
         <div
           ref={searchContainerRef}
           className="relative flex-1 max-w-xl w-full md:mx-auto xl:mx-0 min-w-0"
         >
           <div
-            className={`flex items-center gap-2.5 rounded-full px-4 py-2 border transition-all ${
+            className={`flex items-center gap-2 rounded-full px-3.5 sm:px-4 py-2 min-h-[44px] sm:min-h-0 border transition-all ${
               isSearchOpen
                 ? 'bg-white border-[#C85A38]/55 shadow-md ring-2 ring-[#C85A38]/15'
                 : 'bg-[#FAF7F2]/90 hover:bg-white border-[#DDD2C3] shadow-sm'
@@ -305,7 +404,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                   searchInputRef.current?.focus();
                 }}
                 aria-label="Suchtext löschen"
-                className="p-1 rounded-full hover:bg-[#F3ECE1] text-[#6B6259] hover:text-[#1F1B18] cursor-pointer shrink-0"
+                className="w-8 h-8 sm:w-6 sm:h-6 rounded-full hover:bg-[#F3ECE1] text-[#6B6259] hover:text-[#1F1B18] flex items-center justify-center cursor-pointer shrink-0"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -545,8 +644,8 @@ export const TopBar: React.FC<TopBarProps> = ({
           )}
         </div>
 
-        {/* Right Controls: Sync Indicator + Map Toggle + Invite + Security + Switch Trip */}
-        <div className="flex flex-wrap items-center justify-between md:justify-end gap-2 min-w-0 max-w-full w-full md:w-auto">
+        {/* Right Controls (Tablet sm+ & Desktop lg+): Sync Indicator + Calendar Sheet + Map Toggle + Invite + Security + Switch Trip */}
+        <div className="hidden sm:flex flex-wrap items-center justify-end gap-2 min-w-0 max-w-full w-full md:w-auto">
           {/* Cloud / Local Sync Status */}
           <span
             title={
@@ -556,7 +655,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 ? 'Lokaler Browser-Modus aktiv'
                 : 'Cloud-Sync aktiv'
             }
-            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-[#FAF7F2] border border-[#E6DDD1] text-[11px] font-semibold text-[#6B6259]"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-[#FAF7F2] border border-[#E6DDD1] text-[11px] font-semibold text-[#6B6259]"
           >
             {isSyncing ? (
               <>
@@ -576,12 +675,28 @@ export const TopBar: React.FC<TopBarProps> = ({
             )}
           </span>
 
-          {/* Map Cockpit Toggle (Desktop only; Mobile uses Sidebar Mobile Top Bar button) */}
+          {/* Calendar Sheet Toggle (Tablet sm..lg always, and lg..xl when mapOpen hides right calendar column) */}
+          {onOpenMobileCalendar && (
+            <button
+              type="button"
+              onClick={onOpenMobileCalendar}
+              title="Kalender & Tagesablauf öffnen"
+              aria-label="Kalender & Tagesablauf öffnen"
+              className={`${
+                mapOpen ? '2xl:hidden' : 'lg:hidden'
+              } inline-flex items-center gap-1.5 bg-[#FAF7F2] hover:bg-[#F3ECE1] border border-[#DDD2C3] text-[#1F1B18] text-xs font-bold px-3 py-2 min-h-[40px] lg:min-h-0 rounded-full transition-colors cursor-pointer`}
+            >
+              <CalendarDays className="w-3.5 h-3.5 text-[#2A7B88]" />
+              <span>Kalender</span>
+            </button>
+          )}
+
+          {/* Map Cockpit Toggle (Tablet sm..lg & Desktop lg+) */}
           <button
             type="button"
             onClick={() => setMapOpen(!mapOpen)}
             aria-pressed={mapOpen}
-            className={`hidden lg:inline-flex items-center gap-1.5 text-xs font-extrabold px-3.5 py-2 rounded-full border transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 text-xs font-extrabold px-3.5 py-2 min-h-[40px] lg:min-h-0 rounded-full border transition-all cursor-pointer ${
               mapOpen
                 ? 'bg-[#2A7B88] text-white border-[#2A7B88] shadow-sm'
                 : 'bg-[#2A7B88]/10 hover:bg-[#2A7B88]/18 text-[#1F5E68] border-[#2A7B88]/30'
@@ -596,7 +711,7 @@ export const TopBar: React.FC<TopBarProps> = ({
             type="button"
             onClick={handleCopyPrivateLink}
             title="Privaten Direktlink inkl. Zugangsschlüssel (#access) kopieren"
-            className="inline-flex items-center gap-1.5 bg-[#FAF7F2] hover:bg-[#F3ECE1] border border-[#DDD2C3] text-[#1F1B18] text-xs font-bold px-3 py-2 rounded-full transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 bg-[#FAF7F2] hover:bg-[#F3ECE1] border border-[#DDD2C3] text-[#1F1B18] text-xs font-bold px-3 py-2 min-h-[40px] lg:min-h-0 rounded-full transition-colors cursor-pointer"
           >
             {copiedLink ? (
               <>
@@ -606,7 +721,7 @@ export const TopBar: React.FC<TopBarProps> = ({
             ) : (
               <>
                 <Link2 className="w-3.5 h-3.5 text-[#2A7B88]" />
-                <span className="hidden sm:inline">Privater Link</span>
+                <span className="hidden md:inline">Privater Link</span>
               </>
             )}
           </button>
@@ -619,7 +734,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               aria-expanded={isSecurityOpen}
               aria-label="Sicherheit & Zugangscode"
               title="Passwort ändern oder App sperren"
-              className={`w-9 h-9 rounded-full border flex items-center justify-center transition-colors cursor-pointer ${
+              className={`w-10 h-10 lg:w-9 lg:h-9 rounded-full border flex items-center justify-center transition-colors cursor-pointer ${
                 isSecurityOpen
                   ? 'bg-[#D9822B]/18 border-[#D9822B]/45 text-[#9E5A14]'
                   : 'bg-[#FAF7F2] hover:bg-[#F3ECE1] border-[#DDD2C3] text-[#6B6259] hover:text-[#1F1B18]'
@@ -632,7 +747,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               <div
                 role="dialog"
                 aria-label="Sicherheitseinstellungen"
-                className="absolute right-0 top-full mt-2 w-72 bg-white/[0.98] backdrop-blur-2xl rounded-3xl border border-[#DDD2C3] shadow-2xl p-4 z-50 space-y-3.5 text-[#1F1B18]"
+                className="absolute right-0 top-full mt-2 w-[min(19rem,calc(100vw-2rem))] bg-white/[0.98] backdrop-blur-2xl rounded-3xl border border-[#DDD2C3] shadow-2xl p-4 z-50 space-y-3.5 text-[#1F1B18]"
               >
                 <div className="flex items-center justify-between pb-2 border-b border-[#E6DDD1]">
                   <span className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#1F1B18]">
@@ -646,31 +761,6 @@ export const TopBar: React.FC<TopBarProps> = ({
                     className="text-[#6B6259] hover:text-[#1F1B18] cursor-pointer"
                   >
                     <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-
-                <div className="rounded-2xl bg-[#FAF7F2] border border-[#E6DDD1] px-3 py-2 flex items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B6259] block">
-                      Aktueller Code
-                    </span>
-                    <span className="font-mono tabular-nums text-xs font-bold text-[#C85A38] truncate block">
-                      {showCurrentKey ? accessKey : '••••••••'}
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowCurrentKey((prev) => !prev)}
-                    aria-label={
-                      showCurrentKey ? 'Code verbergen' : 'Code anzeigen'
-                    }
-                    className="p-1.5 rounded-full hover:bg-[#E6DDD1] text-[#6B6259] hover:text-[#1F1B18] cursor-pointer"
-                  >
-                    {showCurrentKey ? (
-                      <EyeOff className="w-3.5 h-3.5" />
-                    ) : (
-                      <Eye className="w-3.5 h-3.5" />
-                    )}
                   </button>
                 </div>
 
@@ -726,9 +816,9 @@ export const TopBar: React.FC<TopBarProps> = ({
         </div>
       </div>
 
-      {/* Row 2: Responsive "Ich bin:" Traveler Pills (wrap/scroll cleanly on 390px) */}
-      <div className="flex items-center gap-2 min-w-0 w-full">
-        <div className="flex items-center flex-wrap sm:flex-nowrap gap-1.5 bg-[#FAF7F2]/90 backdrop-blur-xl rounded-2xl sm:rounded-full p-1.5 border border-[#E6DDD1] w-full sm:w-auto max-w-full overflow-x-auto no-scrollbar">
+      {/* Row 2 (Tablet sm+ & Desktop lg+): "Ich bin:" Traveler Pills */}
+      <div className="hidden sm:flex items-center gap-2 min-w-0 w-full">
+        <div className="flex items-center flex-nowrap gap-1.5 bg-[#FAF7F2]/90 backdrop-blur-xl rounded-full p-1.5 border border-[#E6DDD1] w-auto max-w-full overflow-x-auto no-scrollbar">
           <span className="text-[11px] font-bold text-[#6B6259] pl-2 pr-1 shrink-0">
             Ich bin:
           </span>
@@ -748,7 +838,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 }`}
               >
                 <span
-                  className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
+                  className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black text-[#1F1B18] shrink-0"
                   style={{ backgroundColor: traveler.color }}
                 >
                   {traveler.initials}
@@ -809,6 +899,219 @@ export const TopBar: React.FC<TopBarProps> = ({
           )}
         </div>
       </div>
+
+      {/* PHONE (< sm): Safe Viewport-Clamped Traveler & Security Bottom Sheet */}
+      {isTravelerSheetOpen && (
+        <div
+          className="sm:hidden fixed inset-0 z-50 flex items-end p-0"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Reisende & Sicherheit"
+        >
+          <div
+            className="fixed inset-0 bg-[#1F1B18]/45 backdrop-blur-sm"
+            onClick={() => setIsTravelerSheetOpen(false)}
+          />
+          <div className="mobile-sheet relative z-10 w-full max-h-[88dvh] bg-white/[0.98] backdrop-blur-2xl rounded-t-3xl border-t border-[#DDD2C3] px-4 pt-2.5 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] overflow-y-auto shadow-2xl space-y-4 text-[#1F1B18]">
+            <div className="w-10 h-1 rounded-full bg-[#DDD2C3] mx-auto shrink-0" />
+
+            <div className="flex items-center justify-between pb-2 border-b border-[#E6DDD1]">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span
+                  className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-black text-[#1F1B18] border border-black/10 shrink-0"
+                  style={{ backgroundColor: currentUser.color }}
+                >
+                  {currentUser.initials}
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-extrabold text-[#1F1B18] truncate">
+                    {currentUser.name}
+                  </p>
+                  <p className="text-[11px] text-[#6B6259] flex items-center gap-1">
+                    {isSyncing ? (
+                      <>
+                        <Cloud className="w-3 h-3 text-[#2A7B88] animate-pulse" />
+                        <span>Speichert…</span>
+                      </>
+                    ) : isLocalMode ? (
+                      <>
+                        <HardDrive className="w-3 h-3" />
+                        <span>Lokaler Modus</span>
+                      </>
+                    ) : (
+                      <>
+                        <Cloud className="w-3 h-3 text-[#4E5F40]" />
+                        <span>Cloud-Sync aktiv</span>
+                      </>
+                    )}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsTravelerSheetOpen(false)}
+                aria-label="Schließen"
+                className="w-11 h-11 rounded-full bg-[#F3ECE1] hover:bg-[#E6DDD1] text-[#1F1B18] flex items-center justify-center cursor-pointer shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Traveler Switcher */}
+            <div className="space-y-2">
+              <span className="block text-[11px] font-bold uppercase tracking-wider text-[#6B6259]">
+                Ich bin:
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {trip.travelers.map((traveler) => {
+                  const isSelected = traveler.id === currentUser.id;
+                  return (
+                    <button
+                      key={traveler.id}
+                      type="button"
+                      onClick={() => setCurrentUserById(traveler.id)}
+                      className={`min-h-[44px] inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-xs transition-all cursor-pointer max-w-full ${
+                        isSelected
+                          ? 'bg-[#C85A38] text-white font-extrabold shadow-sm'
+                          : 'bg-[#FAF7F2] text-[#1F1B18] hover:bg-[#F3ECE1] border border-[#E6DDD1] font-semibold'
+                      }`}
+                    >
+                      <span
+                        className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-[#1F1B18] shrink-0"
+                        style={{ backgroundColor: traveler.color }}
+                      >
+                        {traveler.initials}
+                      </span>
+                      <span className="truncate">{traveler.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {!isAddingTraveler ? (
+                <button
+                  type="button"
+                  onClick={() => setIsAddingTraveler(true)}
+                  className="min-h-[44px] inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#FAF7F2] hover:bg-[#F3ECE1] border border-dashed border-[#DDD2C3] text-xs font-bold text-[#6B6259] cursor-pointer"
+                >
+                  <UserPlus className="w-4 h-4 text-[#C85A38]" />
+                  <span>Mitreisende/n hinzufügen</span>
+                </button>
+              ) : (
+                <form
+                  onSubmit={handleAddTravelerSubmit}
+                  className="flex items-center gap-2 bg-[#FAF7F2] rounded-2xl p-2 border border-[#C85A38]/45"
+                >
+                  <input
+                    type="text"
+                    value={newTravelerName}
+                    onChange={(e) => setNewTravelerName(e.target.value)}
+                    placeholder="Name eingeben..."
+                    autoFocus
+                    className="surface-input flex-1 min-w-0 min-h-[44px] rounded-xl px-3 py-2 text-xs font-semibold"
+                  />
+                  <button
+                    type="submit"
+                    aria-label="Name speichern"
+                    className="w-11 h-11 rounded-xl bg-[#C85A38] text-white flex items-center justify-center cursor-pointer shrink-0"
+                  >
+                    <Check className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Abbrechen"
+                    onClick={() => {
+                      setIsAddingTraveler(false);
+                      setNewTravelerName('');
+                    }}
+                    className="w-11 h-11 rounded-xl bg-[#F3ECE1] text-[#6B6259] flex items-center justify-center cursor-pointer shrink-0"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </form>
+              )}
+            </div>
+
+            {/* Trip & Invite Actions */}
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#E6DDD1]">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsTravelerSheetOpen(false);
+                  setIsWelcomeOpen(true);
+                }}
+                className="min-h-[44px] inline-flex items-center justify-center gap-1.5 bg-[#F3ECE1] hover:bg-[#E6DDD1] border border-[#DDD2C3] text-[#1F1B18] text-xs font-bold px-3 py-2 rounded-full transition-colors cursor-pointer"
+              >
+                <ArrowLeftRight className="w-3.5 h-3.5 text-[#D9822B] shrink-0" />
+                <span className="truncate">Urlaub wechseln</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleCopyPrivateLink}
+                className="min-h-[44px] inline-flex items-center justify-center gap-1.5 bg-[#FAF7F2] hover:bg-[#F3ECE1] border border-[#DDD2C3] text-[#1F1B18] text-xs font-bold px-3 py-2 rounded-full transition-colors cursor-pointer"
+              >
+                {copiedLink ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-[#4E5F40] shrink-0" />
+                    <span className="text-[#4E5F40] truncate">Kopiert!</span>
+                  </>
+                ) : (
+                  <>
+                    <Link2 className="w-3.5 h-3.5 text-[#2A7B88] shrink-0" />
+                    <span className="truncate">Privater Link</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Security Section (safe viewport-clamped) */}
+            <div className="pt-2 border-t border-[#E6DDD1] space-y-3">
+              <span className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#1F1B18]">
+                <KeyRound className="w-3.5 h-3.5 text-[#D9822B]" />
+                Zugangsschutz
+              </span>
+
+              <form onSubmit={handleUpdateAccessKey} className="space-y-2">
+                <label
+                  htmlFor="mobile-new-access-key"
+                  className="block text-[11px] font-bold text-[#1F1B18]"
+                >
+                  Passwort ändern
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    id="mobile-new-access-key"
+                    type="password"
+                    value={newAccessKeyInput}
+                    onChange={(e) => setNewAccessKeyInput(e.target.value)}
+                    placeholder="Neuer Code..."
+                    className="surface-input flex-1 min-w-0 min-h-[44px] rounded-xl px-3 py-2 text-xs font-semibold"
+                  />
+                  <button
+                    type="submit"
+                    className="min-h-[44px] px-4 py-2 rounded-xl bg-[#C85A38] hover:bg-[#B54B2B] text-white text-xs font-extrabold transition-colors cursor-pointer shrink-0"
+                  >
+                    Setzen
+                  </button>
+                </div>
+              </form>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsTravelerSheetOpen(false);
+                  lockApp();
+                }}
+                className="w-full min-h-[44px] py-2.5 px-3 rounded-full bg-rose-500/10 hover:bg-rose-500/18 border border-rose-500/30 text-rose-700 text-xs font-extrabold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <Lock className="w-3.5 h-3.5" />
+                <span>App jetzt sperren</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

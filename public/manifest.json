@@ -1,0 +1,18 @@
+{
+  "name": "Urlaubs-Organizer",
+  "short_name": "Urlaubs-Organizer",
+  "description": "Gemeinsam Traumreisen planen – Tagesplan, Karte, Essen, Abstimmungen & Reisekasse",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAF7F2",
+  "theme_color": "#FAF7F2",
+  "lang": "de",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -113,6 +113,7 @@ const AppShell: React.FC = () => {
 
   const [spotlightTrigger, setSpotlightTrigger] = useState(0);
   const [escapeTrigger, setEscapeTrigger] = useState(0);
+  const [mobileCalendarOpen, setMobileCalendarOpen] = useState(false);
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
     try {
@@ -161,6 +162,10 @@ const AppShell: React.FC = () => {
 
       if (e.key === 'Escape') {
         setEscapeTrigger((c) => c + 1);
+        if (mobileCalendarOpen && !isNewTripModalOpen && !isQuickAddOpen) {
+          setMobileCalendarOpen(false);
+          return;
+        }
         if (
           typeof window !== 'undefined' &&
           window.innerWidth < 1024 &&
@@ -217,6 +222,7 @@ const AppShell: React.FC = () => {
     isNewTripModalOpen,
     isQuickAddOpen,
     mapOpen,
+    mobileCalendarOpen,
     selectedDay,
     trip.totalDays,
     setMapOpen,
@@ -256,7 +262,7 @@ const AppShell: React.FC = () => {
   return (
     <>
       <AccessAndWelcomeGate>
-        <div className="surface-canvas relative min-h-screen w-full max-w-full overflow-x-clip p-2.5 sm:p-4 md:p-5 pb-24 lg:pb-5 text-[#1F1B18] font-sans">
+        <div className="surface-canvas relative min-h-[100dvh] w-full max-w-full overflow-x-clip p-2 sm:p-4 md:p-5 pt-[calc(0.5rem+env(safe-area-inset-top,0px))] sm:pt-4 md:pt-5 pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))] sm:pb-4 md:pb-5 text-[#1F1B18] font-sans">
           {/* Subtle Ambient Warm Glow Blobs */}
           <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
             <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#C85A38]/8 rounded-full blur-3xl" />
@@ -265,66 +271,75 @@ const AppShell: React.FC = () => {
             <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-[#D9822B]/8 rounded-full blur-3xl" />
           </div>
 
-          {/* Testmodus Banner */}
+          {/* Testmodus Banner (Ultra-compact single row on <sm) */}
           {trip.isDemo && (
-            <div className="surface-glass relative z-10 w-full max-w-[1680px] mx-auto mb-3 rounded-2xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 border border-[#D9822B]/30">
-              <div className="flex flex-wrap items-center gap-2 text-xs md:text-sm min-w-0 w-full sm:w-auto">
-                <span className="inline-flex items-center gap-1.5 bg-[#D9822B]/15 border border-[#D9822B]/35 text-[#9E5A14] font-bold px-2.5 py-0.5 rounded-full text-xs shrink-0">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  Testmodus
+            <div className="surface-glass relative z-10 w-full max-w-[1680px] mx-auto mb-2 sm:mb-3 rounded-2xl px-2.5 py-1.5 sm:px-4 sm:py-2.5 flex items-center justify-between gap-2 border border-[#D9822B]/30">
+              <div className="flex items-center gap-1.5 sm:gap-2 text-xs md:text-sm min-w-0 flex-1">
+                <span className="inline-flex items-center gap-1 bg-[#D9822B]/15 border border-[#D9822B]/35 text-[#9E5A14] font-bold px-2 sm:px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs shrink-0">
+                  <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                  <span className="sm:hidden">Demo</span>
+                  <span className="hidden sm:inline">Testmodus</span>
                 </span>
                 <span className="text-[#1F1B18] font-medium truncate">
-                  <strong>{trip.title}</strong> (Beispielwerte zum Ausprobieren)
+                  <strong>{trip.title}</strong>
+                  <span className="hidden md:inline text-[#6B6259]">
+                    {' '}
+                    (Beispielwerte zum Ausprobieren)
+                  </span>
                 </span>
                 {isSyncing && (
-                  <span className="inline-flex items-center gap-1 text-[11px] text-[#2A7B88] ml-1 shrink-0">
+                  <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-[#2A7B88] ml-1 shrink-0">
                     <Cloud className="w-3 h-3 animate-pulse" /> Speichert…
                   </span>
                 )}
               </div>
 
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                 <button
                   type="button"
                   onClick={resetDemoTrip}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold bg-[#F3ECE1] hover:bg-[#E6DDD1] border border-[#DDD2C3] text-[#1F1B18] px-3 py-1.5 rounded-full transition-colors cursor-pointer"
+                  className="min-h-[38px] sm:min-h-0 inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold bg-[#F3ECE1] hover:bg-[#E6DDD1] border border-[#DDD2C3] text-[#1F1B18] px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full transition-colors cursor-pointer"
                   title="Alle Beispielwerte von Mallorca 2026 auf Anfang zurücksetzen"
                 >
                   <RotateCcw className="w-3.5 h-3.5 text-[#D9822B]" />
-                  <span>Reset Demo</span>
+                  <span className="sm:hidden">Reset</span>
+                  <span className="hidden sm:inline">Reset Demo</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsNewTripModalOpen(true)}
-                  className="inline-flex items-center gap-1.5 text-xs font-extrabold bg-[#C85A38] hover:bg-[#B54B2B] text-white px-3.5 py-1.5 rounded-full transition-colors cursor-pointer shadow-sm"
+                  className="min-h-[38px] sm:min-h-0 inline-flex items-center gap-1 text-[11px] sm:text-xs font-extrabold bg-[#C85A38] hover:bg-[#B54B2B] text-white px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full transition-colors cursor-pointer shadow-sm"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Eigenen Urlaub erstellen</span>
+                  <span className="sm:hidden">Eigener</span>
+                  <span className="hidden sm:inline">Eigenen Urlaub erstellen</span>
                 </button>
               </div>
             </div>
           )}
 
-          {/* Main Dashboard Shell */}
+          {/* Main Dashboard Shell (1-col Phone, 72px-rail Tablet sm..lg, Multi-pane Desktop lg+) */}
           <div
-            className={`surface-glass relative z-10 w-full max-w-[1680px] mx-auto rounded-[28px] md:rounded-[34px] p-2.5 sm:p-4 md:p-5 grid grid-cols-1 ${gridColumnsClass} gap-4 lg:gap-5 min-h-[calc(100vh-2.5rem)] transition-all duration-200`}
+            className={`bg-white/90 border border-[#E6DDD1] shadow-[0_10px_30px_-12px_rgba(31,27,24,0.10)] relative z-10 w-full max-w-[1680px] mx-auto rounded-[24px] sm:rounded-[28px] md:rounded-[34px] p-2 sm:p-4 md:p-5 grid grid-cols-1 sm:grid-cols-[72px_minmax(0,1fr)] ${gridColumnsClass} gap-3 sm:gap-4 lg:gap-5 min-h-[calc(100dvh-7rem)] sm:min-h-[calc(100dvh-2.5rem)] transition-all duration-200`}
           >
-            {/* Left Navigation Column (Desktop Rail + Mobile Bars/Drawer) */}
+            {/* Left Navigation Column (Phone Bottom Nav/Sheet + Tablet 72px Rail + Desktop Collapsible Sidebar) */}
             <Sidebar
               collapsed={isSidebarCollapsed}
               onToggleCollapse={toggleSidebar}
+              onOpenMobileCalendar={() => setMobileCalendarOpen(true)}
             />
 
-            {/* Center Main Content Column */}
-            <main className="flex flex-col gap-4 min-w-0 w-full">
+            {/* Center Main Content Column (.main-pane enables CSS Container Queries) */}
+            <main className="main-pane flex flex-col gap-3 sm:gap-4 min-w-0 w-full">
               <TopBar
                 spotlightTrigger={spotlightTrigger}
                 escapeTrigger={escapeTrigger}
+                onOpenMobileCalendar={() => setMobileCalendarOpen(true)}
               />
               <div className="flex-1 min-w-0">{renderMainContent()}</div>
             </main>
 
-            {/* Expandable Map-First Split Cockpit (Desktop Split-Screen / Mobile Slide-Over Drawer) */}
+            {/* Expandable Map-First Split Cockpit (Desktop Split-Screen / <lg Full 100dvh Overlay) */}
             {mapOpen && (
               <div
                 onMouseDown={(e) => {
@@ -332,22 +347,49 @@ const AppShell: React.FC = () => {
                     setMapOpen(false);
                   }
                 }}
-                className="fixed inset-0 z-50 bg-[#1F1B18]/45 backdrop-blur-sm p-3 flex flex-col lg:static lg:inset-auto lg:z-auto lg:bg-transparent lg:backdrop-blur-none lg:p-0 lg:block min-w-0"
+                className="fixed inset-0 z-50 bg-[#1F1B18]/45 backdrop-blur-sm p-0 pb-safe sm:p-4 sm:pb-[calc(1rem+env(safe-area-inset-bottom,0px))] flex flex-col lg:static lg:inset-auto lg:z-auto lg:bg-transparent lg:backdrop-blur-none lg:p-0 lg:pb-0 lg:block min-w-0"
               >
-                <div className="h-full w-full lg:h-[calc(100vh-3.5rem)] lg:sticky lg:top-5">
+                <div className="h-[100dvh] sm:h-full w-full lg:h-[calc(100dvh-3.5rem)] lg:sticky lg:top-5">
                   <MapCockpitPanel />
                 </div>
               </div>
             )}
 
-            {/* Right Calendar & Timeline Column */}
-            <div className={mapOpen ? 'lg:hidden 2xl:block min-w-0' : 'min-w-0'}>
+            {/* Right Calendar & Timeline Column (Desktop >=lg when !mapOpen, or >=2xl when mapOpen) */}
+            <div className={mapOpen ? 'hidden 2xl:block min-w-0' : 'hidden lg:block min-w-0'}>
               <RightCalendarPanel
                 collapsed={isCalendarCollapsed}
                 onToggleCollapse={toggleCalendar}
               />
             </div>
           </div>
+
+          {/* Calendar Bottom Sheet / Drawer (<lg always, and lg..xl when mapOpen hides docked calendar) */}
+          {mobileCalendarOpen && (
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Kalender und Tagesablauf"
+              onMouseDown={(e) => {
+                if (e.target === e.currentTarget) {
+                  setMobileCalendarOpen(false);
+                }
+              }}
+              className={`${
+                mapOpen ? '2xl:hidden' : 'lg:hidden'
+              } fixed inset-0 z-50 bg-[#1F1B18]/45 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4`}
+            >
+              <div className="mobile-sheet w-full sm:max-w-lg max-h-[90dvh] h-[88dvh] sm:h-auto sm:max-h-[88dvh] flex flex-col rounded-t-3xl sm:rounded-[28px] overflow-hidden shadow-2xl pb-safe bg-[#FAF7F2] border-t sm:border border-[#DDD2C3]">
+                <div className="sm:hidden pt-2.5 pb-1 flex justify-center bg-[#FAF7F2] shrink-0">
+                  <div className="w-10 h-1 rounded-full bg-[#DDD2C3]" />
+                </div>
+                <RightCalendarPanel
+                  collapsed={false}
+                  onCloseSheet={() => setMobileCalendarOpen(false)}
+                />
+              </div>
+            </div>
+          )}
 
           <QuickAddModal />
         </div>
@@ -360,7 +402,7 @@ const AppShell: React.FC = () => {
       {toasts.length > 0 && (
         <div
           aria-live="polite"
-          className="fixed bottom-20 lg:bottom-5 right-3 sm:right-5 z-[70] flex flex-col gap-2 w-[calc(100vw-1.5rem)] max-w-sm pointer-events-none"
+          className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] sm:bottom-5 right-3 sm:right-5 z-[70] flex flex-col gap-2 w-[calc(100vw-1.5rem)] max-w-sm pointer-events-none"
         >
           {toasts.map((toast) => {
             const meta = TOAST_STYLES[toast.type] || TOAST_STYLES.info;
@@ -369,7 +411,7 @@ const AppShell: React.FC = () => {
               <div
                 key={toast.id}
                 role="status"
-                className={`surface-glass-elevated pointer-events-auto rounded-2xl px-3.5 py-3 border ${meta.border} flex items-center justify-between gap-2.5 animate-fade-in`}
+                className={`surface-glass-elevated pointer-events-auto rounded-2xl px-3.5 py-2.5 sm:py-3 border ${meta.border} flex items-center justify-between gap-2 animate-fade-in`}
               >
                 <div className="flex items-center gap-2.5 min-w-0 flex-1">
                   <Icon className={`w-4 h-4 shrink-0 ${meta.iconColor}`} />
@@ -378,14 +420,14 @@ const AppShell: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="flex items-center gap-1.5 shrink-0">
+                <div className="flex items-center gap-1 shrink-0">
                   {toast.canUndo && (
                     <button
                       type="button"
                       onClick={undoLastDelete}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-white text-[11px] font-extrabold transition-colors cursor-pointer"
+                      className="min-h-[44px] sm:min-h-0 inline-flex items-center gap-1 px-3 sm:px-2.5 py-2 sm:py-1 rounded-full bg-[#C85A38] hover:bg-[#B54B2B] text-white text-xs sm:text-[11px] font-extrabold transition-colors cursor-pointer"
                     >
-                      <Undo2 className="w-3 h-3" />
+                      <Undo2 className="w-3.5 h-3.5 sm:w-3 sm:h-3" />
                       <span>Rückgängig</span>
                     </button>
                   )}
@@ -393,9 +435,9 @@ const AppShell: React.FC = () => {
                     type="button"
                     onClick={() => dismissToast(toast.id)}
                     aria-label="Hinweis schließen"
-                    className="w-6 h-6 rounded-full hover:bg-[#E6DDD1] text-[#6B6259] hover:text-[#1F1B18] flex items-center justify-center transition-colors cursor-pointer"
+                    className="w-11 h-11 sm:w-7 sm:h-7 rounded-full hover:bg-[#E6DDD1] text-[#6B6259] hover:text-[#1F1B18] flex items-center justify-center transition-colors cursor-pointer"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
                   </button>
                 </div>
               </div>

@@ -1,8 +1,19 @@
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { getStore } from '@netlify/blobs';
 import type { Context } from '@netlify/functions';
 
 const STORE_NAME = 'vacayly-trips-store';
 const TRIPS_KEY = 'all-trips';
+const ACCESS_HASH_SALT = 'vo-london-salt-2026-v1:';
+const DEFAULT_ACCESS_HASH = (
+  process.env.VACATION_ACCESS_HASH?.trim() ||
+  '8455f8ba650f8d8312b5d00b7314c8a4f5146f716813a2408eafcf8361e8c718'
+)
+  .trim()
+  .toLowerCase();
+const ACCESS_HASH_STORE_KEY = 'access-hash-v2';
+
+const utf8Encoder = new TextEncoder();
 
 interface StoredTrip {
   id: string;
@@ -16,23 +27,72 @@ function parseTimestampMs(iso?: string): number {
   return Number.isFinite(ms) ? ms : 0;
 }
 
+function extractAuthToken(req: Request): string {
+  const authHeader = req.headers.get('authorization')?.trim() || '';
+  if (/^bearer\s+/i.test(authHeader)) {
+    const bearerToken = authHeader.replace(/^bearer\s+/i, '').trim();
+    if (bearerToken) return bearerToken;
+  }
+  return req.headers.get('x-access-key')?.trim() || '';
+}
+
+function timingSafeEqualUtf8(a: string, b: string): boolean {
+  const bufA = utf8Encoder.encode(a);
+  const bufB = utf8Encoder.encode(b);
+  if (bufA.byteLength !== bufB.byteLength) return false;
+  return timingSafeEqual(bufA, bufB);
+}
+
+function unauthorizedResponse(headers: Record<string, string>): Response {
+  return new Response(JSON.stringify({ ok: false, error: 'Unauthorized' }), {
+    status: 401,
+    headers,
+  });
+}
+
 export default async (req: Request, _context: Context): Promise<Response> => {
   const headers = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Access-Key',
   };
 
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers });
   }
 
+  const token = extractAuthToken(req);
+  if (!token) {
+    return unauthorizedResponse(headers);
+  }
+
+  let store: ReturnType<typeof getStore> | null = null;
+  let expectedHash = DEFAULT_ACCESS_HASH;
   try {
-    const store = getStore(STORE_NAME);
+    store = getStore(STORE_NAME);
+    const storedHash = await store.get(ACCESS_HASH_STORE_KEY, { type: 'text' });
+    if (typeof storedHash === 'string' && storedHash.trim()) {
+      expectedHash = storedHash.trim().toLowerCase();
+    }
+  } catch {
+    // Fallback to DEFAULT_ACCESS_HASH if Netlify Blobs store is unavailable locally
+  }
+
+  const hashOfRaw = createHash('sha256')
+    .update(ACCESS_HASH_SALT + token, 'utf8')
+    .digest('hex');
+  const matchesRawHash = timingSafeEqualUtf8(hashOfRaw, expectedHash);
+
+  if (!matchesRawHash) {
+    return unauthorizedResponse(headers);
+  }
+
+  try {
+    const activeStore = store ?? getStore(STORE_NAME);
 
     if (req.method === 'GET') {
-      const existing = await store.get(TRIPS_KEY, { type: 'json' });
+      const existing = await activeStore.get(TRIPS_KEY, { type: 'json' });
       const trips: StoredTrip[] = Array.isArray(existing) ? existing : [];
       const url = new URL(req.url);
       const id = url.searchParams.get('id')?.trim();
@@ -50,8 +110,35 @@ export default async (req: Request, _context: Context): Promise<Response> => {
     }
 
     if (req.method === 'POST') {
-      const body = await req.json();
-      const incomingTrip = body?.trip as StoredTrip | undefined;
+      let body: { action?: unknown; newAccessHash?: unknown; trip?: StoredTrip };
+      try {
+        body = (await req.json()) as {
+          action?: unknown;
+          newAccessHash?: unknown;
+          trip?: StoredTrip;
+        };
+      } catch {
+        return new Response(
+          JSON.stringify({ ok: false, error: 'Invalid JSON request body' }),
+          { status: 400, headers }
+        );
+      }
+
+      if (body?.action === 'updateAccessHash') {
+        if (typeof body?.newAccessHash !== 'string' || !/^[0-9a-f]{64}$/i.test(body.newAccessHash)) {
+          return new Response(
+            JSON.stringify({ ok: false, error: 'Invalid newAccessHash' }),
+            { status: 400, headers }
+          );
+        }
+        await activeStore.set(ACCESS_HASH_STORE_KEY, body.newAccessHash.toLowerCase());
+        return new Response(JSON.stringify({ ok: true }), {
+          status: 200,
+          headers,
+        });
+      }
+
+      const incomingTrip = body?.trip;
       if (!incomingTrip || typeof incomingTrip.id !== 'string' || !incomingTrip.id.trim()) {
         return new Response(
           JSON.stringify({ error: 'Missing valid trip object in request body' }),
@@ -59,7 +146,7 @@ export default async (req: Request, _context: Context): Promise<Response> => {
         );
       }
 
-      const existing = await store.get(TRIPS_KEY, { type: 'json' });
+      const existing = await activeStore.get(TRIPS_KEY, { type: 'json' });
       const currentTrips: StoredTrip[] = Array.isArray(existing) ? existing : [];
 
       const normalizedIncoming: StoredTrip = {
@@ -87,7 +174,7 @@ export default async (req: Request, _context: Context): Promise<Response> => {
       }
 
       if (!staleIgnored) {
-        await store.setJSON(TRIPS_KEY, currentTrips);
+        await activeStore.setJSON(TRIPS_KEY, currentTrips);
       }
 
       return new Response(
@@ -122,12 +209,12 @@ export default async (req: Request, _context: Context): Promise<Response> => {
         );
       }
 
-      const existing = await store.get(TRIPS_KEY, { type: 'json' });
+      const existing = await activeStore.get(TRIPS_KEY, { type: 'json' });
       const currentTrips: StoredTrip[] = Array.isArray(existing) ? existing : [];
       const remaining = currentTrips.filter((t) => t.id !== id);
 
       if (remaining.length !== currentTrips.length) {
-        await store.setJSON(TRIPS_KEY, remaining);
+        await activeStore.setJSON(TRIPS_KEY, remaining);
       }
 
       return new Response(

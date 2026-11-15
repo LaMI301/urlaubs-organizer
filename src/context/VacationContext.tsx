@@ -27,8 +27,11 @@ import {
   TripInfo,
 } from '../types/vacation';
 import { DEMO_TRIP, createDemoTripClone } from '../data/demoTrip';
+import { LONDON_TRIP, createLondonTripClone } from '../data/londonTrip';
 import {
+  DEFAULT_ACCESS_HASH,
   clampCost,
+  computeAccessHash,
   formatCurrency,
   getSafeInitials,
   normalizeTimeSlot,
@@ -38,11 +41,14 @@ import {
 const STORAGE_KEY_TRIPS = 'vacayly_saved_trips_v1';
 const STORAGE_KEY_ACTIVE_ID = 'vacayly_active_trip_id_v1';
 const STORAGE_KEY_USER_ID = 'vacayly_current_user_id_v1';
-const STORAGE_KEY_ACCESS_KEY = 'vacation_organizer_access_key_v1';
-const STORAGE_KEY_UNLOCKED = 'vacation_organizer_unlocked_v1';
+const STORAGE_KEY_LONDON_DEFAULT = 'vacayly_london_default_v1';
+const STORAGE_KEY_ACCESS_HASH = 'vacation_organizer_access_hash_v2';
+const STORAGE_KEY_SESSION_TOKEN = 'vacation_organizer_session_token_v2';
+const STORAGE_KEY_UNLOCKED = 'vacation_organizer_unlocked_v2';
+const LEGACY_STORAGE_KEY_ACCESS_KEY = 'vacation_organizer_access_key_v1';
+const LEGACY_STORAGE_KEY_UNLOCKED = 'vacation_organizer_unlocked_v1';
 const STORAGE_KEY_WELCOME_DONE = 'vacation_organizer_welcome_done_v1';
 
-const DEFAULT_ACCESS_KEY = 'urlaub2026';
 const CURRENT_SCHEMA_VERSION = 2;
 const MAX_ACTIVITY_LOG = 40;
 
@@ -561,7 +567,6 @@ export interface VacationContextValue {
   isQuickAddOpen: boolean;
   isWelcomeOpen: boolean;
   isUnlocked: boolean;
-  accessKey: string;
   isSyncing: boolean;
   isLocalMode: boolean;
   mapOpen: boolean;
@@ -680,12 +685,84 @@ export interface VacationContextValue {
 
 const VacationContext = createContext<VacationContextValue | undefined>(undefined);
 
-function loadInitialAccessKey(): string {
+function loadInitialAccessHash(): string {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY_ACCESS_KEY)?.trim();
-    return stored || DEFAULT_ACCESS_KEY;
+    const stored = localStorage.getItem(STORAGE_KEY_ACCESS_HASH)?.trim();
+    return stored ? stored.toLowerCase() : DEFAULT_ACCESS_HASH.toLowerCase();
   } catch {
-    return DEFAULT_ACCESS_KEY;
+    return DEFAULT_ACCESS_HASH.toLowerCase();
+  }
+}
+
+interface InitialAuthState {
+  accessHash: string;
+  sessionToken: string;
+  isUnlocked: boolean;
+}
+
+function loadInitialAuthState(): InitialAuthState {
+  const initialHash = loadInitialAccessHash();
+  const hashKey = parseHashAccessKey();
+
+  if (hashKey && computeAccessHash(hashKey).toLowerCase() === initialHash) {
+    try {
+      localStorage.setItem(STORAGE_KEY_SESSION_TOKEN, hashKey);
+      localStorage.setItem(STORAGE_KEY_UNLOCKED, 'true');
+    } catch {
+      // ignore
+    }
+    return {
+      accessHash: initialHash,
+      sessionToken: hashKey,
+      isUnlocked: true,
+    };
+  }
+
+  try {
+    const storedToken = localStorage.getItem(STORAGE_KEY_SESSION_TOKEN)?.trim() || '';
+    if (storedToken && computeAccessHash(storedToken).toLowerCase() === initialHash) {
+      return {
+        accessHash: initialHash,
+        sessionToken: storedToken,
+        isUnlocked: true,
+      };
+    }
+  } catch {
+    // ignore
+  }
+
+  return {
+    accessHash: initialHash,
+    sessionToken: '',
+    isUnlocked: false,
+  };
+}
+
+function hasStoredLondonTrip(): boolean {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_TRIPS);
+    if (!raw) return false;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.some((t) => t && t.id === LONDON_TRIP.id);
+  } catch {
+    return false;
+  }
+}
+
+function loadInitialActiveTripId(): string {
+  try {
+    const storedActive = localStorage.getItem(STORAGE_KEY_ACTIVE_ID)?.trim();
+    const migrated = localStorage.getItem(STORAGE_KEY_LONDON_DEFAULT);
+    if (!migrated) {
+      const hadLondon = hasStoredLondonTrip();
+      localStorage.setItem(STORAGE_KEY_LONDON_DEFAULT, 'true');
+      if (!storedActive || (storedActive === DEMO_TRIP.id && !hadLondon)) {
+        return LONDON_TRIP.id;
+      }
+    }
+    return storedActive || LONDON_TRIP.id;
+  } catch {
+    return LONDON_TRIP.id;
   }
 }
 
@@ -699,53 +776,47 @@ function loadInitialSavedTrips(): Trip[] {
           .map((item) => normalizeTrip(item))
           .filter((item): item is Trip => item !== null);
         if (normalized.length > 0) {
-          const hasDemo = normalized.some((t) => t.id === DEMO_TRIP.id || t.isDemo);
-          return hasDemo ? normalized : [createDemoTripClone(), ...normalized];
+          let result = normalized;
+          const hasDemo = result.some((t) => t.id === DEMO_TRIP.id || t.isDemo);
+          if (!hasDemo) {
+            result = [...result, createDemoTripClone()];
+          }
+          const hasLondon = result.some((t) => t.id === LONDON_TRIP.id);
+          if (!hasLondon) {
+            result = [createLondonTripClone(), ...result];
+          }
+          return result;
         }
       }
     }
   } catch {
     // ignore localStorage read errors
   }
-  return [createDemoTripClone()];
+  return [createLondonTripClone(), createDemoTripClone()];
 }
 
 export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [accessKey, setAccessKeyState] = useState<string>(() => loadInitialAccessKey());
+  const [initialAuth] = useState<InitialAuthState>(() => loadInitialAuthState());
+  const [accessHash, setAccessHash] = useState<string>(initialAuth.accessHash);
+  const [sessionToken, setSessionToken] = useState<string>(initialAuth.sessionToken);
+  const [isUnlocked, setIsUnlocked] = useState<boolean>(initialAuth.isUnlocked);
 
-  const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
-    try {
-      if (localStorage.getItem(STORAGE_KEY_UNLOCKED) === 'true') {
-        return true;
-      }
-    } catch {
-      // ignore
-    }
-    const hashKey = parseHashAccessKey();
-    const initialKey = loadInitialAccessKey();
-    if (hashKey && hashKey === initialKey) {
-      return true;
-    }
-    return false;
-  });
+  const sessionTokenRef = useRef<string>(sessionToken);
+  sessionTokenRef.current = sessionToken;
 
   const [savedTrips, setSavedTrips] = useState<Trip[]>(() => loadInitialSavedTrips());
 
-  const [activeTripId, setActiveTripId] = useState<string>(() => {
-    try {
-      return localStorage.getItem(STORAGE_KEY_ACTIVE_ID) || DEMO_TRIP.id;
-    } catch {
-      return DEMO_TRIP.id;
-    }
-  });
+  const [activeTripId, setActiveTripId] = useState<string>(() =>
+    loadInitialActiveTripId()
+  );
 
   const trip = useMemo(
     () =>
       savedTrips.find((t) => t.id === activeTripId) ||
       savedTrips[0] ||
-      createDemoTripClone(),
+      createLondonTripClone(),
     [savedTrips, activeTripId]
   );
 
@@ -867,13 +938,23 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, []);
 
-  // Clean #access=... hash on mount & persist auto-unlocked status
+  // Clean up legacy v1 auth keys on mount & handle #access=... invite hash
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    try {
+      localStorage.removeItem(LEGACY_STORAGE_KEY_ACCESS_KEY);
+      localStorage.removeItem(LEGACY_STORAGE_KEY_UNLOCKED);
+    } catch {
+      // ignore
+    }
     const hashKey = parseHashAccessKey();
     if (hashKey !== null) {
-      if (isUnlocked) {
+      if (isUnlocked && sessionTokenRef.current) {
         try {
+          localStorage.setItem(
+            STORAGE_KEY_SESSION_TOKEN,
+            sessionTokenRef.current
+          );
           localStorage.setItem(STORAGE_KEY_UNLOCKED, 'true');
         } catch {
           // ignore
@@ -901,9 +982,12 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({
     (passwordInput: string): boolean => {
       const cleaned = passwordInput.trim();
       if (!cleaned) return false;
-      if (cleaned === accessKey) {
+      if (computeAccessHash(cleaned).toLowerCase() === accessHash) {
+        sessionTokenRef.current = cleaned;
+        setSessionToken(cleaned);
         setIsUnlocked(true);
         try {
+          localStorage.setItem(STORAGE_KEY_SESSION_TOKEN, cleaned);
           localStorage.setItem(STORAGE_KEY_UNLOCKED, 'true');
         } catch {
           // ignore
@@ -912,12 +996,15 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({
       }
       return false;
     },
-    [accessKey]
+    [accessHash]
   );
 
   const lockApp = useCallback(() => {
+    sessionTokenRef.current = '';
+    setSessionToken('');
     setIsUnlocked(false);
     try {
+      localStorage.removeItem(STORAGE_KEY_SESSION_TOKEN);
       localStorage.removeItem(STORAGE_KEY_UNLOCKED);
     } catch {
       // ignore
@@ -931,23 +1018,59 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({
         showToast('Zugangscode darf nicht leer sein', 'warning');
         return;
       }
-      setAccessKeyState(cleaned);
+      const prevToken = sessionTokenRef.current;
+      const nextHash = computeAccessHash(cleaned).toLowerCase();
+      sessionTokenRef.current = cleaned;
+      setAccessHash(nextHash);
+      setSessionToken(cleaned);
       try {
-        localStorage.setItem(STORAGE_KEY_ACCESS_KEY, cleaned);
+        localStorage.setItem(STORAGE_KEY_ACCESS_HASH, nextHash);
+        localStorage.setItem(STORAGE_KEY_SESSION_TOKEN, cleaned);
+        localStorage.setItem(STORAGE_KEY_UNLOCKED, 'true');
       } catch {
         // ignore
       }
+      if (!isLocalDev) {
+        fetch('/api/trips', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${prevToken || ''}`,
+          },
+          body: JSON.stringify({
+            action: 'updateAccessHash',
+            newAccessHash: nextHash,
+          }),
+        })
+          .then((res) => {
+            if (res.status === 401) {
+              showToast(
+                'Cloud-Autorisierung fehlgeschlagen – bitte erneut anmelden',
+                'warning'
+              );
+              lockApp();
+            } else if (!res.ok) {
+              showToast(
+                'Passwort lokal aktualisiert, Cloud-Sync fehlgeschlagen',
+                'warning'
+              );
+            }
+          })
+          .catch(() => {
+            // Offline - localStorage remains updated
+          });
+      }
       showToast('Zugangscode aktualisiert', 'success');
     },
-    [showToast]
+    [lockApp, showToast]
   );
 
   const getInviteUrl = useCallback((): string => {
     if (typeof window === 'undefined') return '';
-    return `${window.location.origin}${window.location.pathname}#access=${encodeURIComponent(
-      accessKey
-    )}`;
-  }, [accessKey]);
+    const base = `${window.location.origin}${window.location.pathname}`;
+    if (!sessionToken) return base;
+    return `${base}#access=${encodeURIComponent(sessionToken)}`;
+  }, [sessionToken]);
 
   // Persist savedTrips safely to localStorage
   useEffect(() => {
@@ -995,8 +1118,22 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         const res = await fetch('/api/trips', {
           method: 'GET',
-          headers: { Accept: 'application/json' },
+          headers: {
+            Accept: 'application/json',
+            Authorization: 'Bearer ' + (sessionTokenRef.current || ''),
+          },
         });
+        if (res.status === 401) {
+          hasLoadedRemoteRef.current = true;
+          if (isMounted) {
+            showToast(
+              'Sitzung nicht autorisiert – bitte Passwort erneut eingeben',
+              'warning'
+            );
+            lockApp();
+          }
+          return;
+        }
         if (!res.ok) {
           hasLoadedRemoteRef.current = true;
           return;
@@ -1052,7 +1189,7 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({
     return () => {
       isMounted = false;
     };
-  }, [isUnlocked]);
+  }, [isUnlocked, lockApp, showToast]);
 
   const syncTripToCloud = useCallback(
     async (updatedTrip: Trip) => {
@@ -1064,9 +1201,20 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         const res = await fetch('/api/trips', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + (sessionTokenRef.current || ''),
+          },
           body: JSON.stringify({ trip: updatedTrip }),
         });
+        if (res.status === 401) {
+          showToast(
+            'Cloud-Sync nicht autorisiert – bitte Passwort erneut eingeben',
+            'warning'
+          );
+          lockApp();
+          return;
+        }
         if (!res.ok) {
           showToast('Cloud-Sync fehlgeschlagen (lokal gespeichert)', 'warning');
           return;
@@ -1086,7 +1234,7 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({
         }, 300);
       }
     },
-    [isUnlocked, showToast]
+    [isUnlocked, lockApp, showToast]
   );
 
   // Debounced post-commit cloud sync (NO side effects inside setSavedTrips updater!)
@@ -1407,7 +1555,14 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({
       setActiveTripId(target.id);
       setSelectedDayState(1);
       setSelectedActivityId(target.activities[0]?.id || null);
-      setCurrentUserId(target.travelers[0]?.id || '');
+      const keepExistingUser = target.travelers.some(
+        (t) => t.id === currentUserRef.current.id
+      );
+      setCurrentUserId(
+        keepExistingUser
+          ? currentUserRef.current.id
+          : target.travelers[0]?.id || ''
+      );
     },
     [savedTrips]
   );
@@ -1428,7 +1583,9 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (activeTripRef.current.id === tripId) {
         const nextTrip =
-          remaining.find((t) => t.id === DEMO_TRIP.id || t.isDemo) || remaining[0];
+          remaining.find((t) => t.id === LONDON_TRIP.id) ||
+          remaining.find((t) => t.id === DEMO_TRIP.id || t.isDemo) ||
+          remaining[0];
         if (nextTrip) {
           setActiveTripId(nextTrip.id);
           setSelectedDayState(1);
@@ -1440,13 +1597,26 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({
       if (isUnlocked && !isLocalDev) {
         fetch(`/api/trips?id=${encodeURIComponent(tripId)}`, {
           method: 'DELETE',
-        }).catch(() => {
-          // Offline fallback
-        });
+          headers: {
+            Authorization: 'Bearer ' + (sessionTokenRef.current || ''),
+          },
+        })
+          .then((res) => {
+            if (res.status === 401) {
+              showToast(
+                'Sitzung nicht autorisiert – bitte Passwort erneut eingeben',
+                'warning'
+              );
+              lockApp();
+            }
+          })
+          .catch(() => {
+            // Offline fallback
+          });
       }
       showToast(`Urlaub „${target.title}“ gelöscht`, 'info');
     },
-    [savedTrips, isUnlocked, showToast]
+    [savedTrips, isUnlocked, lockApp, showToast]
   );
 
   const updateTripInfo = useCallback(
@@ -2612,7 +2782,6 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({
       isQuickAddOpen,
       isWelcomeOpen,
       isUnlocked,
-      accessKey,
       isSyncing,
       isLocalMode: isLocalDev,
       mapOpen,
@@ -2688,7 +2857,6 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({
       isQuickAddOpen,
       isWelcomeOpen,
       isUnlocked,
-      accessKey,
       isSyncing,
       mapOpen,
       mapFocusTarget,

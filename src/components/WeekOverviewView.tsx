@@ -104,7 +104,9 @@ export const WeekOverviewView: React.FC = () => {
     scheduleIdeaToDay,
   } = useVacation();
 
-  const [spanMode, setSpanMode] = useState<'3' | '7' | 'all'>('7');
+  const [spanMode, setSpanMode] = useState<'3' | '7' | 'all'>(() =>
+    typeof window !== 'undefined' && window.innerWidth < 768 ? '3' : '7'
+  );
   const [typeFilter, setTypeFilter] = useState<'all' | 'activities' | 'meals'>('all');
   const [pageOffset, setPageOffset] = useState(0);
   const [draggingActivityId, setDraggingActivityId] = useState<string | null>(null);
@@ -183,7 +185,7 @@ export const WeekOverviewView: React.FC = () => {
 
         <div className="flex flex-wrap items-center gap-2 min-w-0">
           {/* Span Selector */}
-          <div className="inline-flex items-center bg-[#FAF7F2] p-1 rounded-full border border-[#E6DDD1]">
+          <div className="inline-flex flex-wrap items-center bg-[#FAF7F2] p-1 rounded-2xl sm:rounded-full border border-[#E6DDD1] max-w-full">
             {[
               { id: '3', label: '3 Tage' },
               { id: '7', label: 'Woche (7T)' },
@@ -195,7 +197,7 @@ export const WeekOverviewView: React.FC = () => {
                 onClick={() => {
                   setSpanMode(opt.id as '3' | '7' | 'all');
                 }}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                className={`px-3 min-h-[44px] sm:min-h-[38px] rounded-full text-xs font-bold transition-all cursor-pointer inline-flex items-center justify-center ${
                   spanMode === opt.id
                     ? 'bg-[#C85A38] text-white shadow-sm'
                     : 'text-[#6B6259] hover:text-[#1F1B18]'
@@ -207,7 +209,7 @@ export const WeekOverviewView: React.FC = () => {
           </div>
 
           {/* Type Filter */}
-          <div className="inline-flex items-center bg-[#FAF7F2] p-1 rounded-full border border-[#E6DDD1]">
+          <div className="inline-flex flex-wrap items-center bg-[#FAF7F2] p-1 rounded-2xl sm:rounded-full border border-[#E6DDD1] max-w-full">
             {[
               { id: 'all', label: 'Alles' },
               { id: 'activities', label: 'Aktivitäten' },
@@ -219,7 +221,7 @@ export const WeekOverviewView: React.FC = () => {
                 onClick={() =>
                   setTypeFilter(opt.id as 'all' | 'activities' | 'meals')
                 }
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                className={`px-3 min-h-[44px] sm:min-h-[38px] rounded-full text-xs font-bold transition-all cursor-pointer inline-flex items-center justify-center ${
                   typeFilter === opt.id
                     ? 'bg-[#F3ECE1] text-[#1F1B18] border border-[#E6DDD1]'
                     : 'text-[#6B6259] hover:text-[#1F1B18]'
@@ -232,13 +234,13 @@ export const WeekOverviewView: React.FC = () => {
 
           {/* Pagination with Day-Range Indicator */}
           {maxPages > 1 && (
-            <div className="inline-flex items-center gap-1.5 bg-[#FAF7F2] px-2 py-1 rounded-full border border-[#E6DDD1]">
+            <div className="inline-flex items-center gap-1.5 bg-[#FAF7F2] px-1.5 py-1 rounded-full border border-[#E6DDD1]">
               <button
                 type="button"
                 onClick={() => setPageOffset((p) => Math.max(0, p - 1))}
                 disabled={pageOffset === 0}
                 aria-label="Vorherige Tage"
-                className="w-7 h-7 rounded-full bg-white hover:bg-[#C85A38]/12 text-[#1F1B18] border border-[#E6DDD1] flex items-center justify-center disabled:opacity-35 cursor-pointer"
+                className="w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-white hover:bg-[#C85A38]/12 text-[#1F1B18] border border-[#E6DDD1] flex items-center justify-center disabled:opacity-35 cursor-pointer"
                 title="Vorherige Tage"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -251,7 +253,7 @@ export const WeekOverviewView: React.FC = () => {
                 onClick={() => setPageOffset((p) => Math.min(maxPages - 1, p + 1))}
                 disabled={pageOffset >= maxPages - 1}
                 aria-label="Nächste Tage"
-                className="w-7 h-7 rounded-full bg-white hover:bg-[#C85A38]/12 text-[#1F1B18] border border-[#E6DDD1] flex items-center justify-center disabled:opacity-35 cursor-pointer"
+                className="w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-white hover:bg-[#C85A38]/12 text-[#1F1B18] border border-[#E6DDD1] flex items-center justify-center disabled:opacity-35 cursor-pointer"
                 title="Nächste Tage"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -261,9 +263,66 @@ export const WeekOverviewView: React.FC = () => {
         </div>
       </div>
 
+      {/* Compact Horizontal Day-Jump Pill Strip */}
+      {safeTotalDays > 1 && (
+        <div
+          className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 min-w-0 w-full"
+          aria-label="Schnellauswahl Reisetag"
+        >
+          {Array.from({ length: safeTotalDays }, (_, idx) => idx + 1).map((dayNum) => {
+            const isSelected = dayNum === selectedDay;
+            const isVisible = visibleDays.includes(dayNum);
+            const dayCount =
+              (typeFilter === 'meals'
+                ? 0
+                : trip.activities.filter((a) => a.dayNumber === dayNum).length) +
+              (typeFilter === 'activities'
+                ? 0
+                : trip.meals.filter((m) => m.dayNumber === dayNum).length);
+
+            return (
+              <button
+                key={dayNum}
+                type="button"
+                onClick={() => {
+                  setSelectedDay(dayNum);
+                  if (spanMode === 'all') {
+                    window.setTimeout(() => {
+                      document
+                        .getElementById(`week-day-${dayNum}`)
+                        ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 30);
+                  }
+                }}
+                className={`min-h-[44px] px-3.5 rounded-full text-xs font-bold transition-all shrink-0 inline-flex items-center gap-1.5 border cursor-pointer ${
+                  isSelected
+                    ? 'bg-[#C85A38] text-white border-[#C85A38] shadow-sm'
+                    : isVisible
+                    ? 'bg-[#C85A38]/12 text-[#A34224] border-[#C85A38]/30 hover:bg-[#C85A38]/20'
+                    : 'surface-glass text-[#6B6259] hover:text-[#1F1B18] hover:bg-[#F3ECE1]'
+                }`}
+              >
+                <span className="font-mono tabular-nums">T{dayNum}</span>
+                {dayCount > 0 && (
+                  <span
+                    className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono tabular-nums ${
+                      isSelected
+                        ? 'bg-white/25 text-white'
+                        : 'bg-[#F3ECE1] text-[#1F1B18]'
+                    }`}
+                  >
+                    {dayCount}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* Multi-Day Columns Grid (responsive without crushing on lg: 1024px or overflowing 390px) */}
       <div
-        className={`grid gap-4 min-w-0 w-full ${
+        className={`grid gap-4 min-w-0 w-full cq-cols-1-narrow ${
           spanMode === '3'
             ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3'
             : 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4'
@@ -328,6 +387,7 @@ export const WeekOverviewView: React.FC = () => {
           return (
             <div
               key={day}
+              id={`week-day-${day}`}
               onDragOver={(e) => {
                 e.preventDefault();
                 if (e.dataTransfer) {
@@ -399,11 +459,11 @@ export const WeekOverviewView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setSelectedDay(day)}
-                    className="text-left group cursor-pointer min-w-0 flex-1"
+                    className="text-left group cursor-pointer min-w-0 flex-1 min-h-[44px] flex items-center"
                   >
                     <div className="flex items-center gap-2 flex-wrap min-w-0">
                       <span
-                        className={`text-xs font-black px-2.5 py-0.5 rounded-full font-mono tabular-nums shrink-0 ${
+                        className={`text-xs font-black px-2.5 py-1 rounded-full font-mono tabular-nums shrink-0 ${
                           isSelectedDay
                             ? 'bg-[#C85A38] text-white'
                             : 'bg-[#C85A38]/12 text-[#A34224] border border-[#C85A38]/30'
@@ -580,15 +640,15 @@ export const WeekOverviewView: React.FC = () => {
                           {(item.location ||
                             (typeof item.lat === 'number' &&
                               typeof item.lng === 'number')) && (
-                            <div className="flex items-center justify-between gap-1.5 text-[11px] text-[#6B6259] min-w-0">
+                            <div className="flex flex-wrap items-center justify-between gap-1.5 text-[11px] text-[#6B6259] min-w-0">
                               <span className="inline-flex items-center gap-1 min-w-0 flex-1">
-                                <MapPin className="w-3 h-3 text-[#2A7B88] shrink-0" />
+                                <MapPin className="w-3.5 h-3.5 text-[#2A7B88] shrink-0" />
                                 <span className="truncate break-words">
                                   {item.location || trip.destination}
                                 </span>
                               </span>
 
-                              <div className="flex items-center gap-1 shrink-0">
+                              <div className="flex items-center gap-1.5 shrink-0">
                                 <button
                                   type="button"
                                   onClick={() =>
@@ -605,9 +665,9 @@ export const WeekOverviewView: React.FC = () => {
                                   }
                                   title="Auf Karte zeigen"
                                   aria-label={`${item.title} auf Karte zeigen`}
-                                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[#2A7B88]/12 hover:bg-[#2A7B88]/20 text-[#1F5E68] border border-[#2A7B88]/30 text-[10px] font-bold transition-colors cursor-pointer"
+                                  className="inline-flex items-center gap-1.5 px-3 min-h-[44px] sm:min-h-[40px] rounded-xl bg-[#2A7B88]/12 hover:bg-[#2A7B88]/20 text-[#1F5E68] border border-[#2A7B88]/30 text-[11px] font-bold transition-colors cursor-pointer"
                                 >
-                                  <Navigation className="w-2.5 h-2.5" />
+                                  <Navigation className="w-3.5 h-3.5" />
                                   <span>Karte</span>
                                 </button>
 
@@ -619,11 +679,11 @@ export const WeekOverviewView: React.FC = () => {
                                       href={mapsUrl}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="inline-flex items-center justify-center w-5 h-5 rounded-md bg-white hover:bg-[#F3ECE1] text-[#6B6259] hover:text-[#1F1B18] border border-[#E6DDD1] transition-colors"
+                                      className="inline-flex items-center justify-center w-11 h-11 sm:w-10 sm:h-10 rounded-xl bg-white hover:bg-[#F3ECE1] text-[#6B6259] hover:text-[#1F1B18] border border-[#E6DDD1] transition-colors"
                                       title="In Google Maps öffnen"
                                       aria-label={`${item.title} in Google Maps öffnen`}
                                     >
-                                      <ExternalLink className="w-2.5 h-2.5" />
+                                      <ExternalLink className="w-4 h-4" />
                                     </a>
                                   )}
                               </div>
@@ -631,7 +691,7 @@ export const WeekOverviewView: React.FC = () => {
                           )}
 
                           {/* Bottom Row: Cost + Touch Move Selector + Vote */}
-                          <div className="flex items-center justify-between gap-2 pt-1 min-w-0">
+                          <div className="flex flex-wrap items-center justify-between gap-2 pt-1 min-w-0">
                             <span className="text-[11px] font-bold text-[#4B593E] font-mono tabular-nums truncate">
                               {item.cost > 0
                                 ? `~${formatCurrency(item.cost, trip.currency)}`
@@ -649,13 +709,13 @@ export const WeekOverviewView: React.FC = () => {
                                   }
                                   aria-expanded={isMoveMenuOpen}
                                   title="Auf anderen Tag verschieben"
-                                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold transition-colors cursor-pointer border ${
+                                  className={`inline-flex items-center gap-1.5 px-3 min-h-[44px] sm:min-h-[40px] rounded-full text-[11px] font-bold transition-colors cursor-pointer border ${
                                     isMoveMenuOpen
                                       ? 'bg-[#C85A38]/12 text-[#A34224] border-[#C85A38]/35'
                                       : 'bg-white hover:bg-[#F3ECE1] text-[#6B6259] border-[#E6DDD1]'
                                   }`}
                                 >
-                                  <ArrowRightLeft className="w-2.5 h-2.5" />
+                                  <ArrowRightLeft className="w-3.5 h-3.5" />
                                   <span>Verschieben</span>
                                 </button>
                               )}
@@ -670,13 +730,13 @@ export const WeekOverviewView: React.FC = () => {
                                   }
                                 }}
                                 aria-label={`Stimmen für ${item.title} (${item.votes.length})`}
-                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer font-mono tabular-nums border ${
+                                className={`inline-flex items-center gap-1.5 px-3 min-h-[44px] sm:min-h-[40px] rounded-full text-[11px] font-bold transition-all cursor-pointer font-mono tabular-nums border ${
                                   hasVoted
                                     ? 'bg-[#C85A38]/12 text-[#A34224] border-[#C85A38]/35'
                                     : 'bg-white hover:bg-[#F3ECE1] text-[#6B6259] border-[#E6DDD1]'
                                 }`}
                               >
-                                <ThumbsUp className="w-2.5 h-2.5" />
+                                <ThumbsUp className="w-3.5 h-3.5" />
                                 <span>{item.votes.length}</span>
                               </button>
                             </div>
@@ -684,44 +744,58 @@ export const WeekOverviewView: React.FC = () => {
 
                           {/* Touch / Mobile Day Move Picker Drawer */}
                           {isMoveMenuOpen && item.kind === 'activity' && (
-                            <div className="pt-2 mt-1 border-t border-[#E6DDD1] space-y-1.5 animate-fade-in">
+                            <div className="pt-2.5 mt-1 border-t border-[#E6DDD1] space-y-2 animate-fade-in">
                               <div className="flex items-center justify-between gap-2">
-                                <span className="text-[10px] font-bold text-[#A34224] uppercase tracking-wider">
+                                <span className="text-[11px] font-bold text-[#A34224] uppercase tracking-wider">
                                   Auf Tag verschieben:
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => setMovingActivityId(null)}
                                   aria-label="Verschieben-Auswahl schließen"
-                                  className="text-[#8C8277] hover:text-[#1F1B18] cursor-pointer"
+                                  className="w-10 h-10 rounded-full text-[#8C8277] hover:text-[#1F1B18] hover:bg-[#F3ECE1] flex items-center justify-center cursor-pointer"
                                 >
-                                  <X className="w-3 h-3" />
+                                  <X className="w-4 h-4" />
                                 </button>
                               </div>
-                              <div className="flex flex-wrap gap-1">
-                                {Array.from(
-                                  { length: safeTotalDays },
-                                  (_, idx) => idx + 1
-                                ).map((targetDay) => {
-                                  const isCurrent = targetDay === day;
-                                  return (
-                                    <button
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <button
+                                  type="button"
+                                  disabled={day <= 1}
+                                  onClick={() => handleMoveActivityToDay(item.id, day - 1)}
+                                  className="min-h-[44px] px-3 rounded-xl text-xs font-bold bg-white hover:bg-[#C85A38] hover:text-white text-[#1F1B18] border border-[#E6DDD1] disabled:opacity-40 disabled:pointer-events-none cursor-pointer transition-colors"
+                                >
+                                  −1 Tag
+                                </button>
+                                <select
+                                  value={day}
+                                  onChange={(e) =>
+                                    handleMoveActivityToDay(item.id, Number(e.target.value))
+                                  }
+                                  aria-label={`Zieltag für ${item.title}`}
+                                  className="surface-input flex-1 min-w-[110px] min-h-[44px] px-2.5 rounded-xl text-xs font-bold font-mono tabular-nums [color-scheme:light]"
+                                >
+                                  {Array.from(
+                                    { length: safeTotalDays },
+                                    (_, idx) => idx + 1
+                                  ).map((targetDay) => (
+                                    <option
                                       key={targetDay}
-                                      type="button"
-                                      disabled={isCurrent}
-                                      onClick={() =>
-                                        handleMoveActivityToDay(item.id, targetDay)
-                                      }
-                                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold font-mono tabular-nums transition-colors ${
-                                        isCurrent
-                                          ? 'bg-[#C85A38]/12 text-[#A34224] border border-[#C85A38]/30 cursor-default'
-                                          : 'bg-white hover:bg-[#C85A38] hover:text-white text-[#1F1B18] border border-[#E6DDD1] cursor-pointer'
-                                      }`}
+                                      value={targetDay}
+                                      className="bg-white text-[#1F1B18]"
                                     >
-                                      T{targetDay}
-                                    </button>
-                                  );
-                                })}
+                                      Tag {targetDay} ({formatTripDayDate(trip.startDate, targetDay)})
+                                    </option>
+                                  ))}
+                                </select>
+                                <button
+                                  type="button"
+                                  disabled={day >= safeTotalDays}
+                                  onClick={() => handleMoveActivityToDay(item.id, day + 1)}
+                                  className="min-h-[44px] px-3 rounded-xl text-xs font-bold bg-white hover:bg-[#C85A38] hover:text-white text-[#1F1B18] border border-[#E6DDD1] disabled:opacity-40 disabled:pointer-events-none cursor-pointer transition-colors"
+                                >
+                                  +1 Tag
+                                </button>
                               </div>
                             </div>
                           )}
@@ -733,16 +807,16 @@ export const WeekOverviewView: React.FC = () => {
               </div>
 
               {/* Footer: Quick Add + Contextual Details Jump */}
-              <div className="pt-2.5 flex items-center justify-between gap-2 border-t border-[#E6DDD1]">
+              <div className="pt-2 flex items-center justify-between gap-2 border-t border-[#E6DDD1]">
                 <button
                   type="button"
                   onClick={() => {
                     setSelectedDay(day);
                     setIsQuickAddOpen(true);
                   }}
-                  className="inline-flex items-center gap-1 text-[11px] font-bold text-[#6B6259] hover:text-[#A34224] transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 min-h-[44px] sm:min-h-[40px] px-2.5 rounded-xl text-xs font-bold text-[#6B6259] hover:text-[#A34224] hover:bg-[#F3ECE1]/60 transition-colors cursor-pointer"
                 >
-                  <Plus className="w-3.5 h-3.5 text-[#C85A38]" />
+                  <Plus className="w-4 h-4 text-[#C85A38]" />
                   <span>Termin</span>
                 </button>
 
@@ -757,7 +831,7 @@ export const WeekOverviewView: React.FC = () => {
                       ? 'Essensplan für diesen Tag öffnen'
                       : 'Tagesplan für diesen Tag öffnen'
                   }
-                  className="text-[11px] font-bold text-[#A34224] hover:text-[#C85A38] transition-colors cursor-pointer"
+                  className="inline-flex items-center min-h-[44px] sm:min-h-[40px] px-2.5 rounded-xl text-xs font-bold text-[#A34224] hover:text-[#C85A38] hover:bg-[#C85A38]/8 transition-colors cursor-pointer"
                 >
                   Details →
                 </button>

@@ -417,7 +417,7 @@ export const PollsView: React.FC = () => {
             <button
               type="button"
               onClick={() => startEdit(poll)}
-              className="p-1.5 rounded-lg text-[#8C8277] hover:text-[#C85A38] hover:bg-[#F3ECE1] transition-colors"
+              className="min-w-[44px] min-h-[44px] rounded-xl text-[#8C8277] hover:text-[#C85A38] hover:bg-[#F3ECE1] flex items-center justify-center transition-colors"
               title="Abstimmung bearbeiten"
               aria-label={`Abstimmung „${poll.question}“ bearbeiten`}
             >
@@ -426,7 +426,7 @@ export const PollsView: React.FC = () => {
             <button
               type="button"
               onClick={() => togglePollClosed(poll.id)}
-              className="p-1.5 rounded-lg text-[#8C8277] hover:text-[#9E5A14] hover:bg-[#F3ECE1] transition-colors"
+              className="min-w-[44px] min-h-[44px] rounded-xl text-[#8C8277] hover:text-[#9E5A14] hover:bg-[#F3ECE1] flex items-center justify-center transition-colors"
               title={poll.isClosed ? 'Abstimmung wieder öffnen' : 'Abstimmung schließen'}
               aria-label={poll.isClosed ? 'Abstimmung öffnen' : 'Abstimmung schließen'}
             >
@@ -435,7 +435,7 @@ export const PollsView: React.FC = () => {
             <button
               type="button"
               onClick={() => deletePoll(poll.id)}
-              className="p-1.5 rounded-lg text-[#8C8277] hover:text-rose-700 hover:bg-rose-600/12 transition-colors"
+              className="min-w-[44px] min-h-[44px] rounded-xl text-[#8C8277] hover:text-rose-700 hover:bg-rose-600/12 flex items-center justify-center transition-colors"
               title="Abstimmung löschen"
               aria-label={`Abstimmung „${poll.question}“ löschen`}
             >
@@ -480,7 +480,7 @@ export const PollsView: React.FC = () => {
                   type="button"
                   disabled={Boolean(poll.isClosed)}
                   onClick={() => togglePollVote(poll.id, opt.id)}
-                  className={`w-full text-left relative overflow-hidden rounded-xl border p-3 transition-all ${
+                  className={`w-full min-h-[44px] text-left relative overflow-hidden rounded-xl border p-3 transition-all ${
                     poll.isClosed ? 'cursor-default' : 'cursor-pointer hover:border-[#C85A38]/40'
                   } ${
                     userVoted
@@ -502,8 +502,8 @@ export const PollsView: React.FC = () => {
                     style={{ width: `${pct}%` }}
                   />
 
-                  <div className="relative flex items-start justify-between gap-2">
-                    <div className="flex items-start gap-2.5 min-w-0">
+                  <div className="relative flex flex-col min-[420px]:flex-row min-[420px]:items-start justify-between gap-2.5 min-w-0">
+                    <div className="flex items-start gap-2.5 min-w-0 flex-1">
                       <span
                         className={`mt-0.5 shrink-0 ${
                           userVoted ? 'text-[#C85A38]' : 'text-[#8C8277]'
@@ -521,7 +521,7 @@ export const PollsView: React.FC = () => {
                           <Circle className="w-4 h-4" />
                         )}
                       </span>
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-1.5">
                           <span className="text-sm font-semibold text-[#1F1B18] break-words">
                             {opt.text}
@@ -544,7 +544,7 @@ export const PollsView: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center justify-between min-[420px]:justify-end gap-2 shrink-0 pl-6 min-[420px]:pl-0">
                       <div className="flex -space-x-1">
                         {opt.votes.slice(0, 5).map((vid) => {
                           const voter = travelerById.get(vid);
@@ -581,17 +581,17 @@ export const PollsView: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => handlePromoteOption(poll, opt.id, 'meal')}
-                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-semibold bg-[#D9822B]/14 hover:bg-[#D9822B]/22 text-[#9E5A14] border border-[#D9822B]/30 transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3 min-h-[44px] rounded-xl text-xs font-semibold bg-[#D9822B]/14 hover:bg-[#D9822B]/22 text-[#9E5A14] border border-[#D9822B]/30 transition-colors"
                       >
-                        <Utensils className="w-3 h-3" /> In Essensplan
+                        <Utensils className="w-3.5 h-3.5" /> In Essensplan
                       </button>
                     ) : (
                       <button
                         type="button"
                         onClick={() => handlePromoteOption(poll, opt.id, 'activity')}
-                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-semibold bg-[#2A7B88]/12 hover:bg-[#2A7B88]/20 text-[#1F5E68] border border-[#2A7B88]/30 transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3 min-h-[44px] rounded-xl text-xs font-semibold bg-[#2A7B88]/12 hover:bg-[#2A7B88]/20 text-[#1F5E68] border border-[#2A7B88]/30 transition-colors"
                       >
-                        <ArrowRight className="w-3 h-3" /> In Tagesplan
+                        <ArrowRight className="w-3.5 h-3.5" /> In Tagesplan
                       </button>
                     )}
                   </div>
@@ -603,28 +603,28 @@ export const PollsView: React.FC = () => {
 
         {/* Winner promotion footer */}
         {clearWinner && (
-          <div className="mt-4 pt-3 border-t border-[#E6DDD1] flex flex-wrap items-center justify-between gap-2">
-            <span className="text-xs text-[#6B6259] truncate max-w-[60%]">
+          <div className="mt-4 pt-3 border-t border-[#E6DDD1] flex flex-wrap items-center justify-between gap-2.5">
+            <span className="text-xs text-[#6B6259] min-w-0 flex-1 break-words">
               Führend: <strong className="text-[#1F1B18]">{clearWinner.text}</strong>
             </span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
               {poll.category === 'food' ? (
                 <button
                   type="button"
                   onClick={() => handlePromoteOption(poll, clearWinner.id, 'meal')}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#D9822B]/14 hover:bg-[#D9822B]/22 text-[#9E5A14] border border-[#D9822B]/30 transition-colors"
+                  className="inline-flex items-center justify-center gap-1.5 px-3.5 min-h-[44px] w-full sm:w-auto rounded-xl text-xs font-semibold bg-[#D9822B]/14 hover:bg-[#D9822B]/22 text-[#9E5A14] border border-[#D9822B]/30 transition-colors"
                 >
-                  <Utensils className="w-3.5 h-3.5" />
-                  Gewinner in Essensplan übernehmen
+                  <Utensils className="w-3.5 h-3.5 shrink-0" />
+                  <span>Gewinner in Essensplan übernehmen</span>
                 </button>
               ) : (
                 <button
                   type="button"
                   onClick={() => handlePromoteOption(poll, clearWinner.id, 'activity')}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#2A7B88]/12 hover:bg-[#2A7B88]/20 text-[#1F5E68] border border-[#2A7B88]/30 transition-colors"
+                  className="inline-flex items-center justify-center gap-1.5 px-3.5 min-h-[44px] w-full sm:w-auto rounded-xl text-xs font-semibold bg-[#2A7B88]/12 hover:bg-[#2A7B88]/20 text-[#1F5E68] border border-[#2A7B88]/30 transition-colors"
                 >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  Gewinner in Tagesplan übernehmen
+                  <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                  <span>Gewinner in Tagesplan übernehmen</span>
                 </button>
               )}
             </div>
@@ -664,7 +664,7 @@ export const PollsView: React.FC = () => {
           <button
             type="button"
             onClick={() => (showForm && !editingId ? resetForm() : openCreateForm())}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-[#C85A38] hover:bg-[#B54B2B] text-white shadow-[0_6px_18px_rgba(200,90,56,0.28)] transition-all"
+            className="inline-flex items-center gap-2 px-4 min-h-[44px] rounded-xl text-sm font-semibold bg-[#C85A38] hover:bg-[#B54B2B] text-white shadow-[0_6px_18px_rgba(200,90,56,0.28)] transition-all"
           >
             {showForm && !editingId ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             {showForm && !editingId ? 'Schließen' : 'Neue Abstimmung'}
@@ -686,7 +686,7 @@ export const PollsView: React.FC = () => {
               key={tab.id}
               type="button"
               onClick={() => setFilterStatus(tab.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+              className={`px-3 min-h-[44px] rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center transition-all ${
                 filterStatus === tab.id
                   ? 'bg-[#C85A38]/12 text-[#A34224] border border-[#C85A38]/30'
                   : 'text-[#6B6259] hover:text-[#1F1B18] hover:bg-[#F3ECE1]/70 border border-transparent'
@@ -702,7 +702,7 @@ export const PollsView: React.FC = () => {
           <button
             type="button"
             onClick={() => setFilterCategory('all')}
-            className={`px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+            className={`px-3 min-h-[44px] rounded-lg text-xs font-medium whitespace-nowrap inline-flex items-center transition-colors ${
               filterCategory === 'all'
                 ? 'bg-[#C85A38] text-white'
                 : 'text-[#6B6259] hover:text-[#1F1B18] hover:bg-[#F3ECE1]/70'
@@ -715,7 +715,7 @@ export const PollsView: React.FC = () => {
               key={cat}
               type="button"
               onClick={() => setFilterCategory(cat)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+              className={`px-3 min-h-[44px] rounded-lg text-xs font-medium whitespace-nowrap inline-flex items-center transition-colors ${
                 filterCategory === cat
                   ? 'bg-[#C85A38] text-white'
                   : 'text-[#6B6259] hover:text-[#1F1B18] hover:bg-[#F3ECE1]/70'
@@ -732,7 +732,7 @@ export const PollsView: React.FC = () => {
         <form
           ref={formRef}
           onSubmit={handleSubmit}
-          className="surface-glass-elevated rounded-2xl p-5 border border-[#C85A38]/30 space-y-4 animate-in"
+          className="surface-glass-elevated rounded-2xl p-4 sm:p-5 border border-[#C85A38]/30 space-y-4 animate-in"
         >
           <div className="flex items-center justify-between gap-2">
             <h3 className="text-base font-bold text-[#1F1B18]">
@@ -741,7 +741,7 @@ export const PollsView: React.FC = () => {
             <button
               type="button"
               onClick={resetForm}
-              className="p-1.5 rounded-lg text-[#8C8277] hover:text-[#1F1B18] hover:bg-[#F3ECE1]"
+              className="min-w-[44px] min-h-[44px] rounded-xl text-[#8C8277] hover:text-[#1F1B18] hover:bg-[#F3ECE1] flex items-center justify-center"
               aria-label="Formular schließen"
             >
               <X className="w-4 h-4" />
@@ -765,18 +765,18 @@ export const PollsView: React.FC = () => {
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 placeholder="z.B. Welchen Strand besuchen wir am Mittwoch?"
-                className="surface-input w-full px-3 py-2 rounded-xl text-sm"
+                className="surface-input w-full px-3 min-h-[44px] rounded-xl text-sm"
                 required
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div>
                 <label className="block text-xs font-medium text-[#1F1B18] mb-1">Kategorie</label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value as Poll['category'])}
-                  className="surface-input w-full px-2.5 py-2 rounded-xl text-sm [color-scheme:light]"
+                  className="surface-input w-full px-2.5 min-h-[44px] rounded-xl text-sm [color-scheme:light]"
                 >
                   {(Object.keys(POLL_CATEGORY_META) as Poll['category'][]).map((cat) => (
                     <option key={cat} value={cat} className="bg-white text-[#1F1B18]">
@@ -790,7 +790,7 @@ export const PollsView: React.FC = () => {
                 <select
                   value={dayNumber}
                   onChange={(e) => setDayNumber(e.target.value)}
-                  className="surface-input w-full px-2.5 py-2 rounded-xl text-sm [color-scheme:light]"
+                  className="surface-input w-full px-2.5 min-h-[44px] rounded-xl text-sm [color-scheme:light]"
                 >
                   <option value="" className="bg-white text-[#1F1B18]">
                     Allgemein
@@ -813,11 +813,11 @@ export const PollsView: React.FC = () => {
                 Wähle zwischen genau einer Stimme oder Mehrfachauswahl pro Person.
               </p>
             </div>
-            <div className="inline-flex rounded-xl p-1 bg-[#F3ECE1] border border-[#E6DDD1]">
+            <div className="inline-flex flex-wrap rounded-xl p-1 bg-[#F3ECE1] border border-[#E6DDD1]">
               <button
                 type="button"
                 onClick={() => setAllowMultiple(false)}
-                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                className={`px-3 min-h-[44px] rounded-lg text-xs font-semibold transition-all ${
                   !allowMultiple
                     ? 'bg-[#C85A38] text-white shadow-sm'
                     : 'text-[#6B6259] hover:text-[#1F1B18]'
@@ -828,7 +828,7 @@ export const PollsView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setAllowMultiple(true)}
-                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                className={`px-3 min-h-[44px] rounded-lg text-xs font-semibold transition-all ${
                   allowMultiple
                     ? 'bg-[#C85A38] text-white shadow-sm'
                     : 'text-[#6B6259] hover:text-[#1F1B18]'
@@ -841,8 +841,8 @@ export const PollsView: React.FC = () => {
 
           {/* Options with preserved ID + editable subtitle */}
           <div className="space-y-2.5">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-medium text-[#1F1B18]">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <label className="text-xs font-medium text-[#1F1B18] min-w-0">
                 Antwortoptionen (min. 2) · bestehende Stimmen bleiben beim Umbenennen erhalten
               </label>
               <button
@@ -853,7 +853,7 @@ export const PollsView: React.FC = () => {
                     { key: `draft-${Date.now()}-${prev.length}`, text: '', subtitle: '' },
                   ])
                 }
-                className="inline-flex items-center gap-1 text-xs font-semibold text-[#C85A38] hover:text-[#B54B2B]"
+                className="inline-flex items-center gap-1.5 min-h-[44px] px-2 text-xs font-semibold text-[#C85A38] hover:text-[#B54B2B] shrink-0"
               >
                 <Plus className="w-3.5 h-3.5" /> Option hinzufügen
               </button>
@@ -879,7 +879,7 @@ export const PollsView: React.FC = () => {
                         );
                       }}
                       placeholder={`Option ${idx + 1} (Titel)`}
-                      className="surface-input w-full px-3 py-1.5 rounded-lg text-sm"
+                      className="surface-input w-full px-3 min-h-[44px] rounded-lg text-sm"
                     />
                   </div>
                   <div className="md:col-span-6">
@@ -893,7 +893,7 @@ export const PollsView: React.FC = () => {
                         );
                       }}
                       placeholder="Untertitel / Preis / Info (optional)"
-                      className="surface-input w-full px-3 py-1.5 rounded-lg text-xs"
+                      className="surface-input w-full px-3 min-h-[44px] rounded-lg text-xs"
                     />
                   </div>
                   <div className="md:col-span-1 flex justify-end">
@@ -903,7 +903,7 @@ export const PollsView: React.FC = () => {
                       onClick={() =>
                         setOptions((prev) => prev.filter((_, i) => i !== idx))
                       }
-                      className="p-1.5 rounded-lg text-[#8C8277] hover:text-rose-700 hover:bg-rose-600/12 disabled:opacity-30 disabled:pointer-events-none"
+                      className="min-w-[44px] min-h-[44px] rounded-lg text-[#8C8277] hover:text-rose-700 hover:bg-rose-600/12 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center"
                       title="Option entfernen"
                       aria-label={`Option ${idx + 1} entfernen`}
                     >
@@ -915,17 +915,17 @@ export const PollsView: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-2 pt-2">
+          <div className="flex flex-wrap items-center justify-end gap-2 pt-2">
             <button
               type="button"
               onClick={resetForm}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-[#6B6259] hover:bg-[#F3ECE1] transition-colors"
+              className="px-4 min-h-[44px] rounded-xl text-xs font-semibold text-[#6B6259] hover:bg-[#F3ECE1] transition-colors"
             >
               Abbrechen
             </button>
             <button
               type="submit"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-[#C85A38] hover:bg-[#B54B2B] text-white transition-colors"
+              className="inline-flex items-center gap-1.5 px-4 min-h-[44px] rounded-xl text-xs font-semibold bg-[#C85A38] hover:bg-[#B54B2B] text-white transition-colors"
             >
               <Check className="w-4 h-4" />
               {editingId ? 'Änderungen speichern' : 'Abstimmung starten'}
@@ -948,7 +948,7 @@ export const PollsView: React.FC = () => {
           <button
             type="button"
             onClick={openCreateForm}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-[#C85A38] hover:bg-[#B54B2B] text-white transition-colors"
+            className="inline-flex items-center gap-2 px-4 min-h-[44px] rounded-xl text-sm font-semibold bg-[#C85A38] hover:bg-[#B54B2B] text-white transition-colors"
           >
             <Plus className="w-4 h-4" /> Erste Abstimmung starten
           </button>
@@ -965,7 +965,7 @@ export const PollsView: React.FC = () => {
                 setFilterStatus('all');
                 setFilterCategory('all');
               }}
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#F3ECE1] hover:bg-[#E6DDD1] text-[#1F1B18] transition-colors"
+              className="px-4 min-h-[44px] rounded-xl text-xs font-semibold bg-[#F3ECE1] hover:bg-[#E6DDD1] text-[#1F1B18] transition-colors"
             >
               Filter zurücksetzen
             </button>
@@ -975,7 +975,7 @@ export const PollsView: React.FC = () => {
         <div className="space-y-6">
           {/* Open Polls */}
           {visibleOpenPolls.length > 0 && (
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 xl:grid-cols-2 cq-cols-1-narrow gap-4">
               {visibleOpenPolls.map(renderPollCard)}
             </div>
           )}
@@ -984,7 +984,7 @@ export const PollsView: React.FC = () => {
           {visibleClosedPolls.length > 0 && (
             <div className="space-y-3">
               {filterStatus === 'closed' ? (
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 xl:grid-cols-2 cq-cols-1-narrow gap-4">
                   {visibleClosedPolls.map(renderPollCard)}
                 </div>
               ) : (
@@ -992,7 +992,7 @@ export const PollsView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setShowClosedPolls((prev) => !prev)}
-                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#6B6259] border border-[#E6DDD1] transition-colors"
+                    className="inline-flex items-center gap-2 px-3.5 min-h-[44px] rounded-xl text-xs font-semibold bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#6B6259] border border-[#E6DDD1] transition-colors"
                   >
                     {showClosedPolls ? (
                       <ChevronDown className="w-4 h-4 text-[#C85A38]" />
@@ -1002,7 +1002,7 @@ export const PollsView: React.FC = () => {
                     Abgeschlossene Abstimmungen ({visibleClosedPolls.length})
                   </button>
                   {showClosedPolls && (
-                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 xl:grid-cols-2 cq-cols-1-narrow gap-4">
                       {visibleClosedPolls.map(renderPollCard)}
                     </div>
                   )}
@@ -1286,13 +1286,13 @@ export const TasksView: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-3 px-3.5 py-2 rounded-xl bg-[#FAF7F2] border border-[#E6DDD1]">
-            <div className="text-right">
+        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+          <div className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border border-[#E6DDD1] w-full sm:w-auto min-w-0">
+            <div className="text-left sm:text-right w-full sm:w-auto">
               <div className="text-xs font-mono tabular-nums font-bold text-[#1F1B18]">
                 {completedTotal} / {totalCount} erledigt ({overallProgress}%)
               </div>
-              <div className="w-32 h-1.5 rounded-full bg-[#E6DDD1] overflow-hidden mt-1">
+              <div className="w-full sm:w-32 h-1.5 rounded-full bg-[#E6DDD1] overflow-hidden mt-1">
                 <div
                   className="h-full bg-[#6E7F5E] transition-all duration-300"
                   style={{ width: `${overallProgress}%` }}
@@ -1304,7 +1304,7 @@ export const TasksView: React.FC = () => {
           <button
             type="button"
             onClick={() => (showForm && !editingId ? resetForm() : openCreateForm())}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-[#C85A38] hover:bg-[#B54B2B] text-white shadow-[0_6px_18px_rgba(200,90,56,0.28)] transition-all"
+            className="inline-flex items-center justify-center gap-2 px-4 min-h-[44px] w-full sm:w-auto rounded-xl text-sm font-semibold bg-[#C85A38] hover:bg-[#B54B2B] text-white shadow-[0_6px_18px_rgba(200,90,56,0.28)] transition-all"
           >
             {showForm && !editingId ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             {showForm && !editingId ? 'Schließen' : 'Neue Aufgabe'}
@@ -1318,7 +1318,7 @@ export const TasksView: React.FC = () => {
           <button
             type="button"
             onClick={() => setFilterCategory('all')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+            className={`px-3 min-h-[44px] rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center transition-all ${
               filterCategory === 'all'
                 ? 'bg-[#C85A38]/12 text-[#A34224] border border-[#C85A38]/30'
                 : 'text-[#6B6259] hover:text-[#1F1B18] hover:bg-[#F3ECE1]/70 border border-transparent'
@@ -1334,20 +1334,21 @@ export const TasksView: React.FC = () => {
                 key={cat}
                 type="button"
                 onClick={() => setFilterCategory(cat)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                className={`px-3 min-h-[44px] rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center gap-1 transition-all ${
                   filterCategory === cat
                     ? 'bg-[#C85A38]/12 text-[#A34224] border border-[#C85A38]/30'
                     : 'text-[#6B6259] hover:text-[#1F1B18] hover:bg-[#F3ECE1]/70 border border-transparent'
                 }`}
               >
-                {meta.label} <span className="font-mono tabular-nums opacity-75">({count})</span>
+                <span>{meta.label}</span>
+                <span className="font-mono tabular-nums opacity-75">({count})</span>
               </button>
             );
           })}
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-[#E6DDD1]">
-          <div className="flex items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-1.5">
             {(
               [
                 { id: 'all', label: 'Alle Status' },
@@ -1359,7 +1360,7 @@ export const TasksView: React.FC = () => {
                 key={st.id}
                 type="button"
                 onClick={() => setFilterStatus(st.id)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                className={`px-3 min-h-[44px] rounded-lg text-xs font-medium transition-colors ${
                   filterStatus === st.id
                     ? 'bg-[#C85A38] text-white'
                     : 'text-[#6B6259] hover:text-[#1F1B18] hover:bg-[#F3ECE1]/70'
@@ -1372,12 +1373,12 @@ export const TasksView: React.FC = () => {
 
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex items-center gap-1.5">
-              <UserCheck className="w-3.5 h-3.5 text-[#8C8277]" />
+              <UserCheck className="w-3.5 h-3.5 text-[#8C8277] shrink-0" />
               <select
                 value={assigneeFilter}
                 onChange={(e) => setAssigneeFilter(e.target.value)}
                 aria-label="Nach Zuständigkeit filtern"
-                className="surface-input px-2.5 py-1 rounded-lg text-xs [color-scheme:light]"
+                className="surface-input px-2.5 min-h-[44px] rounded-lg text-xs [color-scheme:light]"
               >
                 <option value="all" className="bg-white text-[#1F1B18]">
                   Alle Personen
@@ -1394,12 +1395,12 @@ export const TasksView: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-1.5">
-              <Flame className="w-3.5 h-3.5 text-[#8C8277]" />
+              <Flame className="w-3.5 h-3.5 text-[#8C8277] shrink-0" />
               <select
                 value={priorityFilter}
                 onChange={(e) => setPriorityFilter(e.target.value as TaskPriority | 'all')}
                 aria-label="Nach Priorität filtern"
-                className="surface-input px-2.5 py-1 rounded-lg text-xs [color-scheme:light]"
+                className="surface-input px-2.5 min-h-[44px] rounded-lg text-xs [color-scheme:light]"
               >
                 <option value="all" className="bg-white text-[#1F1B18]">
                   Alle Prioritäten
@@ -1420,7 +1421,7 @@ export const TasksView: React.FC = () => {
               <button
                 type="button"
                 onClick={resetAllFilters}
-                className="px-2.5 py-1 rounded-lg text-xs font-medium text-[#C85A38] hover:bg-[#C85A38]/12 transition-colors"
+                className="px-3 min-h-[44px] rounded-lg text-xs font-medium text-[#C85A38] hover:bg-[#C85A38]/12 transition-colors"
               >
                 Zurücksetzen
               </button>
@@ -1434,7 +1435,7 @@ export const TasksView: React.FC = () => {
         <form
           ref={formRef}
           onSubmit={handleSubmit}
-          className="surface-glass-elevated rounded-2xl p-5 border border-[#C85A38]/30 space-y-4 animate-in"
+          className="surface-glass-elevated rounded-2xl p-4 sm:p-5 border border-[#C85A38]/30 space-y-4 animate-in"
         >
           <div className="flex items-center justify-between gap-2">
             <h3 className="text-base font-bold text-[#1F1B18]">
@@ -1443,22 +1444,22 @@ export const TasksView: React.FC = () => {
             <button
               type="button"
               onClick={resetForm}
-              className="p-1.5 rounded-lg text-[#8C8277] hover:text-[#1F1B18] hover:bg-[#F3ECE1]"
+              className="min-w-[44px] min-h-[44px] rounded-xl text-[#8C8277] hover:text-[#1F1B18] hover:bg-[#F3ECE1] flex items-center justify-center"
               aria-label="Formular schließen"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="md:col-span-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="sm:col-span-2">
               <label className="block text-xs font-medium text-[#1F1B18] mb-1">Aufgabe *</label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="z.B. JBL Charge 5 + Powerbank einpacken"
-                className="surface-input w-full px-3 py-2 rounded-xl text-sm"
+                className="surface-input w-full px-3 min-h-[44px] rounded-xl text-sm"
                 required
               />
             </div>
@@ -1468,7 +1469,7 @@ export const TasksView: React.FC = () => {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as TaskCategory)}
-                className="surface-input w-full px-2.5 py-2 rounded-xl text-sm [color-scheme:light]"
+                className="surface-input w-full px-2.5 min-h-[44px] rounded-xl text-sm [color-scheme:light]"
               >
                 {TASK_CATEGORIES_ORDER.map((cat) => (
                   <option key={cat} value={cat} className="bg-white text-[#1F1B18]">
@@ -1483,7 +1484,7 @@ export const TasksView: React.FC = () => {
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as TaskPriority)}
-                className="surface-input w-full px-2.5 py-2 rounded-xl text-sm [color-scheme:light]"
+                className="surface-input w-full px-2.5 min-h-[44px] rounded-xl text-sm [color-scheme:light]"
               >
                 <option value="critical" className="bg-white text-[#1F1B18]">
                   Kritisch
@@ -1498,8 +1499,8 @@ export const TasksView: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="md:col-span-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="sm:col-span-2 lg:col-span-2">
               <label className="block text-xs font-medium text-[#1F1B18] mb-1">
                 Hinweis / Details (optional)
               </label>
@@ -1508,18 +1509,18 @@ export const TasksView: React.FC = () => {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="z.B. Mit USB-C-Kabel für die Finca-Terrasse"
-                className="surface-input w-full px-3 py-2 rounded-xl text-sm"
+                className="surface-input w-full px-3 min-h-[44px] rounded-xl text-sm"
               />
             </div>
 
-            <div>
+            <div className="sm:col-span-2 lg:col-span-1">
               <label className="block text-xs font-medium text-[#1F1B18] mb-1">
                 Zuständig (Wer bringt es mit?)
               </label>
               <select
                 value={assignedTo}
                 onChange={(e) => setAssignedTo(e.target.value)}
-                className="surface-input w-full px-2.5 py-2 rounded-xl text-sm [color-scheme:light]"
+                className="surface-input w-full px-2.5 min-h-[44px] rounded-xl text-sm [color-scheme:light]"
               >
                 <option value="" className="bg-white text-[#1F1B18]">
                   Noch offen / Unassigned
@@ -1533,17 +1534,17 @@ export const TasksView: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
             <button
               type="button"
               onClick={resetForm}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-[#6B6259] hover:bg-[#F3ECE1]"
+              className="px-4 min-h-[44px] rounded-xl text-xs font-semibold text-[#6B6259] hover:bg-[#F3ECE1]"
             >
               Abbrechen
             </button>
             <button
               type="submit"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-[#C85A38] hover:bg-[#B54B2B] text-white transition-colors"
+              className="inline-flex items-center gap-1.5 px-4 min-h-[44px] rounded-xl text-xs font-semibold bg-[#C85A38] hover:bg-[#B54B2B] text-white transition-colors"
             >
               <Check className="w-4 h-4" />
               {editingId ? 'Änderungen speichern' : 'Aufgabe anlegen'}
@@ -1566,7 +1567,7 @@ export const TasksView: React.FC = () => {
           <button
             type="button"
             onClick={() => openCreateForm('before_trip')}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-[#C85A38] hover:bg-[#B54B2B] text-white transition-colors"
+            className="inline-flex items-center gap-2 px-4 min-h-[44px] rounded-xl text-sm font-semibold bg-[#C85A38] hover:bg-[#B54B2B] text-white transition-colors"
           >
             <Plus className="w-4 h-4" /> Erste Aufgabe anlegen
           </button>
@@ -1579,7 +1580,7 @@ export const TasksView: React.FC = () => {
           <button
             type="button"
             onClick={resetAllFilters}
-            className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#F3ECE1] hover:bg-[#E6DDD1] text-[#1F1B18] transition-colors"
+            className="px-4 min-h-[44px] rounded-xl text-xs font-semibold bg-[#F3ECE1] hover:bg-[#E6DDD1] text-[#1F1B18] transition-colors"
           >
             Alle Filter zurücksetzen
           </button>
@@ -1606,13 +1607,13 @@ export const TasksView: React.FC = () => {
             return (
               <section key={cat} className="surface-glass rounded-2xl overflow-hidden">
                 {/* Accordion Header */}
-                <div className="p-4 flex flex-wrap items-center justify-between gap-3 bg-[#FAF7F2] border-b border-[#E6DDD1]">
+                <div className="px-3.5 sm:px-4 py-2.5 min-h-[48px] flex flex-wrap items-center justify-between gap-2.5 bg-[#FAF7F2] border-b border-[#E6DDD1]">
                   <button
                     type="button"
                     onClick={() => toggleCollapse(cat)}
-                    className="flex items-center gap-3 text-left min-w-0 flex-1"
+                    className="flex items-center gap-3 text-left min-w-0 flex-1 min-h-[48px]"
                   >
-                    <span className="text-[#8C8277]">
+                    <span className="text-[#8C8277] shrink-0">
                       {isCollapsed ? (
                         <ChevronRight className="w-4 h-4" />
                       ) : (
@@ -1637,12 +1638,12 @@ export const TasksView: React.FC = () => {
                     </div>
                   </button>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2.5 shrink-0">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-mono tabular-nums text-[#6B6259]">
                         {doneInCat}/{catTasks.length}
                       </span>
-                      <div className="w-20 h-1.5 rounded-full bg-[#E6DDD1] overflow-hidden">
+                      <div className="w-16 sm:w-20 h-1.5 rounded-full bg-[#E6DDD1] overflow-hidden">
                         <div
                           className="h-full bg-[#6E7F5E] transition-all duration-300"
                           style={{ width: `${pctInCat}%` }}
@@ -1652,7 +1653,7 @@ export const TasksView: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => openCreateForm(cat)}
-                      className="p-1.5 rounded-lg text-[#C85A38] hover:bg-[#C85A38]/12 transition-colors"
+                      className="min-w-[44px] min-h-[44px] rounded-xl text-[#C85A38] hover:bg-[#C85A38]/12 flex items-center justify-center transition-colors"
                       title={`Aufgabe zu „${meta.label}“ hinzufügen`}
                       aria-label={`Aufgabe zu ${meta.label} hinzufügen`}
                     >
@@ -1676,7 +1677,7 @@ export const TasksView: React.FC = () => {
                         <div
                           key={task.id}
                           data-search-id={`task-${task.id}`}
-                          className={`p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all ${
+                          className={`px-3 sm:px-3.5 py-2.5 min-h-[48px] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 transition-all ${
                             task.completed ? 'bg-[#FAF7F2]/60 opacity-75' : 'hover:bg-[#FAF7F2]/80'
                           } ${
                             isHighlighted
@@ -1684,14 +1685,14 @@ export const TasksView: React.FC = () => {
                               : ''
                           }`}
                         >
-                          <div className="flex items-start gap-3 min-w-0 flex-1">
+                          <div className="flex items-start gap-2 min-w-0 flex-1">
                             <button
                               type="button"
                               onClick={() => toggleTaskCompleted(task.id)}
-                              className={`mt-0.5 shrink-0 transition-colors ${
+                              className={`min-w-[44px] min-h-[44px] -ml-1.5 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
                                 task.completed
-                                  ? 'text-[#6E7F5E] hover:text-[#4B593E]'
-                                  : 'text-[#8C8277] hover:text-[#C85A38]'
+                                  ? 'text-[#6E7F5E] hover:text-[#4B593E] hover:bg-[#6E7F5E]/10'
+                                  : 'text-[#8C8277] hover:text-[#C85A38] hover:bg-[#C85A38]/10'
                               }`}
                               aria-label={
                                 task.completed ? 'Als offen markieren' : 'Als erledigt markieren'
@@ -1704,7 +1705,7 @@ export const TasksView: React.FC = () => {
                               )}
                             </button>
 
-                            <div className="min-w-0 flex-1">
+                            <div className="min-w-0 flex-1 py-1.5">
                               <div className="flex flex-wrap items-center gap-2">
                                 <span
                                   className={`text-sm font-semibold break-words ${
@@ -1729,7 +1730,7 @@ export const TasksView: React.FC = () => {
                             </div>
                           </div>
 
-                          <div className="flex flex-wrap items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0">
+                          <div className="flex flex-wrap items-center justify-between sm:justify-end gap-1.5 shrink-0 w-full sm:w-auto">
                             {/* Quick inline assignee selector */}
                             <div className="flex items-center gap-1.5">
                               {assignee && (
@@ -1748,7 +1749,7 @@ export const TasksView: React.FC = () => {
                                   })
                                 }
                                 aria-label={`Zuständige Person für ${task.title}`}
-                                className="surface-input px-2 py-1 rounded-lg text-xs [color-scheme:light]"
+                                className="surface-input px-2.5 min-h-[44px] rounded-xl text-xs [color-scheme:light]"
                               >
                                 <option value="" className="bg-white text-[#1F1B18]">
                                   Offen
@@ -1765,39 +1766,41 @@ export const TasksView: React.FC = () => {
                               </select>
                             </div>
 
-                            <button
-                              type="button"
-                              onClick={() => toggleTaskVote(task.id)}
-                              className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-mono tabular-nums border transition-colors ${
-                                userVoted
-                                  ? 'bg-[#C85A38]/12 text-[#A34224] border-[#C85A38]/30'
-                                  : 'bg-[#FAF7F2] text-[#6B6259] border-[#E6DDD1] hover:text-[#1F1B18]'
-                              }`}
-                              title="Wichtigkeit hochvoten"
-                            >
-                              <ThumbsUp className="w-3 h-3" />
-                              {task.votes.length}
-                            </button>
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() => toggleTaskVote(task.id)}
+                                className={`inline-flex items-center justify-center gap-1.5 px-3 min-h-[44px] rounded-xl text-xs font-mono tabular-nums border transition-colors ${
+                                  userVoted
+                                    ? 'bg-[#C85A38]/12 text-[#A34224] border-[#C85A38]/30'
+                                    : 'bg-[#FAF7F2] text-[#6B6259] border-[#E6DDD1] hover:text-[#1F1B18]'
+                                }`}
+                                title="Wichtigkeit hochvoten"
+                              >
+                                <ThumbsUp className="w-3.5 h-3.5" />
+                                {task.votes.length}
+                              </button>
 
-                            <button
-                              type="button"
-                              onClick={() => startEdit(task)}
-                              className="p-1.5 rounded-lg text-[#8C8277] hover:text-[#C85A38] hover:bg-[#F3ECE1] transition-colors"
-                              title="Aufgabe bearbeiten"
-                              aria-label={`Aufgabe „${task.title}“ bearbeiten`}
-                            >
-                              <Edit3 className="w-3.5 h-3.5" />
-                            </button>
+                              <button
+                                type="button"
+                                onClick={() => startEdit(task)}
+                                className="min-w-[44px] min-h-[44px] rounded-xl text-[#8C8277] hover:text-[#C85A38] hover:bg-[#F3ECE1] flex items-center justify-center transition-colors"
+                                title="Aufgabe bearbeiten"
+                                aria-label={`Aufgabe „${task.title}“ bearbeiten`}
+                              >
+                                <Edit3 className="w-4 h-4" />
+                              </button>
 
-                            <button
-                              type="button"
-                              onClick={() => deleteTask(task.id)}
-                              className="p-1.5 rounded-lg text-[#8C8277] hover:text-rose-700 hover:bg-rose-600/12 transition-colors"
-                              title="Aufgabe löschen"
-                              aria-label={`Aufgabe „${task.title}“ löschen`}
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
+                              <button
+                                type="button"
+                                onClick={() => deleteTask(task.id)}
+                                className="min-w-[44px] min-h-[44px] rounded-xl text-[#8C8277] hover:text-rose-700 hover:bg-rose-600/12 flex items-center justify-center transition-colors"
+                                title="Aufgabe löschen"
+                                aria-label={`Aufgabe „${task.title}“ löschen`}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
                           </div>
                         </div>
                       );
@@ -2287,11 +2290,11 @@ export const BudgetView: React.FC = () => {
 
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Planned vs Incl. Ideas Toggle */}
-          <div className="inline-flex rounded-xl p-1 bg-[#F3ECE1] border border-[#E6DDD1]">
+          <div className="inline-flex flex-wrap rounded-xl p-1 bg-[#F3ECE1] border border-[#E6DDD1] max-w-full">
             <button
               type="button"
               onClick={() => setIncludeIdeas(false)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-3 min-h-[44px] rounded-lg text-xs font-semibold transition-all ${
                 !includeIdeas
                   ? 'bg-[#C85A38] text-white shadow-sm'
                   : 'text-[#6B6259] hover:text-[#1F1B18]'
@@ -2302,7 +2305,7 @@ export const BudgetView: React.FC = () => {
             <button
               type="button"
               onClick={() => setIncludeIdeas(true)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-3 min-h-[44px] rounded-lg text-xs font-semibold transition-all ${
                 includeIdeas
                   ? 'bg-[#2A7B88] text-white shadow-sm'
                   : 'text-[#6B6259] hover:text-[#1F1B18]'
@@ -2313,13 +2316,13 @@ export const BudgetView: React.FC = () => {
           </div>
 
           {/* Currency Switcher */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#FAF7F2] border border-[#E6DDD1]">
+          <div className="flex items-center gap-1.5 px-3 min-h-[44px] rounded-xl bg-[#FAF7F2] border border-[#E6DDD1]">
             <span className="text-[11px] text-[#6B6259]">Währung:</span>
             <select
               value={currency}
               onChange={(e) => updateTripMeta({ currency: e.target.value as CurrencyCode })}
               aria-label="Reisewährung ändern"
-              className="bg-transparent text-xs font-mono font-semibold text-[#C85A38] focus:outline-none [color-scheme:light]"
+              className="bg-transparent min-h-[44px] text-xs font-mono font-semibold text-[#C85A38] focus:outline-none [color-scheme:light]"
             >
               {CURRENCY_OPTIONS.map((opt) => (
                 <option
@@ -2337,10 +2340,10 @@ export const BudgetView: React.FC = () => {
 
       {/* Info banner when competing meal options or ideas are active */}
       {!includeIdeas && planningStats.multiOptionSlotCount > 0 && (
-        <div className="surface-glass rounded-xl px-4 py-2.5 flex items-center justify-between gap-2 text-xs text-[#6B6259] border border-[#D9822B]/30">
-          <div className="flex items-center gap-2">
-            <Utensils className="w-4 h-4 text-[#D9822B] shrink-0" />
-            <span>
+        <div className="surface-glass rounded-xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs text-[#6B6259] border border-[#D9822B]/30">
+          <div className="flex items-start sm:items-center gap-2 min-w-0 flex-1">
+            <Utensils className="w-4 h-4 text-[#D9822B] shrink-0 mt-0.5 sm:mt-0" />
+            <span className="min-w-0 break-words">
               In{' '}
               <strong className="font-mono tabular-nums text-[#9E5A14]">
                 {planningStats.multiOptionSlotCount}
@@ -2352,7 +2355,7 @@ export const BudgetView: React.FC = () => {
           <button
             type="button"
             onClick={() => setIncludeIdeas(true)}
-            className="text-[#C85A38] hover:text-[#B54B2B] font-semibold whitespace-nowrap"
+            className="text-[#C85A38] hover:text-[#B54B2B] font-semibold min-h-[44px] px-2 inline-flex items-center text-left sm:text-right shrink-0"
           >
             Alle Alternativen einbeziehen
           </button>
@@ -2360,17 +2363,19 @@ export const BudgetView: React.FC = () => {
       )}
 
       {/* Top KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 cq-cols-1-narrow gap-3 sm:gap-4">
         {/* Card 1: Planned Per Person */}
-        <div className="surface-glass rounded-2xl p-4 space-y-2">
-          <div className="flex items-center justify-between text-xs text-[#6B6259]">
-            <span>{includeIdeas ? 'Max. Plan / Person' : 'Geplant pro Person'}</span>
-            <Compass className="w-4 h-4 text-[#2A7B88]" />
+        <div className="surface-glass rounded-2xl p-3.5 sm:p-4 space-y-2 min-w-0">
+          <div className="flex items-center justify-between gap-1 text-xs text-[#6B6259]">
+            <span className="min-w-0 break-words">
+              {includeIdeas ? 'Max. Plan / Person' : 'Geplant pro Person'}
+            </span>
+            <Compass className="w-4 h-4 text-[#2A7B88] shrink-0" />
           </div>
-          <div className="text-2xl font-bold font-mono tabular-nums text-[#4B593E]">
+          <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-[#4B593E] break-words">
             {formatCurrency(planningStats.plannedPerPerson, currency)}
           </div>
-          <div className="text-xs text-[#6B6259] flex items-center justify-between">
+          <div className="text-xs text-[#6B6259] flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
             <span>
               Aktivitäten:{' '}
               <span className="font-mono tabular-nums text-[#1F1B18]">
@@ -2387,12 +2392,14 @@ export const BudgetView: React.FC = () => {
         </div>
 
         {/* Card 2: Planned Group Total */}
-        <div className="surface-glass rounded-2xl p-4 space-y-2">
-          <div className="flex items-center justify-between text-xs text-[#6B6259]">
-            <span>Gruppen-Planbudget ({trip.travelers.length} Pers.)</span>
-            <Users className="w-4 h-4 text-[#2A7B88]" />
+        <div className="surface-glass rounded-2xl p-3.5 sm:p-4 space-y-2 min-w-0">
+          <div className="flex items-center justify-between gap-1 text-xs text-[#6B6259]">
+            <span className="min-w-0 break-words">
+              Gruppen-Planbudget ({trip.travelers.length} Pers.)
+            </span>
+            <Users className="w-4 h-4 text-[#2A7B88] shrink-0" />
           </div>
-          <div className="text-2xl font-bold font-mono tabular-nums text-[#1F1B18]">
+          <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-[#1F1B18] break-words">
             {formatCurrency(planningStats.plannedTotal, currency)}
           </div>
           <div className="text-xs text-[#6B6259]">
@@ -2405,14 +2412,14 @@ export const BudgetView: React.FC = () => {
         </div>
 
         {/* Card 3: Inline editable target per person */}
-        <div className="surface-glass rounded-2xl p-4 space-y-2">
-          <div className="flex items-center justify-between text-xs text-[#6B6259]">
-            <span>Zielbudget / Person</span>
-            <PiggyBank className="w-4 h-4 text-[#C85A38]" />
+        <div className="surface-glass rounded-2xl p-3.5 sm:p-4 space-y-2 min-w-0">
+          <div className="flex items-center justify-between gap-1 text-xs text-[#6B6259]">
+            <span className="min-w-0 break-words">Zielbudget / Person</span>
+            <PiggyBank className="w-4 h-4 text-[#C85A38] shrink-0" />
           </div>
 
           {editingTarget ? (
-            <div className="flex items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-1.5">
               <input
                 type="number"
                 min="0"
@@ -2427,13 +2434,13 @@ export const BudgetView: React.FC = () => {
                   }
                 }}
                 aria-label="Zielbudget pro Person bearbeiten"
-                className="surface-input w-full px-2.5 py-1.5 rounded-lg text-sm font-mono tabular-nums"
+                className="surface-input w-full min-w-[80px] flex-1 px-2.5 min-h-[44px] rounded-lg text-sm font-mono tabular-nums"
                 autoFocus
               />
               <button
                 type="button"
                 onClick={saveBudgetTarget}
-                className="p-1.5 rounded-lg bg-[#6E7F5E]/14 text-[#4B593E] hover:bg-[#6E7F5E]/22"
+                className="min-w-[44px] min-h-[44px] rounded-lg bg-[#6E7F5E]/14 text-[#4B593E] hover:bg-[#6E7F5E]/22 flex items-center justify-center"
                 aria-label="Zielbudget speichern"
               >
                 <Check className="w-4 h-4" />
@@ -2444,23 +2451,23 @@ export const BudgetView: React.FC = () => {
                   setTargetInput(String(trip.budgetTargetPerPerson ?? 0));
                   setEditingTarget(false);
                 }}
-                className="p-1.5 rounded-lg bg-[#F3ECE1] text-[#6B6259] hover:text-[#1F1B18]"
+                className="min-w-[44px] min-h-[44px] rounded-lg bg-[#F3ECE1] text-[#6B6259] hover:text-[#1F1B18] flex items-center justify-center"
                 aria-label="Abbrechen"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
           ) : (
-            <div className="flex items-center justify-between gap-2">
-              <div className="text-2xl font-bold font-mono tabular-nums text-[#1F1B18]">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-[#1F1B18] break-words">
                 {formatCurrency(targetPerPerson, currency)}
               </div>
               <button
                 type="button"
                 onClick={() => setEditingTarget(true)}
-                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#C85A38] border border-[#E6DDD1] transition-colors"
+                className="inline-flex items-center gap-1 px-2.5 min-h-[44px] rounded-lg text-xs font-semibold bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#C85A38] border border-[#E6DDD1] transition-colors"
               >
-                <Edit3 className="w-3 h-3" /> Ändern
+                <Edit3 className="w-3.5 h-3.5" /> Ändern
               </button>
             </div>
           )}
@@ -2475,7 +2482,7 @@ export const BudgetView: React.FC = () => {
                   style={{ width: `${targetUsedPct}%` }}
                 />
               </div>
-              <div className="flex items-center justify-between text-[11px] font-mono tabular-nums">
+              <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5 text-[11px] font-mono tabular-nums">
                 <span className="text-[#6B6259]">
                   Gruppe: {formatCurrency(targetGroupTotal, currency)}
                 </span>
@@ -2496,15 +2503,15 @@ export const BudgetView: React.FC = () => {
         </div>
 
         {/* Card 4: Actual Expenses Total */}
-        <div className="surface-glass rounded-2xl p-4 space-y-2 border border-[#D9822B]/30">
-          <div className="flex items-center justify-between text-xs text-[#6B6259]">
-            <span>Tatsächliche Ausgaben (Ist)</span>
-            <Receipt className="w-4 h-4 text-[#D9822B]" />
+        <div className="surface-glass rounded-2xl p-3.5 sm:p-4 space-y-2 border border-[#D9822B]/30 min-w-0">
+          <div className="flex items-center justify-between gap-1 text-xs text-[#6B6259]">
+            <span className="min-w-0 break-words">Tatsächliche Ausgaben (Ist)</span>
+            <Receipt className="w-4 h-4 text-[#D9822B] shrink-0" />
           </div>
-          <div className="text-2xl font-bold font-mono tabular-nums text-[#9E5A14]">
+          <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-[#9E5A14] break-words">
             {formatCurrency(expenseStats.totalActual, currency)}
           </div>
-          <div className="text-xs text-[#6B6259] flex items-center justify-between font-mono tabular-nums">
+          <div className="text-xs text-[#6B6259] flex flex-wrap items-center justify-between gap-x-2 gap-y-1 font-mono tabular-nums">
             <span>
               Ø {formatCurrency(expenseStats.actualPerPerson, currency)} / Pers.
             </span>
@@ -2516,13 +2523,13 @@ export const BudgetView: React.FC = () => {
       {/* ==================================================================== */}
       {/* REISEKASSE 2.0: TATSÄCHLICHE AUSGABEN & WER SCHULDET WEM WAS         */}
       {/* ==================================================================== */}
-      <section className="surface-glass-elevated rounded-2xl p-5 space-y-5 border border-[#C85A38]/25">
+      <section className="surface-glass-elevated rounded-2xl p-4 sm:p-5 space-y-5 border border-[#C85A38]/25">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#C85A38]/12 border border-[#C85A38]/30 flex items-center justify-center text-[#A34224]">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-xl bg-[#C85A38]/12 border border-[#C85A38]/30 flex items-center justify-center text-[#A34224] shrink-0">
               <CreditCard className="w-5 h-5" />
             </div>
-            <div>
+            <div className="min-w-0">
               <h3 className="text-lg font-bold text-[#1F1B18]">
                 Tatsächliche Ausgaben & Wer schuldet wem was
               </h3>
@@ -2538,7 +2545,7 @@ export const BudgetView: React.FC = () => {
             onClick={() =>
               showExpenseForm && !editingExpenseId ? resetExpenseForm() : openCreateExpense()
             }
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-[#C85A38] hover:bg-[#B54B2B] text-white shadow-[0_6px_18px_rgba(200,90,56,0.28)] transition-all self-start sm:self-auto"
+            className="inline-flex items-center gap-2 px-4 min-h-[44px] rounded-xl text-sm font-semibold bg-[#C85A38] hover:bg-[#B54B2B] text-white shadow-[0_6px_18px_rgba(200,90,56,0.28)] transition-all self-start sm:self-auto shrink-0"
           >
             {showExpenseForm && !editingExpenseId ? (
               <X className="w-4 h-4" />
@@ -2556,14 +2563,14 @@ export const BudgetView: React.FC = () => {
             onSubmit={handleExpenseSubmit}
             className="rounded-2xl p-4 bg-[#FAF7F2] border border-[#C85A38]/30 space-y-4 animate-in"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <h4 className="text-sm font-bold text-[#1F1B18]">
                 {editingExpenseId ? 'Ausgabe bearbeiten' : 'Neue gemeinsame Ausgabe verbuchen'}
               </h4>
               <button
                 type="button"
                 onClick={resetExpenseForm}
-                className="p-1.5 rounded-lg text-[#8C8277] hover:text-[#1F1B18] hover:bg-[#F3ECE1]"
+                className="min-w-[44px] min-h-[44px] rounded-xl text-[#8C8277] hover:text-[#1F1B18] hover:bg-[#F3ECE1] flex items-center justify-center"
                 aria-label="Ausgaben-Formular schließen"
               >
                 <X className="w-4 h-4" />
@@ -2577,8 +2584,8 @@ export const BudgetView: React.FC = () => {
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
-              <div className="lg:col-span-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="sm:col-span-2 lg:col-span-2">
                 <label className="block text-xs font-medium text-[#1F1B18] mb-1">
                   Beschreibung / Beleg *
                 </label>
@@ -2587,7 +2594,7 @@ export const BudgetView: React.FC = () => {
                   value={expTitle}
                   onChange={(e) => setExpTitle(e.target.value)}
                   placeholder="z.B. Mietwagen-Anzahlung oder Einkauf Mercadona"
-                  className="surface-input w-full px-3 py-2 rounded-xl text-sm"
+                  className="surface-input w-full px-3 min-h-[44px] rounded-xl text-sm"
                   required
                 />
               </div>
@@ -2603,7 +2610,7 @@ export const BudgetView: React.FC = () => {
                   value={expAmount}
                   onChange={(e) => setExpAmount(e.target.value)}
                   placeholder="0.00"
-                  className="surface-input w-full px-3 py-2 rounded-xl text-sm font-mono tabular-nums"
+                  className="surface-input w-full px-3 min-h-[44px] rounded-xl text-sm font-mono tabular-nums"
                   required
                 />
               </div>
@@ -2615,7 +2622,7 @@ export const BudgetView: React.FC = () => {
                 <select
                   value={expPaidBy}
                   onChange={(e) => setExpPaidBy(e.target.value)}
-                  className="surface-input w-full px-2.5 py-2 rounded-xl text-sm [color-scheme:light]"
+                  className="surface-input w-full px-2.5 min-h-[44px] rounded-xl text-sm [color-scheme:light]"
                 >
                   {trip.travelers.map((tr) => (
                     <option key={tr.id} value={tr.id} className="bg-white text-[#1F1B18]">
@@ -2625,7 +2632,7 @@ export const BudgetView: React.FC = () => {
                 </select>
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="sm:col-span-2 lg:col-span-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-[#1F1B18] mb-1">
                     Kategorie
@@ -2633,7 +2640,7 @@ export const BudgetView: React.FC = () => {
                   <select
                     value={expCategory}
                     onChange={(e) => setExpCategory(e.target.value as ExpenseCategory)}
-                    className="surface-input w-full px-2 py-2 rounded-xl text-xs [color-scheme:light]"
+                    className="surface-input w-full px-2.5 min-h-[44px] rounded-xl text-xs [color-scheme:light]"
                   >
                     {(Object.keys(EXPENSE_CATEGORY_META) as ExpenseCategory[]).map((cat) => (
                       <option key={cat} value={cat} className="bg-white text-[#1F1B18]">
@@ -2649,7 +2656,7 @@ export const BudgetView: React.FC = () => {
                   <select
                     value={expDayNumber}
                     onChange={(e) => setExpDayNumber(e.target.value)}
-                    className="surface-input w-full px-2 py-2 rounded-xl text-xs [color-scheme:light]"
+                    className="surface-input w-full px-2.5 min-h-[44px] rounded-xl text-xs [color-scheme:light]"
                   >
                     <option value="" className="bg-white text-[#1F1B18]">
                       Allgemein
@@ -2670,11 +2677,11 @@ export const BudgetView: React.FC = () => {
                 <label className="text-xs font-medium text-[#1F1B18]">
                   Aufgeteilt auf ({expSplitBetween.length} von {trip.travelers.length} Personen)
                 </label>
-                <div className="flex items-center gap-2 text-[11px]">
+                <div className="flex flex-wrap items-center gap-1 text-xs">
                   <button
                     type="button"
                     onClick={() => setExpSplitBetween(trip.travelers.map((t) => t.id))}
-                    className="text-[#C85A38] hover:text-[#B54B2B] font-semibold"
+                    className="text-[#C85A38] hover:text-[#B54B2B] font-semibold min-h-[44px] px-2 inline-flex items-center"
                   >
                     Alle wählen
                   </button>
@@ -2686,7 +2693,7 @@ export const BudgetView: React.FC = () => {
                         trip.travelers.filter((t) => t.id !== expPaidBy).map((t) => t.id)
                       )
                     }
-                    className="text-[#6B6259] hover:text-[#1F1B18]"
+                    className="text-[#6B6259] hover:text-[#1F1B18] min-h-[44px] px-2 inline-flex items-center"
                   >
                     Ohne Zahler
                   </button>
@@ -2694,7 +2701,7 @@ export const BudgetView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setExpSplitBetween([])}
-                    className="text-[#8C8277] hover:text-[#1F1B18]"
+                    className="text-[#8C8277] hover:text-[#1F1B18] min-h-[44px] px-2 inline-flex items-center"
                   >
                     Keine
                   </button>
@@ -2709,7 +2716,7 @@ export const BudgetView: React.FC = () => {
                       key={tr.id}
                       type="button"
                       onClick={() => toggleSplitMember(tr.id)}
-                      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                      className={`inline-flex items-center gap-2 px-3 min-h-[44px] rounded-xl text-xs font-semibold border transition-all ${
                         selected
                           ? 'bg-[#C85A38]/12 text-[#A34224] border-[#C85A38]/35'
                           : 'bg-white text-[#6B6259] border-[#E6DDD1] hover:text-[#1F1B18]'
@@ -2729,17 +2736,17 @@ export const BudgetView: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-1">
+            <div className="flex flex-wrap items-center justify-end gap-2 pt-1">
               <button
                 type="button"
                 onClick={resetExpenseForm}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-[#6B6259] hover:bg-[#F3ECE1]"
+                className="px-4 min-h-[44px] rounded-xl text-xs font-semibold text-[#6B6259] hover:bg-[#F3ECE1]"
               >
                 Abbrechen
               </button>
               <button
                 type="submit"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-[#C85A38] hover:bg-[#B54B2B] text-white transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 min-h-[44px] rounded-xl text-xs font-semibold bg-[#C85A38] hover:bg-[#B54B2B] text-white transition-colors"
               >
                 <Check className="w-4 h-4" />
                 {editingExpenseId ? 'Ausgabe aktualisieren' : 'Ausgabe speichern'}
@@ -2749,10 +2756,10 @@ export const BudgetView: React.FC = () => {
         )}
 
         {/* Settlements + Balances Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 cq-cols-1-narrow gap-4">
           {/* Who owes whom */}
-          <div className="rounded-2xl p-4 bg-[#FAF7F2] border border-[#E6DDD1] space-y-3">
-            <div className="flex items-center justify-between">
+          <div className="rounded-2xl p-4 bg-[#FAF7F2] border border-[#E6DDD1] space-y-3 min-w-0">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <Scale className="w-4 h-4 text-[#4B593E]" />
                 <h4 className="text-sm font-bold text-[#1F1B18]">Ausgleichszahlungen</h4>
@@ -2786,7 +2793,7 @@ export const BudgetView: React.FC = () => {
                           : 'bg-white border-[#E6DDD1]'
                       }`}
                     >
-                      <div className="flex items-center gap-2 flex-wrap text-sm">
+                      <div className="flex items-center gap-2 flex-wrap text-sm min-w-0">
                         <span className="inline-flex items-center gap-1.5 font-semibold text-[#1F1B18]">
                           {from && (
                             <span
@@ -2812,7 +2819,7 @@ export const BudgetView: React.FC = () => {
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-between sm:justify-end gap-2.5">
+                      <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2.5">
                         <span
                           className={`text-sm font-mono tabular-nums font-bold ${
                             isSettled ? 'line-through text-[#4B593E]' : 'text-[#9E5A14]'
@@ -2823,7 +2830,7 @@ export const BudgetView: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => toggleSettlementPaid(s.fromId, s.toId)}
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
+                          className={`inline-flex items-center gap-1.5 px-3 min-h-[44px] rounded-xl text-xs font-semibold border transition-colors ${
                             isSettled
                               ? 'bg-[#6E7F5E]/20 text-[#4B593E] border-[#6E7F5E]/40 hover:bg-[#6E7F5E]/30'
                               : 'bg-[#FAF7F2] hover:bg-[#6E7F5E]/14 text-[#1F1B18] hover:text-[#4B593E] border-[#E6DDD1]'
@@ -2841,7 +2848,7 @@ export const BudgetView: React.FC = () => {
           </div>
 
           {/* Per-Traveler Balance Sheet */}
-          <div className="rounded-2xl p-4 bg-[#FAF7F2] border border-[#E6DDD1] space-y-3">
+          <div className="rounded-2xl p-4 bg-[#FAF7F2] border border-[#E6DDD1] space-y-3 min-w-0">
             <div className="flex items-center gap-2">
               <ArrowUpDown className="w-4 h-4 text-[#2A7B88]" />
               <h4 className="text-sm font-bold text-[#1F1B18]">Saldo pro Mitreisendem</h4>
@@ -2851,20 +2858,20 @@ export const BudgetView: React.FC = () => {
               {expenseStats.balances.map(({ traveler, paid, share, net }) => (
                 <div
                   key={traveler.id}
-                  className="p-2.5 rounded-xl bg-white border border-[#E6DDD1] flex items-center justify-between gap-2"
+                  className="p-2.5 rounded-xl bg-white border border-[#E6DDD1] flex flex-wrap items-center justify-between gap-2"
                 >
-                  <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
                     <span
                       className="w-7 h-7 rounded-full text-[10px] font-bold text-white flex items-center justify-center shrink-0"
                       style={{ backgroundColor: traveler.color }}
                     >
                       {getSafeInitials(traveler.initials || traveler.name)}
                     </span>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="text-xs font-semibold text-[#1F1B18] truncate">
                         {traveler.name}
                       </div>
-                      <div className="text-[11px] text-[#6B6259] font-mono tabular-nums">
+                      <div className="text-[11px] text-[#6B6259] font-mono tabular-nums break-words">
                         Gezahlt: {formatCurrency(paid, currency)} · Anteil:{' '}
                         {formatCurrency(share, currency)}
                       </div>
@@ -2896,11 +2903,11 @@ export const BudgetView: React.FC = () => {
               Erfasste Belege & Ausgaben ({filteredExpenses.length})
             </h4>
 
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar max-w-full">
               <button
                 type="button"
                 onClick={() => setExpCategoryFilter('all')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+                className={`px-3 min-h-[44px] rounded-lg text-xs font-medium whitespace-nowrap inline-flex items-center transition-colors ${
                   expCategoryFilter === 'all'
                     ? 'bg-[#C85A38] text-white'
                     : 'text-[#6B6259] hover:text-[#1F1B18] hover:bg-[#F3ECE1]'
@@ -2913,7 +2920,7 @@ export const BudgetView: React.FC = () => {
                   key={cat}
                   type="button"
                   onClick={() => setExpCategoryFilter(cat)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+                  className={`px-3 min-h-[44px] rounded-lg text-xs font-medium whitespace-nowrap inline-flex items-center transition-colors ${
                     expCategoryFilter === cat
                       ? 'bg-[#C85A38] text-white'
                       : 'text-[#6B6259] hover:text-[#1F1B18] hover:bg-[#F3ECE1]'
@@ -2937,7 +2944,7 @@ export const BudgetView: React.FC = () => {
               <button
                 type="button"
                 onClick={openCreateExpense}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-[#C85A38] hover:bg-[#B54B2B] text-white transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 min-h-[44px] rounded-xl text-xs font-semibold bg-[#C85A38] hover:bg-[#B54B2B] text-white transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" /> Erste Ausgabe hinzufügen
               </button>
@@ -2968,7 +2975,9 @@ export const BudgetView: React.FC = () => {
                   >
                     <div className="min-w-0 space-y-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-semibold text-[#1F1B18]">{exp.title}</span>
+                        <span className="text-sm font-semibold text-[#1F1B18] break-words">
+                          {exp.title}
+                        </span>
                         <span
                           className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${catMeta.colorClass}`}
                         >
@@ -2981,7 +2990,7 @@ export const BudgetView: React.FC = () => {
                         )}
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-[#6B6259]">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-[#6B6259]">
                         <span>
                           Bezahlt von{' '}
                           <strong className="text-[#1F1B18]">
@@ -3006,7 +3015,7 @@ export const BudgetView: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
+                    <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
                       <span className="text-base font-bold font-mono tabular-nums text-[#9E5A14]">
                         {formatCurrency(exp.amount, currency)}
                       </span>
@@ -3014,7 +3023,7 @@ export const BudgetView: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => startEditExpense(exp)}
-                          className="p-1.5 rounded-lg text-[#8C8277] hover:text-[#C85A38] hover:bg-[#F3ECE1] transition-colors"
+                          className="min-w-[44px] min-h-[44px] rounded-xl text-[#8C8277] hover:text-[#C85A38] hover:bg-[#F3ECE1] flex items-center justify-center transition-colors"
                           title="Ausgabe bearbeiten"
                           aria-label={`Ausgabe „${exp.title}“ bearbeiten`}
                         >
@@ -3023,7 +3032,7 @@ export const BudgetView: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => deleteExpense(exp.id)}
-                          className="p-1.5 rounded-lg text-[#8C8277] hover:text-rose-700 hover:bg-rose-600/12 transition-colors"
+                          className="min-w-[44px] min-h-[44px] rounded-xl text-[#8C8277] hover:text-rose-700 hover:bg-rose-600/12 flex items-center justify-center transition-colors"
                           title="Ausgabe löschen"
                           aria-label={`Ausgabe „${exp.title}“ löschen`}
                         >
@@ -3042,12 +3051,12 @@ export const BudgetView: React.FC = () => {
       {/* ==================================================================== */}
       {/* PLANNED BUDGET BREAKDOWN (CATEGORIES + PER DAY)                      */}
       {/* ==================================================================== */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 cq-cols-1-narrow gap-4">
         {/* Category Breakdown */}
-        <section className="surface-glass rounded-2xl p-5 space-y-4">
-          <div className="flex items-center justify-between">
+        <section className="surface-glass rounded-2xl p-4 sm:p-5 space-y-4 min-w-0">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-[#2A7B88]" />
+              <TrendingUp className="w-4 h-4 text-[#2A7B88] shrink-0" />
               <h3 className="text-sm font-bold text-[#1F1B18]">Plan-Kosten p.P. nach Kategorie</h3>
             </div>
             <span className="text-xs font-mono tabular-nums text-[#6B6259]">
@@ -3068,7 +3077,7 @@ export const BudgetView: React.FC = () => {
                     : 0;
                 return (
                   <div key={cat.label} className="space-y-1.5">
-                    <div className="flex items-center justify-between text-xs">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                       <span className="text-[#1F1B18] font-medium">{cat.label}</span>
                       <span className="font-mono tabular-nums text-[#1F1B18]">
                         {formatCurrency(cat.amount, currency)}{' '}
@@ -3089,8 +3098,8 @@ export const BudgetView: React.FC = () => {
         </section>
 
         {/* Per-Day Cost Overview */}
-        <section className="surface-glass rounded-2xl p-5 space-y-4">
-          <div className="flex items-center justify-between">
+        <section className="surface-glass rounded-2xl p-4 sm:p-5 space-y-4 min-w-0">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="text-sm font-bold text-[#1F1B18]">Plan-Kosten p.P. pro Reisetag</h3>
             <span className="text-xs font-mono tabular-nums text-[#6B6259]">
               {trip.totalDays} Tage
@@ -3107,22 +3116,22 @@ export const BudgetView: React.FC = () => {
               return (
                 <div
                   key={d.day}
-                  className="p-2.5 rounded-xl bg-[#FAF7F2] border border-[#E6DDD1] flex items-center justify-between gap-2 text-xs"
+                  className="p-2.5 rounded-xl bg-[#FAF7F2] border border-[#E6DDD1] flex flex-wrap items-center justify-between gap-2 text-xs"
                 >
-                  <div>
+                  <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 min-w-0">
                     <span className="font-mono tabular-nums font-bold text-[#C85A38]">
                       Tag {d.day}
                     </span>
-                    <span className="text-[#6B6259] ml-2">{dateLabel}</span>
+                    <span className="text-[#6B6259]">{dateLabel}</span>
                   </div>
-                  <div className="flex items-center gap-3 font-mono tabular-nums">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono tabular-nums">
                     <span className="text-[#6B6259]">
                       Akt: {formatCurrency(d.activities, currency)}
                     </span>
                     <span className="text-[#6B6259]">
                       Essen: {formatCurrency(d.meals, currency)}
                     </span>
-                    <span className="font-bold text-[#1F1B18] min-w-[4.5rem] text-right">
+                    <span className="font-bold text-[#1F1B18] sm:min-w-[4.5rem] sm:text-right">
                       {formatCurrency(d.total, currency)}
                     </span>
                   </div>
@@ -3131,7 +3140,7 @@ export const BudgetView: React.FC = () => {
             })}
 
             {planningStats.outOfRangeTotal > 0 && (
-              <div className="p-2.5 rounded-xl bg-[#D9822B]/14 border border-[#D9822B]/30 flex items-center justify-between text-xs">
+              <div className="p-2.5 rounded-xl bg-[#D9822B]/14 border border-[#D9822B]/30 flex flex-wrap items-center justify-between gap-2 text-xs">
                 <span className="text-[#9E5A14] font-semibold">
                   Außerhalb Reisedauer (Tag &gt; {trip.totalDays})
                 </span>

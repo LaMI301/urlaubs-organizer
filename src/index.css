@@ -81,6 +81,15 @@
   .animate-in {
     animation: surfaceFadeIn 0.2s ease-out both;
   }
+
+  /* Safe-area helpers for PWA & notched mobile devices */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
 }
 
 @keyframes surfaceFadeIn {
@@ -91,6 +100,57 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes slideUpSheet {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-sheet {
+  animation: slideUpSheet 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (min-width: 640px) {
+  .mobile-sheet {
+    animation: surfaceFadeIn 0.2s ease-out both;
+  }
+}
+
+/* CSS Container Query support for center workspace */
+.main-pane {
+  container-type: inline-size;
+  container-name: main;
+}
+
+@container main (max-width: 680px) {
+  .cq-cols-1-narrow {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+/* Prevent iOS Safari auto-zoom on form inputs on mobile */
+@media (max-width: 767px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Touch-friendly Leaflet zoom controls on <1024px / coarse pointers */
+@media (max-width: 1023px), (pointer: coarse) {
+  .leaflet-control-zoom a {
+    min-width: 40px;
+    min-height: 40px;
+    line-height: 40px;
   }
 }
 

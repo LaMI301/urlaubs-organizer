@@ -118,7 +118,7 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
   // 1. PASSWORD GATE
   if (!isUnlocked) {
     return (
-      <div className="surface-canvas min-h-screen flex items-center justify-center p-4 text-[#1F1B18] font-sans relative overflow-hidden">
+      <div className="surface-canvas min-h-[100dvh] flex items-center justify-center p-4 pt-[calc(1rem+env(safe-area-inset-top,0px))] pb-[calc(1rem+env(safe-area-inset-bottom,0px))] text-[#1F1B18] font-sans relative overflow-hidden">
         <div className="fixed inset-0 pointer-events-none overflow-hidden">
           <div className="absolute -top-28 -left-24 w-96 h-96 bg-[#C85A38]/8 rounded-full blur-3xl" />
           <div className="absolute -bottom-28 -right-24 w-96 h-96 bg-[#6E7F5E]/8 rounded-full blur-3xl" />
@@ -176,7 +176,7 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
 
             <button
               type="submit"
-              className="w-full bg-[#C85A38] hover:bg-[#B54B2B] text-white font-extrabold text-sm py-3.5 rounded-full shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
+              className="w-full min-h-[44px] bg-[#C85A38] hover:bg-[#B54B2B] text-white font-extrabold text-sm py-3.5 rounded-full shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
               <span>Zugang freischalten</span>
               <ArrowRight className="w-4 h-4" />
@@ -190,7 +190,7 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
   // 2. GUIDED STEP-BY-STEP START FLOW (Trip Selection -> User Selection -> Dashboard)
   if (isWelcomeOpen) {
     return (
-      <div className="surface-canvas min-h-screen flex items-center justify-center p-4 text-[#1F1B18] font-sans relative overflow-hidden">
+      <div className="surface-canvas min-h-[100dvh] flex items-center justify-center p-4 pt-[calc(1rem+env(safe-area-inset-top,0px))] pb-[calc(1rem+env(safe-area-inset-bottom,0px))] text-[#1F1B18] font-sans relative overflow-hidden">
         <div className="fixed inset-0 pointer-events-none overflow-hidden">
           <div className="absolute -top-28 -left-24 w-96 h-96 bg-[#C85A38]/8 rounded-full blur-3xl" />
           <div className="absolute top-1/3 -right-24 w-96 h-96 bg-[#6E7F5E]/8 rounded-full blur-3xl" />
@@ -211,9 +211,9 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
                 type="button"
                 onClick={() => setUnlockedViaInviteLink(false)}
                 aria-label="Hinweis ausblenden"
-                className="p-1 rounded-full hover:bg-[#6E7F5E]/15 text-[#4E5F40] shrink-0 cursor-pointer"
+                className="w-11 h-11 sm:w-8 sm:h-8 -mr-2 sm:mr-0 rounded-full hover:bg-[#6E7F5E]/15 text-[#4E5F40] flex items-center justify-center shrink-0 cursor-pointer"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
               </button>
             </div>
           )}
@@ -297,7 +297,7 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
                             <button
                               type="button"
                               onClick={() => handleSelectExistingTrip(t.id)}
-                              className="min-w-0 flex-1 text-left p-1.5 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#C85A38]/40"
+                              className="min-w-0 min-h-[44px] flex-1 text-left p-2 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#C85A38]/40"
                             >
                               <p className="font-extrabold text-sm text-[#1F1B18] truncate">
                                 {t.title}
@@ -311,41 +311,41 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
                             </button>
 
                             {isConfirmingDelete ? (
-                              <div className="flex items-center gap-1 shrink-0 pr-1">
+                              <div className="flex items-center gap-1.5 shrink-0 pr-1">
                                 <button
                                   type="button"
                                   onClick={() => {
                                     deleteTrip(t.id);
                                     setConfirmDeleteTripId(null);
                                   }}
-                                  className="px-2.5 py-1 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold transition-colors cursor-pointer"
+                                  className="min-h-[44px] sm:min-h-[32px] px-3 py-2 sm:px-2.5 sm:py-1 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-[10px] font-bold transition-colors cursor-pointer"
                                 >
                                   Löschen
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => setConfirmDeleteTripId(null)}
-                                  className="px-2 py-1 rounded-full bg-[#F3ECE1] hover:bg-[#E6DDD1] text-[#1F1B18] text-[10px] font-bold transition-colors cursor-pointer"
+                                  className="min-h-[44px] sm:min-h-[32px] px-3 py-2 sm:px-2 sm:py-1 rounded-full bg-[#F3ECE1] hover:bg-[#E6DDD1] text-[#1F1B18] text-xs sm:text-[10px] font-bold transition-colors cursor-pointer"
                                 >
                                   Abbr.
                                 </button>
                               </div>
                             ) : (
-                              <div className="flex items-center gap-1 shrink-0 pr-1">
+                              <div className="flex items-center gap-1 shrink-0 pr-0.5">
                                 <button
                                   type="button"
                                   onClick={() => setConfirmDeleteTripId(t.id)}
                                   title="Urlaub löschen"
                                   aria-label={`Urlaub ${t.title} löschen`}
-                                  className="w-7 h-7 rounded-full hover:bg-rose-500/12 text-[#8C8277] hover:text-rose-700 flex items-center justify-center transition-colors cursor-pointer"
+                                  className="w-11 h-11 sm:w-8 sm:h-8 rounded-full hover:bg-rose-500/12 text-[#8C8277] hover:text-rose-700 flex items-center justify-center transition-colors cursor-pointer"
                                 >
-                                  <Trash2 className="w-3.5 h-3.5" />
+                                  <Trash2 className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => handleSelectExistingTrip(t.id)}
                                   aria-label={`Urlaub ${t.title} öffnen`}
-                                  className="w-7 h-7 rounded-full text-[#8C8277] group-hover:text-[#C85A38] flex items-center justify-center transition-colors cursor-pointer"
+                                  className="w-11 h-11 sm:w-8 sm:h-8 rounded-full text-[#8C8277] group-hover:text-[#C85A38] flex items-center justify-center transition-colors cursor-pointer"
                                 >
                                   <ArrowRight className="w-4 h-4" />
                                 </button>
@@ -429,7 +429,13 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
               </div>
 
               {/* Traveler Cards */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+              <div
+                className={`grid gap-2.5 ${
+                  trip.travelers.length <= 2
+                    ? 'grid-cols-1 min-[420px]:grid-cols-2'
+                    : 'grid-cols-1 min-[420px]:grid-cols-2 sm:grid-cols-3'
+                }`}
+              >
                 {trip.travelers.map((traveler) => {
                   const isSelected = traveler.id === currentUser.id;
                   return (
@@ -437,14 +443,14 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
                       key={traveler.id}
                       type="button"
                       onClick={() => handleSelectUserAndEnter(traveler.id)}
-                      className={`p-3.5 rounded-2xl border text-left transition-all flex items-center gap-2.5 cursor-pointer min-w-0 ${
+                      className={`min-h-[44px] p-3.5 rounded-2xl border text-left transition-all flex items-center gap-2.5 cursor-pointer min-w-0 ${
                         isSelected
                           ? 'bg-[#C85A38]/12 text-[#1F1B18] border-[#C85A38]/45 shadow-sm'
                           : 'bg-[#FAF7F2] hover:bg-[#F3ECE1] text-[#1F1B18] border-[#E6DDD1]'
                       }`}
                     >
                       <span
-                        className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-black text-white shrink-0 shadow-sm"
+                        className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-black text-[#1F1B18] border border-black/10 shrink-0 shadow-sm"
                         style={{ backgroundColor: traveler.color }}
                       >
                         {traveler.initials}
@@ -484,7 +490,7 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
                 <button
                   type="submit"
                   disabled={!newUserName.trim()}
-                  className="bg-[#C85A38] hover:bg-[#B54B2B] disabled:opacity-40 text-white text-xs font-extrabold px-5 py-3 rounded-full transition-all shrink-0 cursor-pointer"
+                  className="min-h-[44px] bg-[#C85A38] hover:bg-[#B54B2B] disabled:opacity-40 text-white text-xs font-extrabold px-5 py-3 rounded-full transition-all shrink-0 cursor-pointer"
                 >
                   Hinzufügen &amp; starten
                 </button>
@@ -494,7 +500,7 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
                 <button
                   type="button"
                   onClick={() => setWelcomeStep('select-trip')}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#6B6259] hover:text-[#1F1B18] py-2 cursor-pointer"
+                  className="min-h-[44px] inline-flex items-center gap-1.5 text-xs font-bold text-[#6B6259] hover:text-[#1F1B18] px-2 -ml-2 py-2.5 rounded-xl cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span>Zurück zur Urlaubsauswahl</span>
@@ -503,7 +509,7 @@ export const AccessAndWelcomeGate: React.FC<{ children: React.ReactNode }> = ({
                 <button
                   type="button"
                   onClick={handleContinueAsCurrent}
-                  className="inline-flex items-center gap-1.5 bg-[#C85A38] hover:bg-[#B54B2B] text-white text-xs font-extrabold px-5 py-2.5 rounded-full transition-colors cursor-pointer max-w-[230px]"
+                  className="min-h-[44px] inline-flex items-center gap-1.5 bg-[#C85A38] hover:bg-[#B54B2B] text-white text-xs font-extrabold px-5 py-2.5 rounded-full transition-colors cursor-pointer max-w-full sm:max-w-[260px]"
                 >
                   <Check className="w-3.5 h-3.5 shrink-0" />
                   <span className="truncate">

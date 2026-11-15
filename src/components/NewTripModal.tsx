@@ -321,11 +321,15 @@ export const NewTripModal: React.FC = () => {
           setIsNewTripModalOpen(false);
         }
       }}
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-[#1F1B18]/45 backdrop-blur-sm p-3 sm:p-4"
+      className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-[#1F1B18]/45 backdrop-blur-sm p-0 sm:p-4"
     >
-      <div className="surface-glass-elevated text-[#1F1B18] w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-[30px] shadow-2xl">
+      <div className="surface-glass-elevated mobile-sheet text-[#1F1B18] w-full max-w-xl max-h-[92dvh] sm:max-h-[90dvh] flex flex-col overflow-hidden rounded-t-3xl sm:rounded-3xl shadow-2xl">
         {/* Top Header + Step Progress */}
-        <div className="bg-[#FAF7F2]/95 border-b border-[#E6DDD1] px-6 py-5 sticky top-0 z-10 backdrop-blur-xl">
+        <div className="bg-[#FAF7F2]/95 border-b border-[#E6DDD1] px-5 sm:px-6 pt-3 pb-4 sm:py-5 shrink-0 backdrop-blur-xl">
+          <div
+            aria-hidden="true"
+            className="sm:hidden w-10 h-1 rounded-full bg-[#DDD2C3] mx-auto mb-3"
+          />
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-10 h-10 rounded-2xl bg-[#C85A38] text-white flex items-center justify-center shrink-0 shadow-sm">
@@ -348,9 +352,9 @@ export const NewTripModal: React.FC = () => {
               type="button"
               onClick={() => setIsNewTripModalOpen(false)}
               aria-label="Modal schließen"
-              className="w-8 h-8 rounded-full bg-[#F3ECE1] hover:bg-[#E6DDD1] border border-[#DDD2C3] flex items-center justify-center text-[#6B6259] hover:text-[#1F1B18] transition-colors cursor-pointer shrink-0"
+              className="w-11 h-11 sm:w-9 sm:h-9 rounded-full bg-[#F3ECE1] hover:bg-[#E6DDD1] border border-[#DDD2C3] flex items-center justify-center text-[#6B6259] hover:text-[#1F1B18] transition-colors cursor-pointer shrink-0"
             >
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5 sm:w-4 sm:h-4" />
             </button>
           </div>
 
@@ -367,7 +371,11 @@ export const NewTripModal: React.FC = () => {
           </div>
         </div>
 
-        <form onSubmit={handleFormSubmit} className="p-5 sm:p-7 space-y-6">
+        <form
+          onSubmit={handleFormSubmit}
+          className="flex-1 overflow-y-auto overscroll-contain pb-safe"
+        >
+          <div className="p-5 sm:p-7 space-y-6">
           {/* STEP 1: REISEZIEL, TEMPLATE & NAME */}
           {step === 1 && (
             <div className="space-y-5">
@@ -386,7 +394,7 @@ export const NewTripModal: React.FC = () => {
                 <span className="block text-[11px] font-bold uppercase tracking-wider text-[#6B6259] mb-2">
                   Reisetyp-Template (optional)
                 </span>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
                   {TRIP_TEMPLATES.map((tpl) => {
                     const Icon = tpl.icon;
                     const active = selectedTemplate === tpl.id;
@@ -396,7 +404,7 @@ export const NewTripModal: React.FC = () => {
                         type="button"
                         onClick={() => handleSelectTemplate(tpl)}
                         aria-pressed={active}
-                        className={`p-2.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col gap-1.5 ${
+                        className={`min-h-[44px] p-3 sm:p-2.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col gap-1.5 ${
                           active
                             ? `${tpl.accentClass} shadow-sm`
                             : 'bg-[#FAF7F2] hover:bg-[#F3ECE1] border-[#E6DDD1] text-[#6B6259]'
@@ -484,7 +492,7 @@ export const NewTripModal: React.FC = () => {
                   type="button"
                   disabled={!canAdvanceStep1}
                   onClick={() => setStep(2)}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-extrabold bg-[#C85A38] hover:bg-[#B54B2B] disabled:opacity-40 text-white shadow-sm transition-all cursor-pointer"
+                  className="min-h-[44px] w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-sm font-extrabold bg-[#C85A38] hover:bg-[#B54B2B] disabled:opacity-40 text-white shadow-sm transition-all cursor-pointer"
                 >
                   <span>Weiter zu Schritt 2</span>
                   <ArrowRight className="w-4 h-4" />
@@ -572,7 +580,7 @@ export const NewTripModal: React.FC = () => {
                         key={preset}
                         type="button"
                         onClick={() => handleDaysChange(preset)}
-                        className={`font-mono tabular-nums px-2.5 py-1 rounded-full text-[11px] font-bold border transition-colors cursor-pointer ${
+                        className={`min-h-[44px] sm:min-h-[30px] font-mono tabular-nums px-3.5 py-2 sm:px-2.5 sm:py-1 rounded-full text-xs sm:text-[11px] font-bold border transition-colors cursor-pointer ${
                           totalDays === preset
                             ? 'bg-[#C85A38]/12 border-[#C85A38]/35 text-[#9E3F22]'
                             : 'bg-white hover:bg-[#F3ECE1] border-[#DDD2C3] text-[#6B6259]'
@@ -628,11 +636,11 @@ export const NewTripModal: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-3 border-t border-[#E6DDD1]">
+              <div className="flex items-center justify-between gap-2 pt-3 border-t border-[#E6DDD1]">
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-bold bg-[#F3ECE1] hover:bg-[#E6DDD1] border border-[#DDD2C3] text-[#1F1B18] transition-colors cursor-pointer"
+                  className="min-h-[44px] inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-xs font-bold bg-[#F3ECE1] hover:bg-[#E6DDD1] border border-[#DDD2C3] text-[#1F1B18] transition-colors cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span>Zurück</span>
@@ -641,7 +649,7 @@ export const NewTripModal: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setStep(3)}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-extrabold bg-[#C85A38] hover:bg-[#B54B2B] text-white shadow-sm transition-all cursor-pointer"
+                  className="min-h-[44px] inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-extrabold bg-[#C85A38] hover:bg-[#B54B2B] text-white shadow-sm transition-all cursor-pointer"
                 >
                   <span>Weiter zu Schritt 3</span>
                   <ArrowRight className="w-4 h-4" />
@@ -691,7 +699,7 @@ export const NewTripModal: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleAddPerson}
-                    className="inline-flex items-center gap-1.5 bg-[#F3ECE1] hover:bg-[#E6DDD1] border border-[#DDD2C3] text-[#1F1B18] px-4 sm:px-5 py-3 rounded-full text-xs font-bold cursor-pointer shrink-0 transition-colors"
+                    className="min-h-[44px] inline-flex items-center gap-1.5 bg-[#F3ECE1] hover:bg-[#E6DDD1] border border-[#DDD2C3] text-[#1F1B18] px-4 sm:px-5 py-3 rounded-full text-xs font-bold cursor-pointer shrink-0 transition-colors"
                   >
                     <Plus className="w-4 h-4 text-[#C85A38]" />
                     <span>Hinzufügen</span>
@@ -737,7 +745,7 @@ export const NewTripModal: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => setSelectedUserName(name)}
-                            className="inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 text-xs font-bold cursor-pointer min-w-0"
+                            className="min-h-[44px] sm:min-h-[28px] inline-flex items-center gap-1.5 pl-3 pr-2 py-2 sm:pl-2.5 sm:pr-1.5 sm:py-1 text-xs font-bold cursor-pointer min-w-0"
                           >
                             <span className="truncate max-w-[140px]">{name}</span>
                             {isMe && (
@@ -749,11 +757,11 @@ export const NewTripModal: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleRemovePerson(name)}
-                            className="w-6 h-6 rounded-full hover:bg-rose-500/15 text-[#6B6259] hover:text-rose-700 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                            className="w-10 h-10 sm:w-6 sm:h-6 rounded-full hover:bg-rose-500/15 text-[#6B6259] hover:text-rose-700 flex items-center justify-center transition-colors cursor-pointer shrink-0"
                             title={`${name} entfernen`}
                             aria-label={`${name} entfernen`}
                           >
-                            <Trash2 className="w-3 h-3" />
+                            <Trash2 className="w-3.5 h-3.5 sm:w-3 sm:h-3" />
                           </button>
                         </div>
                       );
@@ -766,7 +774,7 @@ export const NewTripModal: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setStep(2)}
-                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-bold bg-[#F3ECE1] hover:bg-[#E6DDD1] border border-[#DDD2C3] text-[#1F1B18] transition-colors cursor-pointer"
+                  className="min-h-[44px] inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-xs font-bold bg-[#F3ECE1] hover:bg-[#E6DDD1] border border-[#DDD2C3] text-[#1F1B18] transition-colors cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span>Zurück</span>
@@ -777,7 +785,7 @@ export const NewTripModal: React.FC = () => {
                   disabled={
                     travelerNames.length === 0 && !newPersonInput.trim()
                   }
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-extrabold bg-[#6E7F5E] hover:bg-[#5B6B4D] disabled:opacity-40 text-white shadow-sm transition-all cursor-pointer"
+                  className="min-h-[44px] inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-extrabold bg-[#6E7F5E] hover:bg-[#5B6B4D] disabled:opacity-40 text-white shadow-sm transition-all cursor-pointer"
                 >
                   <Check className="w-4 h-4" />
                   <span>Urlaub erstellen &amp; starten</span>
@@ -785,6 +793,7 @@ export const NewTripModal: React.FC = () => {
               </div>
             </div>
           )}
+          </div>
         </form>
       </div>
     </div>
