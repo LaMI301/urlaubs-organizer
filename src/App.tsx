@@ -230,6 +230,10 @@ const AppShell: React.FC = () => {
     setSelectedDay,
   ]);
 
+  const isNetlifyPublicHost =
+    typeof window !== 'undefined' &&
+    window.location.hostname.endsWith('.netlify.app');
+
   const gridColumnsClass = getGridColumnsClass(
     isSidebarCollapsed,
     isCalendarCollapsed,
@@ -262,7 +266,13 @@ const AppShell: React.FC = () => {
   return (
     <>
       <AccessAndWelcomeGate>
-        <div className="surface-canvas relative min-h-[100dvh] w-full max-w-full overflow-x-clip p-2 sm:p-4 md:p-5 pt-[calc(0.5rem+env(safe-area-inset-top,0px))] sm:pt-4 md:pt-5 pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))] sm:pb-4 md:pb-5 text-[#1F1B18] font-sans">
+        <div
+          className={`surface-canvas relative min-h-[100dvh] w-full max-w-full overflow-x-clip p-2 sm:p-4 md:p-5 pt-[calc(0.5rem+env(safe-area-inset-top,0px))] sm:pt-4 md:pt-5 ${
+            isNetlifyPublicHost
+              ? 'pb-[calc(9.5rem+env(safe-area-inset-bottom,0px))] sm:pb-16 md:pb-16'
+              : 'pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))] sm:pb-14 md:pb-14'
+          } text-[#1F1B18] font-sans`}
+        >
           {/* Subtle Ambient Warm Glow Blobs */}
           <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
             <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#C85A38]/8 rounded-full blur-3xl" />
@@ -349,7 +359,7 @@ const AppShell: React.FC = () => {
                 }}
                 className="fixed inset-0 z-50 bg-[#1F1B18]/45 backdrop-blur-sm p-0 pb-safe sm:p-4 sm:pb-[calc(1rem+env(safe-area-inset-bottom,0px))] flex flex-col lg:static lg:inset-auto lg:z-auto lg:bg-transparent lg:backdrop-blur-none lg:p-0 lg:pb-0 lg:block min-w-0"
               >
-                <div className="h-[100dvh] sm:h-full w-full lg:h-[calc(100dvh-3.5rem)] lg:sticky lg:top-5">
+                <div className="h-[100dvh] sm:h-full w-full lg:h-[calc(100dvh-5.25rem)] lg:sticky lg:top-5">
                   <MapCockpitPanel />
                 </div>
               </div>
@@ -402,7 +412,11 @@ const AppShell: React.FC = () => {
       {toasts.length > 0 && (
         <div
           aria-live="polite"
-          className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] sm:bottom-5 right-3 sm:right-5 z-[70] flex flex-col gap-2 w-[calc(100vw-1.5rem)] max-w-sm pointer-events-none"
+          className={`fixed ${
+            isNetlifyPublicHost
+              ? 'bottom-[calc(8.75rem+env(safe-area-inset-bottom,0px))] sm:bottom-16'
+              : 'bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] sm:bottom-14'
+          } right-3 sm:right-5 z-[70] flex flex-col gap-2 w-[calc(100vw-1.5rem)] max-w-sm pointer-events-none`}
         >
           {toasts.map((toast) => {
             const meta = TOAST_STYLES[toast.type] || TOAST_STYLES.info;

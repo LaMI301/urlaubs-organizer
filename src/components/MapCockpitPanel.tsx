@@ -1003,7 +1003,14 @@ export const MapCockpitPanel: React.FC = () => {
 
       {/* Mobile/Tablet (<lg) Compact Bottom Stop-Peek Card & "+ Aktivität" CTA */}
       {mobileView === 'map' && (
-        <div className="lg:hidden shrink-0 border-t border-[#E6DDD1] bg-white/[0.97] backdrop-blur-xl px-3 py-2 flex items-center justify-between gap-2">
+        <div
+          className={`lg:hidden shrink-0 border-t border-[#E6DDD1] bg-white/[0.97] backdrop-blur-xl px-3 pt-2 ${
+            typeof window !== 'undefined' &&
+            window.location.hostname.endsWith('.netlify.app')
+              ? 'pb-[calc(4rem+env(safe-area-inset-bottom,0px))]'
+              : 'pb-2'
+          } flex items-center justify-between gap-2`}
+        >
           {peekPin ? (
             <button
               type="button"
@@ -1108,7 +1115,7 @@ export const MapCockpitPanel: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-3 space-y-2">
+        <div className="flex-1 overflow-y-auto p-3 pb-16 space-y-2">
           {allPins.length === 0 ? (
             <p className="text-xs text-[#6B6259] text-center py-6">
               Keine Einträge für diese Auswahl gefunden.

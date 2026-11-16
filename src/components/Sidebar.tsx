@@ -232,12 +232,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
     setIsMobileDrawerOpen(false);
   };
 
+  const isNetlifyPublicHost =
+    typeof window !== 'undefined' &&
+    window.location.hostname.endsWith('.netlify.app');
+
   const mobileBottomUi = (
     <>
-      {/* 1. PHONE (< sm): Fixed Bottom Thumb-Zone Navigation (5 >=48px tabs + pb-safe) */}
+      {/* 1. PHONE (< sm): Fixed Bottom Thumb-Zone Navigation (lifted above Netlify Free badge on *.netlify.app) */}
       <nav
         aria-label="Mobile Hauptnavigation"
-        className="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-white/[0.96] backdrop-blur-2xl border-t border-[#E6DDD1] px-1.5 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom,0px))] shadow-[0_-8px_24px_rgba(31,27,24,0.08)]"
+        className={`sm:hidden fixed z-40 bg-white/[0.96] backdrop-blur-2xl border-[#E6DDD1] px-1.5 pt-1.5 ${
+          isNetlifyPublicHost
+            ? 'bottom-[calc(3.6rem+env(safe-area-inset-bottom,0px))] inset-x-2 rounded-2xl border pb-1.5 shadow-[0_8px_28px_rgba(31,27,24,0.14)]'
+            : 'bottom-0 inset-x-0 border-t pb-[calc(0.375rem+env(safe-area-inset-bottom,0px))] shadow-[0_-8px_24px_rgba(31,27,24,0.08)]'
+        }`}
       >
         <div className="max-w-lg mx-auto grid grid-cols-5 gap-1">
           {primaryBottomTabs.map((tabId) => {
@@ -327,7 +335,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             className="fixed inset-0 bg-[#1F1B18]/45 backdrop-blur-sm"
             onClick={() => setIsMobileDrawerOpen(false)}
           />
-          <div className="mobile-sheet relative z-10 w-full max-h-[88dvh] bg-white/[0.98] backdrop-blur-2xl border-t border-[#DDD2C3] rounded-t-3xl px-4 pt-2.5 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] flex flex-col overflow-y-auto shadow-2xl text-[#1F1B18]">
+          <div
+            className={`mobile-sheet relative z-10 w-full max-h-[88dvh] bg-white/[0.98] backdrop-blur-2xl border-t border-[#DDD2C3] rounded-t-3xl px-4 pt-2.5 ${
+              isNetlifyPublicHost
+                ? 'pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))]'
+                : 'pb-[calc(1rem+env(safe-area-inset-bottom,0px))]'
+            } flex flex-col overflow-y-auto shadow-2xl text-[#1F1B18]`}
+          >
             <div className="w-10 h-1 rounded-full bg-[#DDD2C3] mx-auto mb-3 shrink-0" />
 
             {/* Sheet Header */}

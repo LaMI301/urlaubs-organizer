@@ -634,7 +634,7 @@ export const RightCalendarPanel: React.FC<RightCalendarPanelProps> = ({
           </span>
         </div>
 
-        <div className={onCloseSheet ? 'space-y-2 pb-1' : 'space-y-2 overflow-y-auto pr-0.5 flex-1 min-w-0'}>
+        <div className={onCloseSheet ? 'space-y-2 pb-16 sm:pb-2' : 'space-y-2 overflow-y-auto pr-0.5 flex-1 min-w-0 pb-14'}>
           {timelineItems.length === 0 ? (
             <div className="bg-[#FAF7F2] rounded-[20px] p-6 text-center border border-dashed border-[#E6DDD1]">
               <Clock className="w-5 h-5 text-[#8C8277] mx-auto mb-2" />
