@@ -243,7 +243,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         aria-label="Mobile Hauptnavigation"
         className={`sm:hidden fixed z-40 bg-white/[0.96] backdrop-blur-2xl border-[#E6DDD1] px-1.5 pt-1.5 ${
           isNetlifyPublicHost
-            ? 'bottom-[calc(3.6rem+env(safe-area-inset-bottom,0px))] inset-x-2 rounded-2xl border pb-1.5 shadow-[0_8px_28px_rgba(31,27,24,0.14)]'
+            ? 'bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] inset-x-2 rounded-2xl border pb-1.5 shadow-[0_8px_28px_rgba(31,27,24,0.14)]'
             : 'bottom-0 inset-x-0 border-t pb-[calc(0.375rem+env(safe-area-inset-bottom,0px))] shadow-[0_-8px_24px_rgba(31,27,24,0.08)]'
         }`}
       >
@@ -338,7 +338,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div
             className={`mobile-sheet relative z-10 w-full max-h-[88dvh] bg-white/[0.98] backdrop-blur-2xl border-t border-[#DDD2C3] rounded-t-3xl px-4 pt-2.5 ${
               isNetlifyPublicHost
-                ? 'pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))]'
+                ? 'pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))]'
                 : 'pb-[calc(1rem+env(safe-area-inset-bottom,0px))]'
             } flex flex-col overflow-y-auto shadow-2xl text-[#1F1B18]`}
           >

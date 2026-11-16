@@ -1007,7 +1007,7 @@ export const MapCockpitPanel: React.FC = () => {
           className={`lg:hidden shrink-0 border-t border-[#E6DDD1] bg-white/[0.97] backdrop-blur-xl px-3 pt-2 ${
             typeof window !== 'undefined' &&
             window.location.hostname.endsWith('.netlify.app')
-              ? 'pb-[calc(4rem+env(safe-area-inset-bottom,0px))]'
+              ? 'pb-[calc(5rem+env(safe-area-inset-bottom,0px))]'
               : 'pb-2'
           } flex items-center justify-between gap-2`}
         >

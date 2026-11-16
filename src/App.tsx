@@ -269,7 +269,7 @@ const AppShell: React.FC = () => {
         <div
           className={`surface-canvas relative min-h-[100dvh] w-full max-w-full overflow-x-clip p-2 sm:p-4 md:p-5 pt-[calc(0.5rem+env(safe-area-inset-top,0px))] sm:pt-4 md:pt-5 ${
             isNetlifyPublicHost
-              ? 'pb-[calc(9.5rem+env(safe-area-inset-bottom,0px))] sm:pb-16 md:pb-16'
+              ? 'pb-[calc(10.75rem+env(safe-area-inset-bottom,0px))] sm:pb-16 md:pb-16'
               : 'pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))] sm:pb-14 md:pb-14'
           } text-[#1F1B18] font-sans`}
         >
@@ -414,7 +414,7 @@ const AppShell: React.FC = () => {
           aria-live="polite"
           className={`fixed ${
             isNetlifyPublicHost
-              ? 'bottom-[calc(8.75rem+env(safe-area-inset-bottom,0px))] sm:bottom-16'
+              ? 'bottom-[calc(9.75rem+env(safe-area-inset-bottom,0px))] sm:bottom-16'
               : 'bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] sm:bottom-14'
           } right-3 sm:right-5 z-[70] flex flex-col gap-2 w-[calc(100vw-1.5rem)] max-w-sm pointer-events-none`}
         >
