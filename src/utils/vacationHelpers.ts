@@ -535,7 +535,7 @@ export function formatTripDayDate(
 
 export const ACCESS_HASH_SALT = 'vo-london-salt-2026-v1:';
 export const DEFAULT_ACCESS_HASH =
-  '8455f8ba650f8d8312b5d00b7314c8a4f5146f716813a2408eafcf8361e8c718';
+  'a78c236769256eec0d9e42dc125c51e02c5192f5ce5cf63000ab76b7d0106279';
 
 const SHA256_K = new Uint32Array([
   0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,

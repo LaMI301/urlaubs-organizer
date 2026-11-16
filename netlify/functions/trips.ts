@@ -7,7 +7,7 @@ const TRIPS_KEY = 'all-trips';
 const ACCESS_HASH_SALT = 'vo-london-salt-2026-v1:';
 const DEFAULT_ACCESS_HASH = (
   process.env.VACATION_ACCESS_HASH?.trim() ||
-  '8455f8ba650f8d8312b5d00b7314c8a4f5146f716813a2408eafcf8361e8c718'
+  'a78c236769256eec0d9e42dc125c51e02c5192f5ce5cf63000ab76b7d0106279'
 )
   .trim()
   .toLowerCase();
